@@ -10,6 +10,7 @@ import { toast } from "@steveyuowo/vue-hot-toast";
 import { useForm, useField } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
+import { Loader2 } from "lucide-vue-next";
 
 const authStore = useAuthStore();
 const currentUser = computed(() => authStore.user);
@@ -28,6 +29,7 @@ const { value: name, errorMessage: nameError } = useField<string>("name");
 const { value: email, errorMessage: emailError } = useField<string>("email");
 
 const avatarUrl = ref<string | null>(null);
+const isLoading = ref(false);
 const uploading = computed(() => authStore.uploading);
 const fileInput = ref<HTMLInputElement | null>(null);
 
@@ -37,7 +39,7 @@ watch(
   (user) => {
     if (user) {
       setValues({
-        name: user.user_metadata?.full_name || "",
+        name: user.user_metadata?.display_name || "",
         email: user.email || "",
       });
       avatarUrl.value = user.user_metadata?.avatar_url || null;
@@ -61,6 +63,7 @@ function onFileChange(event: Event) {
 
 const onSubmit = handleSubmit(async (values) => {
   try {
+    isLoading.value = true;
     await authStore.updateUser({
       email: values.email,
       data: {
@@ -68,9 +71,10 @@ const onSubmit = handleSubmit(async (values) => {
         avatar_url: avatarUrl.value,
       },
     });
-    toast.success("Profile updated!");
+    isLoading.value = false;
   } catch (error) {
     toast.error("Failed to update profile.");
+    isLoading.value = false;
   }
 });
 </script>
@@ -117,7 +121,10 @@ const onSubmit = handleSubmit(async (values) => {
     </div>
 
     <div class="flex justify-center">
-      <Button type="submit">Save Changes</Button>
+      <Button type="submit" :disabled="isLoading">
+        <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
+        Save Changes</Button
+      >
     </div>
   </form>
 </template>

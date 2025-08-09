@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import PasswordInput from "@/components/PasswordInput.vue"; // your custom password input
 import { toast } from "@steveyuowo/vue-hot-toast";
 import { useAuthStore } from "@/stores/auth";
+import { Loader2 } from "lucide-vue-next";
 
 // Validation schema
 const schema = z
@@ -68,7 +69,7 @@ const onSubmit = handleSubmit(async (values) => {
       </div>
 
       <Button type="submit" :disabled="isLoading" class="w-full">
-        <template v-if="isLoading">Updating...</template>
+          <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
         <template v-else>Change Password</template>
       </Button>
     </div>

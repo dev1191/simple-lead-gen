@@ -20,6 +20,10 @@ definePageMeta({
   layout: "admin",
   middleware: ["auth"],
 });
+
+useHead({
+  title: 'Settings',
+})
 </script>
 
 <template>

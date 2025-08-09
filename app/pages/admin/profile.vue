@@ -4,6 +4,10 @@ definePageMeta({
   layout: "admin",
   middleware: ["auth"],
 });
+
+useHead({
+  title: 'Profile',
+})
 </script>
 
 <template>

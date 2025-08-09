@@ -13,6 +13,7 @@
     "supabase:link": "supabase link --project-ref miwnfulcokwmphwyhslj"
   },
   "dependencies": {
+    "@iconify/vue": "^5.0.0",
     "@nuxt/eslint": "1.8.0",
     "@nuxt/image": "1.11.0",
     "@nuxtjs/color-mode": "3.5.2",
@@ -20,6 +21,7 @@
     "@pinia/nuxt": "^0.11.2",
     "@steveyuowo/vue-hot-toast": "^1.4.3",
     "@tailwindcss/vite": "^4.1.11",
+    "@tanstack/vue-table": "^8.21.3",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^13.6.0",
     "class-variance-authority": "^0.7.1",

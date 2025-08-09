@@ -75,7 +75,7 @@ export const useAuthStore = defineStore('auth', () => {
             setTimeout(() => {
                 toast.update(id, {
                     type: "success",
-                    message: "User info updated successfully!"
+                    message: "Profile updated successfully!"
                 });
             }, 1000);
         } catch (err: any) {
@@ -152,6 +152,7 @@ export const useAuthStore = defineStore('auth', () => {
     return {
         user,
         error,
+        uploading,
         isRegistering,
         userAuthStatus,
         handleAuth,
