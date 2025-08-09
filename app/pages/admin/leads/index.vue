@@ -3,13 +3,14 @@
 <script setup lang="ts">
 
 definePageMeta({
-    layout:'admin'
+     layout:'admin',
+    middleware:['auth']
 })
 </script>
 
 <template>
     <div>
-            <h1>Leads Admin</h1>
+    <h2 class="text-2xl font-bold tracking-tight">Leads</h2>
     </div>
 </template>
 

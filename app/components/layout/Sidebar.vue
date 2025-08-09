@@ -35,6 +35,7 @@ import type { User } from "@/shared/types/user";
 
 const appConfig = useAppConfig();
 const authStore = useAuthStore();
+
 const router = useRouter();
 const route = useRoute();
 
@@ -61,8 +62,18 @@ const sidebarLinks = [
     tooltip: "Services",
   },
   { title: "Tools", icon: Wrench, to: "/admin/tools", tooltip: "Tools" },
-  { title: "Insights(Blogs)", icon: PenTool, to: "/admin/insights", tooltip: "Insights(Blogs)" },
-    { title: "Frontend Pages", icon: Globe, to: "/admin/pages", tooltip: "Frontend Pages" },
+  {
+    title: "Insights(Blogs)",
+    icon: PenTool,
+    to: "/admin/insights",
+    tooltip: "Insights(Blogs)",
+  },
+  {
+    title: "Frontend Pages",
+    icon: Globe,
+    to: "/admin/pages",
+    tooltip: "Frontend Pages",
+  },
   {
     title: "Settings",
     icon: Settings,
@@ -81,10 +92,17 @@ function isActive(menu: any): boolean {
   if (menu.to) {
     return path === menu.to || path.startsWith(menu.to + "/");
   }
-  return menu.items?.some(
-    (item: any) => path === item.to || path.startsWith(item.to + "/")
-  ) || false;
+  return (
+    menu.items?.some(
+      (item: any) => path === item.to || path.startsWith(item.to + "/")
+    ) || false
+  );
 }
+
+const handleLogout = async () => {
+  await authStore.logout();
+  navigateTo("/auth/login");
+};
 </script>
 
 <template>
@@ -169,17 +187,30 @@ function isActive(menu: any): boolean {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <NuxtLink
+                <template
                   v-for="userLinks in appConfig.application.siderbarUserLinks"
                   :key="userLinks.title"
-                  :to="userLinks.to"
                 >
-                  <DropdownMenuSeparator v-if="userLinks.separator" />
-                  <DropdownMenuItem class="cursor-pointer">
+                  <NuxtLink
+                    v-if="userLinks.action !== 'logout'"
+                    :to="userLinks.to"
+                  >
+                    <DropdownMenuSeparator v-if="userLinks.separator" />
+                    <DropdownMenuItem class="cursor-pointer">
+                      <component v-if="userLinks.icon" :is="userLinks.icon" />
+                      {{ userLinks.title }}
+                    </DropdownMenuItem>
+                  </NuxtLink>
+
+                  <DropdownMenuItem
+                    v-else
+                    class="cursor-pointer"
+                    @click="handleLogout"
+                  >
                     <component v-if="userLinks.icon" :is="userLinks.icon" />
                     {{ userLinks.title }}
                   </DropdownMenuItem>
-                </NuxtLink>
+                </template>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { toast } from "@steveyuowo/vue-hot-toast";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
@@ -33,7 +32,6 @@ const [password, passwordAttrs] = defineField("password");
 // 4️⃣ Submit handler
 const onSubmit = handleSubmit(async (values) => {
   isLoading.value = true;
-  toast.loading('Loading...')
   await authStore.handleAuth(values.email, values.password);
 
   isLoading.value = false;

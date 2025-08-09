@@ -1,6 +1,17 @@
 <script setup lang="ts">
-import {  Toaster } from "@steveyuowo/vue-hot-toast";
-import "@steveyuowo/vue-hot-toast/vue-hot-toast.css";
+import { Toaster } from "@steveyuowo/vue-hot-toast";
+
+
+useHead({
+  title: 'lead gen',
+  meta: [
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+    { key: "theme-color", name: "theme-color", content: 'light' },
+  ],
+  htmlAttrs: {
+    lang: 'en',
+  },
+})
 </script>
 
 <template>

@@ -16,49 +16,73 @@ export const useAuthStore = defineStore('auth', () => {
     const userAuthStatus = computed(() => !!user.value);
 
     async function handleAuth(email: string, password: string) {
+        error.value = null;
+        const id = toast.loading('Loading...');
 
         try {
             if (isRegistering.value) {
-                const { error: signUpError } = await supabase.auth.signUp({
-                    email,
-                    password,
-                });
+                const { error: signUpError } = await supabase.auth.signUp({ email, password });
                 if (signUpError) throw signUpError;
-                alert('Registration successful! Check your email to confirm.');
+                setTimeout(() => {
+                    toast.update(id, {
+                        type: "success",
+                        message: 'Registration successful! Check your email to confirm.'
+                    })
+                }, 1000)
                 isRegistering.value = false;
             } else {
-                const { error: signInError } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
+                const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
                 if (signInError) throw signInError;
+                setTimeout(() => {
+                    toast.update(id, {
+                        type: "success",
+                        message: "Login successful!"
+                    })
+                }, 1000)
+
                 await router.push('/admin/dashboard');
             }
         } catch (err: any) {
+            ;
+
             console.error('Auth error:', err.message);
             switch (err.message) {
                 case 'Invalid login credentials':
-                    toast.error(err.message)
-
-                    break;
                 case 'Email already registered':
-                    toast.error(err.message)
-                    break;
                 case 'Email not confirmed':
-                    toast.error(err.message)
-                    break;
                 case 'User already registered':
-                    toast.error(err.message)
-                    break;
                 case 'Invalid email or password':
-                    toast.error(err.message)
+                    toast.error(err.message);
                     break;
                 default:
-                    toast.error(err.message)
+                    toast.error(err.message || 'An error occurred. Please try again.');
                     break;
             }
         }
     }
+
+
+    // New updateUser function
+  async function updateUser(updates: { email?: string; password?: string; data?: Record<string, any> }) {
+    error.value = null;
+    const id = toast.loading('Updating user info...');
+
+    try {
+      const { error: updateError } = await supabase.auth.updateUser(updates);
+      if (updateError) throw updateError;
+
+      setTimeout(() => {
+        toast.update(id, {
+          type: "success",
+          message: "User info updated successfully!"
+        });
+      }, 1000);
+    } catch (err: any) {
+      console.error('Update user error:', err.message);
+      toast.error(err.message || "Failed to update user");
+      error.value = err.message || "Failed to update user";
+    }
+  }
 
     async function logout() {
         try {
@@ -77,6 +101,7 @@ export const useAuthStore = defineStore('auth', () => {
         isRegistering,
         userAuthStatus,
         handleAuth,
+        updateUser,
         logout,
     };
 });

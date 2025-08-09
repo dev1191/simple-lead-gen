@@ -4,6 +4,7 @@ import {
   User,
   LogOut,
   Settings,
+  User2,
 } from "lucide-vue-next";
 
 export default defineAppConfig({
@@ -39,14 +40,14 @@ export default defineAppConfig({
     ],
     siderbarUserLinks: [
       {
-        title: "Settings",
-        to: "/account/settings",
-        icon: Settings,
+        title: "Profile",
+        action:'profile',
+        icon: User2,
         separator: false,
       },
       {
         title: "Logout",
-        to: "/auth/sign-in",
+        action: "logout",
         icon: LogOut,
         separator: true,
       },

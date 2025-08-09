@@ -1,18 +1,14 @@
-
-
 <script setup lang="ts">
-
 definePageMeta({
-    layout:'admin'
-})
+  layout: "admin",
+  middleware: ["auth"],
+});
 </script>
 
 <template>
-    <div>
-            <h1>insights Blogs Page</h1>
-    </div>
+  <div>
+    <h2 class="text-2xl font-bold tracking-tight">Insights(Blogs)</h2>
+  </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

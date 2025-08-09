@@ -3,7 +3,8 @@
 <script setup lang="ts">
 
 definePageMeta({
-    layout:'admin'
+    layout:'admin',
+    middleware:['auth']
 })
 
 useHead({
@@ -13,7 +14,7 @@ useHead({
 
 <template>
     <div>
-            <h1>Dashboard Admin</h1>
+     <h2 class="text-2xl font-bold tracking-tight">Dashboard</h2>
     </div>
 </template>
 
