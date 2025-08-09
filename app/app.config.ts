@@ -41,7 +41,7 @@ export default defineAppConfig({
     siderbarUserLinks: [
       {
         title: "Profile",
-        action:'profile',
+        to:'/admin/profile',
         icon: User2,
         separator: false,
       },

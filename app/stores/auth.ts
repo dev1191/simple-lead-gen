@@ -11,6 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const user = useSupabaseUser();
     const error = ref<string | null>(null);
+    const uploading = ref(false)
     const isRegistering = ref(false);
 
     const userAuthStatus = computed(() => !!user.value);
@@ -63,26 +64,26 @@ export const useAuthStore = defineStore('auth', () => {
 
 
     // New updateUser function
-  async function updateUser(updates: { email?: string; password?: string; data?: Record<string, any> }) {
-    error.value = null;
-    const id = toast.loading('Updating user info...');
+    async function updateUser(updates: { email?: string; password?: string; data?: Record<string, any> }) {
+        error.value = null;
+        const id = toast.loading('Updating user info...');
 
-    try {
-      const { error: updateError } = await supabase.auth.updateUser(updates);
-      if (updateError) throw updateError;
+        try {
+            const { error: updateError } = await supabase.auth.updateUser(updates);
+            if (updateError) throw updateError;
 
-      setTimeout(() => {
-        toast.update(id, {
-          type: "success",
-          message: "User info updated successfully!"
-        });
-      }, 1000);
-    } catch (err: any) {
-      console.error('Update user error:', err.message);
-      toast.error(err.message || "Failed to update user");
-      error.value = err.message || "Failed to update user";
+            setTimeout(() => {
+                toast.update(id, {
+                    type: "success",
+                    message: "User info updated successfully!"
+                });
+            }, 1000);
+        } catch (err: any) {
+            console.error('Update user error:', err.message);
+            toast.error(err.message || "Failed to update user");
+            error.value = err.message || "Failed to update user";
+        }
     }
-  }
 
     async function logout() {
         try {
@@ -95,6 +96,59 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    async function uploadAvatar(file: File) {
+        if (!user.value) return;
+
+        uploading.value = true;
+
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${user.value.id}/avatar.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
+
+        try {
+            // Upload to Supabase storage bucket "avatars"
+            const { error: uploadError } = await supabase.storage
+                .from("avatars")
+                .upload(filePath, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            // Get public URL of uploaded avatar
+            const { data: publicUrlData, error: publicUrlError } = supabase.storage
+                .from("avatars")
+                .getPublicUrl(filePath);
+
+            if (publicUrlError) throw publicUrlError;
+
+            const avatarUrl = publicUrlData.publicUrl;
+
+            // Update user metadata in Supabase Auth
+            const { error: updateError } = await supabase.auth.updateUser({
+                data: {
+                    avatar_url: avatarUrl,
+                },
+            });
+
+            if (updateError) throw updateError;
+
+            // Update user metadata in local store to keep UI reactive
+            user.value = {
+                ...user.value,
+                user_metadata: {
+                    ...user.value.user_metadata,
+                    avatar_url: avatarUrl,
+                },
+            };
+
+            toast.success("Avatar uploaded successfully!");
+        } catch (err: any) {
+            console.error("Avatar upload error:", err.message);
+            toast.error("Failed to upload avatar.");
+        } finally {
+            uploading.value = false;
+        }
+    }
+
     return {
         user,
         error,
@@ -102,6 +156,7 @@ export const useAuthStore = defineStore('auth', () => {
         userAuthStatus,
         handleAuth,
         updateUser,
+        uploadAvatar,
         logout,
     };
 });
