@@ -7,6 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogScrollContent,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -40,37 +41,40 @@ const sizeClasses: Record<string, string> = {
 
 <template>
   <Dialog :open="props.open" @update:open="(val) => emit('update:open', val)">
-    <DialogContent
-      :class="sizeClasses[props.size || 'md']"
-      :onInteractOutside="
-        (e) => {
-          e.preventDefault();
-        }
-      "
-    >
-      <DialogHeader class="text-left">
-        <DialogTitle>
-          {{
-            props.title || (props.mode === "edit" ? "Edit Item" : "Create Item")
-          }}
-        </DialogTitle>
-        <DialogDescription>
-          {{
-            props.description ||
-            (props.mode === "edit" ? "Update item details." : "Add new item.")
-          }}
-        </DialogDescription>
-      </DialogHeader>
+    <DialogScrollContent class="sm:max-w-[425px]">
+      <DialogContent
+        :class="sizeClasses[props.size || 'md']"
+        :onInteractOutside="
+          (e) => {
+            e.preventDefault();
+          }
+        "
+      >
+        <DialogHeader class="text-left">
+          <DialogTitle>
+            {{
+              props.title ||
+              (props.mode === "edit" ? "Edit Item" : "Create Item")
+            }}
+          </DialogTitle>
+          <DialogDescription>
+            {{
+              props.description ||
+              (props.mode === "edit" ? "Update item details." : "Add new item.")
+            }}
+          </DialogDescription>
+        </DialogHeader>
 
-      <slot />
+        <slot />
 
-      <DialogFooter class="mt-4 flex justify-end gap-3">
-        <DialogClose as-child>
-          <Button type="button" variant="outline"> Close </Button>
-        </DialogClose>
+        <DialogFooter class="mt-4 flex justify-end gap-3">
+          <DialogClose as-child>
+            <Button type="button" variant="outline"> Close </Button>
+          </DialogClose>
 
-        <slot name="footer"></slot>
-      </DialogFooter>
-    </DialogContent>
+          <slot name="footer"></slot>
+        </DialogFooter>
+      </DialogContent>
+    </DialogScrollContent>
   </Dialog>
 </template>

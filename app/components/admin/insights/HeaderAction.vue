@@ -23,6 +23,10 @@ const form = ref({
   status: "Draft",
 });
 
+watch(form, (newValue) => {
+  form.value.slug = newValue.title.toLowerCase();
+});
+
 const submit = () => {};
 </script>
 
@@ -63,6 +67,17 @@ const submit = () => {};
               required
             />
           </div>
+
+          <div class="grid gap-2">
+            <TagsInput
+              id="name"
+              v-model="form.tags"
+              required
+              autocomplete="tags"
+              placeholder="Enter tags"
+              label="Tags"
+            />
+          </div>
           <div class="grid gap-2">
             <ToggleInput
               label="Status"
@@ -76,6 +91,11 @@ const submit = () => {};
             />
           </div>
         </div>
+
+        <TextEditor     id="content"
+              v-model="form.content"
+              label="Content"
+              required />
 
         <Separator />
         <h2 class="text-xl font-bold space-x-2">SEO Settings</h2>

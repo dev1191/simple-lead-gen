@@ -31,7 +31,11 @@ const value = computed(() => props.modelValue);
     <Label v-if="label" :for="id">
       {{ label }}<span v-if="required" class="text-red-500">*</span>
     </Label>
-    <EditorContent :editor="editor" class="border p-2 rounded min-h-[200px]" />
+    <TiptapProvider :editor="editor">
+      <TiptapToolbar />
+      <TiptapContent />
+      <TiptapStatusBar show-word-count />
+    </TiptapProvider>
     <InputError v-if="error" :message="error" />
   </div>
 </template>

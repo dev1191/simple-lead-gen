@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { FunctionalComponent } from "vue";
+import { string } from "zod";
 
 interface ToggleOption {
   id: string;
@@ -16,11 +17,19 @@ type Props =
       type?: "single";
       modelValue: string;
       options: ToggleOption[];
+      id: string;
+      error?: string;
+      label?: string;
+      required?: boolean;
     }
   | {
       type: "multiple";
       modelValue: string[];
       options: ToggleOption[];
+      id: string;
+      error?: string;
+      label?: string;
+      required?: boolean;
     };
 
 const props = defineProps<Props>();
@@ -38,7 +47,7 @@ const value = computed<string | string[]>({
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div class="space-y-2">
     <Label v-if="label" :for="id"
       >{{ label }}<span v-if="required" class="text-red-500">*</span></Label
     >
