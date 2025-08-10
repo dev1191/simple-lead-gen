@@ -11,12 +11,19 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     "@pinia/nuxt",
     '@nuxtjs/supabase',
+    'nuxt-tiptap-editor',
   ],
+   tiptap: {
+    prefix: 'Tiptap', //prefix for Tiptap imports, composables not included
+  },
   supabase: {
     redirect: false,
     login: '/auth/login'
   },
-  css: ['~/assets/css/tailwind.css'],
+  css: ['echo-editor/style.css','~/assets/css/tailwind.css'],
+  build: {
+    transpile: ['echo-editor']
+  },
   vite: {
     plugins: [
       tailwindcss(),
@@ -31,7 +38,7 @@ export default defineNuxtConfig({
         'class-variance-authority',
         'reka-ui',
         'tailwind-merge',
-
+        'echo-editor'
       ]
     }
   },

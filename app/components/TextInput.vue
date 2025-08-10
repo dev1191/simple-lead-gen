@@ -1,62 +1,85 @@
 <script setup lang="ts">
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 interface Props {
-    id: string;
-    modelValue: string | number;
-    label?: string;
-        error?: string;
-    placeholder?: string;
-    required?: boolean;
-    autocomplete?: string;
-    type?: string;
-    min?: number;
-    max?: number;
+  name: string;
+  modelValue?: string | number;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
+  autocomplete?: string;
+  type?: string;
+  min?: number;
+  max?: number;
+  validateOnBlur?: boolean;
+  isFieldDirty?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  type: 'text',
+  validateOnBlur: true,
+  isFieldDirty: false,
+});
+
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string | number): void;
+  (e: 'update:modelValue', value: string | number): void;
 }>();
 
 const value = computed({
-    get: () => props.modelValue,
-    set: (val: string | number) => emit('update:modelValue', val),
+  get: () => props.modelValue,
+  set: (val: string | number) => emit('update:modelValue', val),
 });
 
-function onInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    let val: string | number = input.value;
-
-    if (props.type === 'number') {
-        const numVal = parseFloat(val);
-        if (!isNaN(numVal)) {
-            if (props.min !== undefined && numVal < props.min) val = props.min;
-            if (props.max !== undefined && numVal > props.max) val = props.max;
-        }
+function handleInput(event: Event, field: any) {
+  const input = event.target as HTMLInputElement;
+  let val: string | number = input.value;
+  
+  if (props.type === 'number') {
+    const numVal = parseFloat(val);
+    if (!isNaN(numVal)) {
+      if (props.min !== undefined && numVal < props.min) val = props.min;
+      if (props.max !== undefined && numVal > props.max) val = props.max;
     }
-
-    emit('update:modelValue', val);
+  }
+  
+  // Update both the form field and v-model
+  field.onChange(val);
+  emit('update:modelValue', val);
 }
 </script>
 
 <template>
-    <div class="space-y-4">
-        <Label v-if="label" :for="id">{{ label }}<span v-if="required" class="text-red-500">*</span></Label>
+  <FormField 
+    v-slot="{ componentField }" 
+    :name="name" 
+    :validate-on-blur="validateOnBlur && !isFieldDirty"
+  >
+    <FormItem>
+      <FormLabel v-if="label">
+        {{ label }}
+        <span v-if="required" class="text-red-500">*</span>
+      </FormLabel>
+      <FormControl>
         <Input
-            :id="id"
-            v-model="value"
-            :required="required"
-            :autocomplete="autocomplete"
-            :placeholder="placeholder || label"
-            :type="type || 'text'"
-            :min="type === 'number' ? min : undefined"
-            :max="type === 'number' ? max : undefined"
-            :class="{ 'border-red-500': error }"
-            @input="onInput"
+          :type="type"
+          :placeholder="placeholder || label"
+          :required="required"
+          :autocomplete="autocomplete"
+          :min="type === 'number' ? min : undefined"
+          :max="type === 'number' ? max : undefined"
+          :model-value="modelValue || componentField.modelValue"
+          v-bind="componentField"
+          @input="(event) => handleInput(event, componentField)"
         />
-        <InputError v-if="error" :message="error" />
-    </div>
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  </FormField>
 </template>

@@ -1,112 +1,111 @@
 <script setup lang="ts">
+import { toTypedSchema } from "@vee-validate/zod";
+import { useForm } from "vee-validate";
+import * as z from "zod";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { BlogCategories } from "~/shared/constants";
 
+const formSchema = toTypedSchema(
+  z.object({
+    title: z.string().min(2).max(50),
+    category: z.string().min(1, "Please select a category"),
+    content: z.string().min(1, "Content is required"),
+  })
+);
 
-const isSheetModal = ref<boolean>(false);
-const closeSheetModal = () => {
-  isSheetModal.value = false;
-};
-
-const categories = ref({ ...BlogCategories });
-
-const form = ref({
-  title: "",
-  slug: "",
-  content: "",
-  category: "",
-  tags: [],
-  seo_title: "",
-  seo_description: "",
-  status: "Draft",
+const { isFieldDirty, handleSubmit, values } = useForm({
+  validationSchema: formSchema,
 });
 
-watch(form, (newValue) => {
-  form.value.slug = newValue.title.toLowerCase();
-});
+const categories = ref(BlogCategories);
 
-const submit = () => {};
+const onSubmit = handleSubmit((values) => {
+  console.log("Form submitted:", values);
+  // Handle form submission here
+});
 </script>
 
 <template>
-  <form @submit.prevent="submit" class="space-y-6">
-    <div class="grid grid-cols-2 gap-4 md:grid-cols-2">
-      <div class="grid gap-2">
-        <TextInput
-          id="name"
-          v-model="form.title"
-          required
-          autocomplete="name"
-          placeholder="Enter title"
-          label="Title"
-        />
-      </div>
-      <div class="grid gap-2">
-        <SelectInput
-          id="category"
-          v-model="form.category"
-          :options="categories"
-          placeholder="Choose a category"
-          label="Category"
-          required
-        />
-      </div>
+  <form class="w-2/3 space-y-6" @submit="onSubmit">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <!-- Title Field -->
+      <FormField
+        v-slot="{ componentField }"
+        name="title"
+        :validate-on-blur="!isFieldDirty"
+      >
+        <FormItem>
+          <FormLabel>Title <span class="text-red-500">*</span></FormLabel>
+          <FormControl>
+            <Input
+              type="text"
+              placeholder="Enter blog title"
+              v-bind="componentField"
+            />
+          </FormControl>
 
-      <div class="grid gap-2">
-        <TagsInput
-          id="name"
-          v-model="form.tags"
-          required
-          autocomplete="tags"
-          placeholder="Enter tags"
-          label="Tags"
-        />
-      </div>
-      <div class="grid gap-2">
-        <ToggleInput
-          label="Status"
-          id="status"
-          type="single"
-          v-model="form.status"
-          :options="[
-            { value: 'Draft', label: 'Draft' },
-            { value: 'Published', label: 'Published' },
-          ]"
-        />
-      </div>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+
+      <!-- Category Field -->
+      <FormField
+        v-slot="{ componentField }"
+        name="category"
+        :validate-on-blur="!isFieldDirty"
+      >
+        <FormItem>
+          <FormLabel>Category <span class="text-red-500">*</span></FormLabel>
+          <FormControl>
+            <Select v-bind="componentField">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <template
+                    v-for="category in categories"
+                    :key="category.value"
+                  >
+                    <SelectItem :value="category.value">
+                      {{ category.label }}
+                    </SelectItem>
+                  </template>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
     </div>
 
-    <TextEditor     id="content"
-              v-model="form.content"
-              label="Content"
-              required />
+    <!-- Content Field -->
+    <FormField
+      v-slot="{ componentField }"
+      name="content"
+      :validate-on-blur="!isFieldDirty"
+    >
+      <FormItem>
+        <FormLabel>Content</FormLabel>
+        <FormControl>
+          <EditorTextEditor
+            id="content"
+            v-bind="componentField"
+            placeholder="Write your blog content here..."
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
 
-
-    <Separator />
-    <h2 class="text-xl font-bold space-x-2">SEO Settings</h2>
-
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-1">
-      <div class="grid gap-2">
-        <TextInput
-          id="seo_title"
-          v-model="form.seo_title"
-          required
-          autocomplete="seo_title"
-          placeholder="Enter seo title"
-          label="Seo Title"
-        />
-      </div>
-      <div class="grid gap-2">
-        <TextAreaInput
-          id="seo_description"
-          v-model="form.seo_description"
-          required
-          autocomplete="seo_description"
-          placeholder="Enter seo description"
-          label="Seo Description"
-        />
-      </div>
-    </div>
+    <Button type="submit">Submit</Button>
   </form>
 </template>
-
-<style scoped></style>

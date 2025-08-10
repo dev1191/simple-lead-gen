@@ -18,7 +18,6 @@ import { TreeItem } from 'reka-ui'
 import { computed, h, ref, render, watchEffect } from 'vue'
 import Icon from './TiptapIcon.vue'
 
-
 const props = defineProps<{
   item: FlattenedItem<any>
 }>()

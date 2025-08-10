@@ -15,8 +15,6 @@ const props = defineProps<{
 const { editor: contextEditor } = useTiptapContext()
 const editor = computed(() => props.editor ?? contextEditor.value)
 
-
-
 // Editor is ready when it's available and initialized
 const isEditorReady = computed(() => {
   return editor.value && editor.value.isEditable
