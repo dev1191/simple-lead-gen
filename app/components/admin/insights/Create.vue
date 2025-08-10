@@ -75,7 +75,11 @@ const submit = () => {};
       </div>
     </div>
 
-    <TextEditor id="content" v-model="form.content" label="Content" required />
+    <TextEditor     id="content"
+              v-model="form.content"
+              label="Content"
+              required />
+
 
     <Separator />
     <h2 class="text-xl font-bold space-x-2">SEO Settings</h2>

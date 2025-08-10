@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import StarterKit from "@tiptap/starter-kit";
-import { useEditor, EditorContent } from "@tiptap/vue-3";
-import { Label } from "@/components/ui/label";
-import { computed } from "vue";
 
 interface Props {
   id: string;
@@ -15,13 +11,6 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{ (e: "update:modelValue", value: string): void }>();
 
-const editor = useEditor({
-  extensions: [StarterKit],
-  content: props.modelValue || "",
-  onUpdate({ editor }) {
-    emit("update:modelValue", editor.getHTML());
-  },
-});
 
 const value = computed(() => props.modelValue);
 </script>
@@ -31,11 +20,9 @@ const value = computed(() => props.modelValue);
     <Label v-if="label" :for="id">
       {{ label }}<span v-if="required" class="text-red-500">*</span>
     </Label>
-    <TiptapProvider :editor="editor">
-      <TiptapToolbar />
-      <TiptapContent />
-      <TiptapStatusBar show-word-count />
-    </TiptapProvider>
+
     <InputError v-if="error" :message="error" />
   </div>
 </template>
+
+

@@ -13,8 +13,6 @@
     "supabase:link": "supabase link --project-ref miwnfulcokwmphwyhslj"
   },
   "dependencies": {
-    "@atlaskit/pragmatic-drag-and-drop": "^1.7.4",
-    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.1.0",
     "@iconify/vue": "^5.0.0",
     "@nuxt/eslint": "1.8.0",
     "@nuxt/image": "1.11.0",
@@ -24,13 +22,11 @@
     "@steveyuowo/vue-hot-toast": "^1.4.3",
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/vue-table": "^8.21.3",
-    "@tiptap/pm": "^3.0.9",
-    "@tiptap/starter-kit": "^3.0.9",
-    "@tiptap/vue-3": "^3.0.9",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^13.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "echo-editor": "^0.5.0",
     "eslint": "^9.32.0",
     "lucide-vue-next": "^0.538.0",
     "nuxt": "^4.0.1",
