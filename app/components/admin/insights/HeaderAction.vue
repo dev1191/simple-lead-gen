@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { toTypedSchema } from "@vee-validate/zod";
+import { toast } from "@steveyuowo/vue-hot-toast";
 import { useForm } from "vee-validate";
 import * as z from "zod";
 import {
@@ -13,6 +14,7 @@ import {
 import { BlogCategories } from "~/shared/constants";
 import { slugify } from "~/shared/utils";
 
+const { createPost } = useBlogPosts();
 const { label } = defineProps<{
   label: string;
 }>();
@@ -35,34 +37,64 @@ const formSchema = toTypedSchema(
   })
 );
 
-const { isFieldDirty, handleSubmit, values } = useForm({
-  validationSchema: formSchema,
-  initialValues: {
-    status: "Draft",
-    tags: [],
-    slug: "",
-  },
-});
+const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
+  useForm({
+    validationSchema: formSchema,
+    initialValues: {
+      status: "Draft",
+      tags: [],
+      slug: "",
+      title: "",
+      category: "",
+      content: "",
+      seo_title: "",
+      seo_description: "",
+    },
+  });
 
 const categories = ref(BlogCategories);
 const isLoading = ref(false);
+const imageFile = ref(null);
 
-watch(
-  () => values.title,
-  (newTitle) => {
-    if (newTitle) {
-      values.slug = slugify(newTitle);
-    } else {
-      values.slug = "";
-    }
+// Handle file upload
+const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+  const file = target.files[0];
+  if (file) {
+    // You can store the file object or just the filename
+    imageFile.value = file;
+    // If you need the actual file object for upload, store it separately:
+    // selectedFile.value = file;
+  } else {
+    imageFile.value = null;
   }
-);
+};
 
-const onSubmit = handleSubmit((values) => {
+
+
+const onSubmit = handleSubmit(async (values) => {
   isLoading.value = true;
-  console.log("Form submitted:", values);
-  // Handle form submission here
+  try {
+    const response = await createPost(values, imageFile.value);
+
+    // Show success message
+    toast.success("Post created successfully!");
+
+    // Reset form and close modal
+    resetForm();
+    closeSheetModal();
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to create post. Please try again.");
+  } finally {
+    isLoading.value = false;
+  }
 });
+
+// Handle form submission from button click
+const handleFormSubmit = () => {
+  onSubmit();
+};
 </script>
 
 <template>
@@ -81,8 +113,9 @@ const onSubmit = handleSubmit((values) => {
   >
     <template #default>
       <form
-        @submit="onSubmit"
+        @submit.prevent="onSubmit"
         class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6"
+        id="blog-form"
       >
         <!-- Left Column: Title, Category, Content -->
         <div class="flex flex-col space-y-6">
@@ -145,7 +178,7 @@ const onSubmit = handleSubmit((values) => {
             :validate-on-blur="!isFieldDirty"
           >
             <FormItem>
-              <FormLabel>Content</FormLabel>
+              <FormLabel>Content <span class="text-red-500">*</span></FormLabel>
               <FormControl>
                 <EditorTextEditor
                   id="content"
@@ -157,6 +190,7 @@ const onSubmit = handleSubmit((values) => {
             </FormItem>
           </FormField>
         </div>
+
         <!-- Right Column: Tags, Status, SEO -->
         <div class="flex flex-col space-y-6">
           <!-- Tags -->
@@ -208,6 +242,21 @@ const onSubmit = handleSubmit((values) => {
             </FormItem>
           </FormField>
 
+          <!-- Image -->
+          <FormField name="imageFile">
+            <FormItem>
+              <FormLabel>Image </FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  @change="handleFileChange"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
           <!-- SEO Settings -->
           <div class="mt-6 space-y-6">
             <Separator />
@@ -220,12 +269,12 @@ const onSubmit = handleSubmit((values) => {
             >
               <FormItem>
                 <FormLabel>
-                  Seo Title <span class="text-red-500">*</span>
+                  SEO Title <span class="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
                     type="text"
-                    placeholder="Enter seo title"
+                    placeholder="Enter SEO title"
                     v-bind="componentField"
                   />
                 </FormControl>
@@ -240,12 +289,11 @@ const onSubmit = handleSubmit((values) => {
             >
               <FormItem>
                 <FormLabel>
-                  Seo Description <span class="text-red-500">*</span>
+                  SEO Description <span class="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <Textarea
-                    type="text"
-                    placeholder="Enter seo description"
+                    placeholder="Enter SEO description"
                     v-bind="componentField"
                   />
                 </FormControl>
@@ -258,7 +306,7 @@ const onSubmit = handleSubmit((values) => {
     </template>
 
     <template #footer>
-      <Button @click="onSubmit" :disabled="isLoading">
+      <Button type="button" @click="handleFormSubmit" :disabled="isLoading">
         <Icon
           name="Loader2"
           v-if="isLoading"

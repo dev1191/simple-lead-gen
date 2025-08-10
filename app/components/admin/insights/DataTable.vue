@@ -29,67 +29,27 @@ import {
 } from "@/components/ui/table";
 import type { BlogArticle } from "~/shared/types/blogArticle";
 
-// Mock data - replace with your Supabase data
-const blogArticles = ref<BlogArticle[]>([
-  {
-    id: "1",
-    title: "Getting Started with Vue 3",
-    content:
-      "Learn the basics of Vue 3 composition API and its new features...",
-    status: "published",
-    category: "Vue.js",
-    author: "John Doe",
-    tags: [],
-    created_at: "2024-01-15",
-    updated_at: "2024-01-20",
-    slug: "getting-started-vue-3",
-  },
-  {
-    id: "2",
-    title: "Nuxt 3 Server Side Rendering",
-    content:
-      "Explore the power of SSR in Nuxt 3 and how to optimize performance...",
-    status: "published",
-    category: "Nuxt.js",
-    author: "Jane Smith",
-    created_at: "2024-01-10",
-    updated_at: "2024-01-18",
-    tags: [],
-    slug: "nuxt-3-ssr",
-  },
-  {
-    id: "3",
-    title: "Building REST APIs with Supabase",
-    content:
-      "Complete guide to building scalable APIs using Supabase backend...",
-    status: "draft",
-    category: "Guides",
-    author: "Mike Johnson",
-    tags: [],
-    created_at: "2024-01-12",
-    updated_at: "2024-01-22",
-
-    slug: "supabase-rest-apis",
-  },
-  {
-    id: "4",
-    title: "Advanced JavaScript Patterns",
-    content:
-      "Deep dive into advanced JavaScript patterns and best practices...",
-    status: "published",
-    category: "Tips",
-    author: "Sarah Wilson",
-    tags: [],
-    created_at: "2024-01-08",
-    updated_at: "2024-01-25",
-    slug: "advanced-js-patterns",
-  },
-]);
+const { posts, total, loading, fetchPosts } = useBlogPosts();
 
 // Filters
 const globalFilter = ref("");
 const statusFilter = ref("");
 const categoryFilter = ref("");
+const page = ref(1);
+const limit = ref(10);
+const search = ref("");
+const sort = ref({ column: "created_at", order: "desc" });
+
+watch([page, limit, search, sort], () => {
+  fetchPosts();
+});
+
+// Mock data - replace with your Supabase data
+const blogArticles = ref(posts);
+
+onMounted(() => {
+  fetchPosts();
+});
 
 // Column helper
 const columnHelper = createColumnHelper<BlogArticle>();
@@ -105,6 +65,10 @@ const columns: ColumnDef<BlogArticle>[] = [
     header: "Category",
   },
   {
+    accessorKey: "author",
+    header: "Author",
+  },
+  {
     accessorKey: "status",
     header: "Status",
   },
@@ -114,7 +78,9 @@ const filteredData = computed(() => {
   let filtered = blogArticles.value;
 
   if (statusFilter.value) {
-    filtered = filtered.filter((Article) => Article.status === statusFilter.value);
+    filtered = filtered.filter(
+      (Article) => Article.status === statusFilter.value
+    );
   }
 
   if (categoryFilter.value) {
@@ -201,8 +167,6 @@ watch(globalFilter, (newValue) => {
           <option value="Case Study">Case Study</option>
         </select>
       </div>
-
-
     </div>
 
     <!-- Table -->
