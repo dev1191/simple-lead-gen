@@ -16,13 +16,13 @@ fetchPosts()
     </BaseCard>
   <BaseCard  size="sm"  height="h-30">
       <template #default>
-     <h2 class="text-3xl font-bold">4</h2>
+     <h2 class="text-3xl font-bold">0</h2>
             <div class="text-md text-card-foreground">Published</div>
       </template>
     </BaseCard>
       <BaseCard  size="sm"  height="h-30">
       <template #default>
-     <h2 class="text-3xl font-bold">1</h2>
+     <h2 class="text-3xl font-bold">2</h2>
             <div class="text-md text-card-foreground">Drafts</div>
       </template>
     </BaseCard>

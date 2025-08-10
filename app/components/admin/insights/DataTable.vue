@@ -28,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { BlogArticle } from "~/shared/types/blogArticle";
+import DataTableRowActions from "@/components/datatable/RowActions.vue"
 
 const { posts, total, loading, fetchPosts } = useBlogPosts();
 
@@ -71,6 +72,11 @@ const columns: ColumnDef<BlogArticle>[] = [
   {
     accessorKey: "status",
     header: "Status",
+  },
+  {
+    accessorKey: "actions",
+    header: "Actions",
+        cell: ({ row }) => h(DataTableRowActions, { row  }),
   },
 ];
 // Filtered data based on filters
