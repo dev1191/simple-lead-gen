@@ -5,37 +5,35 @@ import { slugify } from '../shared/utils'
 export function useBlogPosts() {
     const supabase = useSupabaseClient()
 
-    const posts = ref([])
-    const loading = ref(false)
-    const totalCount = ref(0)
-    const currentPage = ref(1)
-    const pageSize = ref(10)
-    const draftCount = ref(0)
-    const publishedCount = ref(0)
-    const error = ref(null)
+    // Shared state
+    const posts = useState('blogPosts', () => [] as any[])
+    const loading = useState('blogPostsLoading', () => false)
+    const totalCount = useState('blogPostsTotalCount', () => 0)
+    const currentPage = useState('blogPostsCurrentPage', () => 1)
+    const pageSize = useState('blogPostsPageSize', () => 10)
+    const draftCount = useState('blogPostsDraftCount', () => 0)
+    const publishedCount = useState('blogPostsPublishedCount', () => 0)
+    const error = useState('blogPostsError', () => null as any)
 
-    // Filters and search state
-    const filters = ref({
+    const filters = useState('blogPostsFilters', () => ({
         search: '',
         category: '',
         status: '',
         author: '',
         tags: [] as string[]
-    })
+    }))
 
-    // Sorting state
-    const sort = ref({
+    const sort = useState('blogPostsSort', () => ({
         field: 'created_at',
         order: 'desc' as 'asc' | 'desc'
-    })
+    }))
 
-    // Computed for total pages
     const totalPages = computed(() =>
         Math.ceil(totalCount.value / pageSize.value)
     )
 
-    // Build query based on current filters and sort
-    const buildQuery = (supabase: any) => {
+    // Build query
+    const buildQuery = () => {
         let query = supabase
             .from('blog_posts')
             .select(`
@@ -55,7 +53,6 @@ export function useBlogPosts() {
         if (filters.value.author) {
             query = query.eq('profiles.display_name', filters.value.author)
         }
-
         if (filters.value.tags.length > 0) {
             query = query.contains('tags', filters.value.tags)
         }
@@ -64,24 +61,23 @@ export function useBlogPosts() {
         return query.order(sort.value.field, { ascending })
     }
 
+    // Fetch posts
     const fetchPosts = async () => {
         loading.value = true
         try {
             const from = (currentPage.value - 1) * pageSize.value
             const to = from + pageSize.value - 1
 
-            const query = buildQuery(supabase)
-            const { data, error, count } = await query.range(from, to)
+            const query = buildQuery()
+            const { data, error: err, count } = await query.range(from, to)
 
-            if (error) throw error
+            if (err) throw err
 
-            // Force reactivity trigger
             posts.value = data || []
             totalCount.value = count || 0
-            
-            console.log('Posts fetched:', posts.value.length) // Debug log
-        } catch (error) {
-            console.error('Error fetching posts:', error)
+            await fetchCounts()
+        } catch (err) {
+            console.error('Error fetching posts:', err)
             posts.value = []
             totalCount.value = 0
         } finally {
@@ -96,7 +92,7 @@ export function useBlogPosts() {
     }
 
     const updateFilter = (key: string, value: any) => {
-        filters.value[key] = value
+        (filters.value as any)[key] = value
         currentPage.value = 1
         fetchPosts()
     }
@@ -134,7 +130,7 @@ export function useBlogPosts() {
 
             let imageUrl = null
             if (imageFile) {
-                const fileExt = imageFile.name.split(".").pop();
+                const fileExt = imageFile.name.split(".").pop()
                 const fileName = `${user.id}/${Date.now()}-${fileExt}`
                 const { data: uploadData, error: uploadError } = await supabase.storage
                     .from('blog-images')
@@ -159,121 +155,96 @@ export function useBlogPosts() {
                 }])
                 .select()
 
-            // Refresh posts after create
-            if (!error) {
-                await fetchPosts()
-            }
+            if (!error) await fetchPosts()
 
             return { data, error }
-        } catch (error) {
-            console.error('Error creating blog post:', error)
-            return { data: null, error }
+        } catch (err) {
+            console.error('Error creating blog post:', err)
+            return { data: null, error: err }
         }
     }
 
     const updatePost = async (postId: string, updateData: any, newImageFile = null) => {
         try {
-            const { data: { user }, error: userError } = await supabase.auth.getUser();
-            if (userError || !user) throw new Error('Not authenticated');
+            const { data: { user }, error: userError } = await supabase.auth.getUser()
+            if (userError || !user) throw new Error('Not authenticated')
 
-            let updatePayload = { ...updateData, slug: slugify(updateData.title) };
+            let updatePayload = { ...updateData, slug: slugify(updateData.title) }
 
-            // Handle image update
             if (newImageFile) {
-                // Get existing post to check for old image
                 const { data: existingPost } = await supabase
                     .from('blog_posts')
                     .select('image_url')
                     .eq('id', postId)
                     .eq('author_id', user.id)
-                    .single();
+                    .single()
 
-                // Delete old image if exists
                 if (existingPost?.image_url) {
-                    // Extract the file path from the URL
-                    const urlParts = existingPost.image_url.split('/');
-                    const fileName = urlParts[urlParts.length - 1];
-                    const oldPath = `${user.id}/${fileName}`;
-
-                    await supabase.storage
-                        .from('blog-images')
-                        .remove([oldPath]);
+                    const urlParts = existingPost.image_url.split('/')
+                    const fileName = urlParts[urlParts.length - 1]
+                    const oldPath = `${user.id}/${fileName}`
+                    await supabase.storage.from('blog-images').remove([oldPath])
                 }
 
-                // Upload new image
-                const fileExt = newImageFile.name.split(".").pop();
-                const fileName = `${user.id}/${Date.now()}-${fileExt}`;
+                const fileExt = newImageFile.name.split(".").pop()
+                const fileName = `${user.id}/${Date.now()}-${fileExt}`
                 const { data: uploadData, error: uploadError } = await supabase.storage
                     .from('blog-images')
-                    .upload(fileName, newImageFile);
+                    .upload(fileName, newImageFile)
 
-                if (uploadError) throw uploadError;
+                if (uploadError) throw uploadError
 
                 const { data: { publicUrl } } = supabase.storage
                     .from('blog-images')
-                    .getPublicUrl(uploadData.path);
+                    .getPublicUrl(uploadData.path)
 
-                updatePayload.image_url = publicUrl;
+                updatePayload.image_url = publicUrl
             }
 
-            // Update blog post (RLS will ensure only author can update)
             const { data, error } = await supabase
                 .from('blog_posts')
                 .update(updatePayload)
                 .eq('id', postId)
-                .select();
+                .select()
 
-            // Refresh posts after update
-            if (!error) {
-                await fetchPosts()
-            }
+            if (!error) await fetchPosts()
 
-            return { data, error };
-        } catch (error) {
-            console.error('Error updating blog post:', error);
-            return { data: null, error };
+            return { data, error }
+        } catch (err) {
+            console.error('Error updating blog post:', err)
+            return { data: null, error: err }
         }
     }
 
     const deletePost = async (postId: string) => {
         try {
-            const { data: { user }, error: userError } = await supabase.auth.getUser();
-            if (userError || !user) throw new Error('Not authenticated');
+            const { data: { user }, error: userError } = await supabase.auth.getUser()
+            if (userError || !user) throw new Error('Not authenticated')
 
-            // Get post data to find image (RLS will ensure only author can access)
             const { data: post } = await supabase
                 .from('blog_posts')
                 .select('image_url')
                 .eq('id', postId)
-                .single();
+                .single()
 
-            // Delete image from storage if exists
             if (post?.image_url) {
-                const urlParts = post.image_url.split('/');
-                const fileName = urlParts[urlParts.length - 1];
-                const imagePath = `${user.id}/${fileName}`;
-
-                await supabase.storage
-                    .from('blog-images')
-                    .remove([imagePath]);
+                const urlParts = post.image_url.split('/')
+                const fileName = urlParts[urlParts.length - 1]
+                const imagePath = `${user.id}/${fileName}`
+                await supabase.storage.from('blog-images').remove([imagePath])
             }
 
-            // Delete blog post (RLS will ensure only author can delete)
             const { data, error } = await supabase
                 .from('blog_posts')
                 .delete()
-                .eq('id', postId);
+                .eq('id', postId)
 
-            // Refresh posts after delete - THIS IS KEY!
-            if (!error) {
-                console.log('Post deleted, refreshing posts...')
-                await fetchPosts()
-            }
+            if (!error) await fetchPosts()
 
-            return { data, error };
-        } catch (error) {
-            console.error('Error deleting blog post:', error);
-            return { data: null, error };
+            return { data, error }
+        } catch (err) {
+            console.error('Error deleting blog post:', err)
+            return { data: null, error: err }
         }
     }
 
@@ -311,7 +282,7 @@ export function useBlogPosts() {
     return {
         draftCount,
         publishedCount,
-        posts, 
+        posts,
         loading,
         totalCount,
         currentPage,

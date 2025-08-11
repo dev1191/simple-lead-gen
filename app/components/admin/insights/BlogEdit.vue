@@ -17,7 +17,7 @@ import { BlogCategories } from "~/shared/constants";
 const props = defineProps<{ post: BlogPost; modelValue: boolean }>();
 const emit = defineEmits(["update:modelValue", "confirm", "close"]);
 
-const { updatePost } = useBlogPosts();
+const { updatePost,fetchPosts } = useBlogPosts();
 
 const isOpen = ref<boolean>(props.modelValue);
 const post = ref(props.post);
@@ -83,6 +83,7 @@ const onSubmit = async () => {
     // Reset form and close modal
     resetForm();
     handleCancel();
+    fetchPosts();
   } catch (error) {
     console.error(error);
     toast.error("Failed to create post. Please try again.");

@@ -13,8 +13,6 @@ useHead({
 });
 
 const blogPosts = useBlogPosts();
-
-console.log("check posts : ",blogPosts.posts.value)
 </script>
 
 <template>
