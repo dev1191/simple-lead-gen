@@ -33,7 +33,7 @@ function confirm() {
                     <Button variant="outline" @click="close"> Cancel </Button>
                 </DialogClose>
                 <Button variant="destructive" :disabled="loading" @click="confirm" class="cursor-pointer">
-                    {{ loading ? 'deleting...': `Yes,Delete` }}
+                    {{ loading ? 'Deleting...': `Yes,Delete` }}
                 </Button>
             </DialogFooter>
         </DialogContent>

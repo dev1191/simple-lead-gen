@@ -6,9 +6,15 @@ definePageMeta({
 </script>
 
 <template>
-  <div>
-    <h2 class="text-2xl font-bold tracking-tight">Frontend Pages</h2>
-  </div>
+  <AdminLayoutPage
+    title="Frontend Pages Management"
+    description="Manage Frontend Pages"
+    sticky
+  >
+    <template #actions> </template>
+
+    <div class="overflow-x-auto"></div>
+  </AdminLayoutPage>
 </template>
 
 <style scoped></style>

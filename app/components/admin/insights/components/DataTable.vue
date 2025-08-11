@@ -43,21 +43,6 @@ interface DataTableProps {
 const props = defineProps<DataTableProps>();
 const { blogPosts, columns } = props;
 
-// Add a reactive key to force table updates
-const tableKey = ref(0);
-const forceTableUpdate = () => {
-  tableKey.value++;
-};
-
-// Watch for posts changes and force table update
-watch(
-  () => blogPosts.posts.value,
-  () => {
-    forceTableUpdate();
-  },
-  { deep: true }
-);
-
 // Local reactive filter states synced with composable filters
 const globalFilter = ref(blogPosts.filters.value.search || "");
 const statusFilter = ref(blogPosts.filters.value.status || "");
@@ -110,48 +95,44 @@ const tableState = reactive({
   },
   globalFilter: globalFilter.value,
 });
+const data = computed(() => blogPosts.posts.value || []);
 
 // Create the table instance with computed data
-const table = computed(() => {
-  // Access tableKey to make this computed reactive to forced updates
-  tableKey.value;
-  
-  return useVueTable({
-    get data() {
-      return blogPosts.posts.value || []; // Ensure fallback to empty array
-    },
-    get columns() {
-      return columns;
-    },
-    state: tableState,
-    manualSorting: true,
-    manualPagination: true,
-    manualFiltering: true,
-    pageCount: Math.ceil(blogPosts.totalCount.value / blogPosts.pageSize.value),
-    onSortingChange: (updater) => {
-      const newSorting =
-        typeof updater === "function" ? updater(tableState.sorting) : updater;
-      if (newSorting.length > 0) {
-        const { id, desc } = newSorting[0];
-        blogPosts.updateSort(id, desc ? "desc" : "asc");
-        tableState.sorting = newSorting;
-      }
-    },
-    onPaginationChange: (updater) => {
-      const newPagination =
-        typeof updater === "function" ? updater(tableState.pagination) : updater;
-      blogPosts.changePage(newPagination.pageIndex + 1);
-      tableState.pagination = newPagination;
-    },
-    onGlobalFilterChange: (val) => {
-      globalFilter.value = val;
-      blogPosts.updateSearch(val);
-      tableState.globalFilter = val;
-    },
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  });
+const table = useVueTable({
+  get data() {
+    return data.value;
+  },
+  get columns() {
+    return columns;
+  },
+  state: tableState,
+  manualSorting: true,
+  manualPagination: true,
+  manualFiltering: true,
+  pageCount: Math.ceil(blogPosts.totalCount.value / blogPosts.pageSize.value),
+  onSortingChange: (updater) => {
+    const newSorting =
+      typeof updater === "function" ? updater(tableState.sorting) : updater;
+    if (newSorting.length > 0) {
+      const { id, desc } = newSorting[0];
+      blogPosts.updateSort(id, desc ? "desc" : "asc");
+      tableState.sorting = newSorting;
+    }
+  },
+  onPaginationChange: (updater) => {
+    const newPagination =
+      typeof updater === "function" ? updater(tableState.pagination) : updater;
+    blogPosts.changePage(newPagination.pageIndex + 1);
+    tableState.pagination = newPagination;
+  },
+  onGlobalFilterChange: (val) => {
+    globalFilter.value = val;
+    blogPosts.updateSearch(val);
+    tableState.globalFilter = val;
+  },
+  getCoreRowModel: getCoreRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
 });
 
 // Keep table state synced with composable's reactive values:

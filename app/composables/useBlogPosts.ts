@@ -1,5 +1,4 @@
 // composables/useBlogPosts.ts
-import { ref, computed, readonly, shallowRef, triggerRef } from 'vue'
 import { useSupabaseClient } from '#imports'
 import { slugify } from '../shared/utils'
 
@@ -78,14 +77,12 @@ export function useBlogPosts() {
 
             // Force reactivity trigger
             posts.value = data || []
-            triggerRef(posts) // Manually trigger reactivity
             totalCount.value = count || 0
             
             console.log('Posts fetched:', posts.value.length) // Debug log
         } catch (error) {
             console.error('Error fetching posts:', error)
             posts.value = []
-            triggerRef(posts)
             totalCount.value = 0
         } finally {
             loading.value = false

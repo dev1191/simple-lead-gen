@@ -12,9 +12,9 @@ useHead({
   title: "Insights (Blog Management)",
 });
 
-
 const blogPosts = useBlogPosts();
 
+console.log("check posts : ",blogPosts.posts.value)
 </script>
 
 <template>
@@ -30,7 +30,7 @@ const blogPosts = useBlogPosts();
       <AdminInsightsCard />
     </template>
     <div class="overflow-x-auto">
-      <DataTable  :blogPosts="blogPosts" :columns="columns"  />
+      <DataTable :blogPosts="blogPosts" :columns="columns" />
     </div>
   </AdminLayoutPage>
 </template>
