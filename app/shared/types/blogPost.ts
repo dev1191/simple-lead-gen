@@ -10,6 +10,7 @@ export interface BlogPost {
     content:string
     author: string
     tags: string[]
+    image_url:string
     seo_title:string;
     seo_description:string;
     created_at: string

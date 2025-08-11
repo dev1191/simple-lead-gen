@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { columns } from "~/components/admin/insights/components/Columns";
-import { BlogCategories } from "~/shared/constants";
 import DataTable from "~/components/admin/insights/components/DataTable.vue";
 
 definePageMeta({

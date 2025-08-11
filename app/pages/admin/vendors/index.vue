@@ -1,19 +1,26 @@
-
-
 <script setup lang="ts">
-
+import { columns } from "~/components/admin/vendors/Columns";
+import DataTable from "~/components/admin/vendors/DataTable.vue";
 definePageMeta({
-    layout:'admin',
-    middleware:['auth']
-})
+  layout: "admin",
+  middleware: ["auth"],
+});
+
+const vendors = useVendors();
 </script>
 
 <template>
-    <div>
-       <h2 class="text-2xl font-bold tracking-tight">Vendors</h2>
+  <AdminLayoutPage title="Vendors" description="Manage all vendors" sticky>
+    <template #actions> </template>
+
+    <template #cardHeader>
+      <AdminVendorsCard />
+    </template>
+
+    <div class="overflow-x-auto">
+      <DataTable :vendors="vendors" :columns="columns" />
     </div>
+  </AdminLayoutPage>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

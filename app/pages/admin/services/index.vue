@@ -1,19 +1,16 @@
-
-
 <script setup lang="ts">
-
 definePageMeta({
-   layout:'admin',
-    middleware:['auth']
-})
+  layout: "admin",
+  middleware: ["auth"],
+});
 </script>
 
 <template>
-    <div>
-            <h1>Services Admin</h1>
-    </div>
+  <AdminLayoutPage title="Services" description="Manage all service listings" sticky>
+    <template #actions> </template>
+
+    <div class="overflow-x-auto"></div>
+  </AdminLayoutPage>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
