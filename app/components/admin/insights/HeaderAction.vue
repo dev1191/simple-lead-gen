@@ -110,7 +110,7 @@ const handleFormSubmit = () => {
     title="Create New Article"
     description=""
     @update:open="closeSheetModal"
-    size="seven"
+    size="six"
   >
     <template #default>
       <form
