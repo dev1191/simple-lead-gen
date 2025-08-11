@@ -14,7 +14,7 @@ import {
 import { BlogCategories } from "~/shared/constants";
 import { slugify } from "~/shared/utils";
 
-const { createPost } = useBlogPosts();
+const { createPost,fetchPosts} = useBlogPosts();
 const { label } = defineProps<{
   label: string;
 }>();
@@ -83,6 +83,7 @@ const onSubmit = handleSubmit(async (values) => {
     // Reset form and close modal
     resetForm();
     closeSheetModal();
+
   } catch (error) {
     console.error(error);
     toast.error("Failed to create post. Please try again.");

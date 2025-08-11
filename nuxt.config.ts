@@ -13,14 +13,15 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     'nuxt-tiptap-editor',
   ],
-   tiptap: {
+    buildModules: ["@nuxtjs/date-fns"],
+  tiptap: {
     prefix: 'Tiptap', //prefix for Tiptap imports, composables not included
   },
   supabase: {
     redirect: false,
     login: '/auth/login'
   },
-  css: ['echo-editor/style.css','~/assets/css/tailwind.css'],
+  css: ['echo-editor/style.css', '~/assets/css/tailwind.css'],
   build: {
     transpile: ['echo-editor']
   },
@@ -53,7 +54,7 @@ export default defineNuxtConfig({
      */
     componentDir: './app/components/ui'
   },
-    colorMode: {
+  colorMode: {
     preference: "system",
     fallback: "dark",
     classPrefix: "",

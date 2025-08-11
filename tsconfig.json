@@ -21,6 +21,10 @@
       "@/*": [
         "./app/*"
       ]
-    }
+    },
+    "types": [
+      "@nuxt/types",
+      "@nuxtjs/date-fns"
+    ]
   }
 }

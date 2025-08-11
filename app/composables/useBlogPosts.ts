@@ -1,5 +1,5 @@
 // composables/useBlogPosts.ts
-import { ref, computed, readonly } from 'vue'
+import { ref, computed, readonly, shallowRef, triggerRef } from 'vue'
 import { useSupabaseClient } from '#imports'
 import { slugify } from '../shared/utils'
 
@@ -11,6 +11,9 @@ export function useBlogPosts() {
     const totalCount = ref(0)
     const currentPage = ref(1)
     const pageSize = ref(10)
+    const draftCount = ref(0)
+    const publishedCount = ref(0)
+    const error = ref(null)
 
     // Filters and search state
     const filters = ref({
@@ -37,22 +40,21 @@ export function useBlogPosts() {
         let query = supabase
             .from('blog_posts')
             .select(`
-        *
+        *,
+        profiles(id,display_name,avatar_url)
       `, { count: 'exact' })
 
-            console.log("query",query)
-
         if (filters.value.search) {
-            query = query.or(`title.ilike.%${filters.value.search}%,content.ilike.%${filters.value.search}%,excerpt.ilike.%${filters.value.search}%`)
+            query = query.or(`title.ilike.%${filters.value.search}%,content.ilike.%${filters.value.search}%`)
         }
         if (filters.value.category) {
-            query = query.eq('category_id', filters.value.category)
+            query = query.eq('category', filters.value.category)
         }
         if (filters.value.status) {
             query = query.eq('status', filters.value.status)
         }
-          if (filters.value.author) {
-            query = query.eq('author', filters.value.author)
+        if (filters.value.author) {
+            query = query.eq('profiles.display_name', filters.value.author)
         }
 
         if (filters.value.tags.length > 0) {
@@ -70,19 +72,20 @@ export function useBlogPosts() {
             const to = from + pageSize.value - 1
 
             const query = buildQuery(supabase)
-       
             const { data, error, count } = await query.range(from, to)
- 
 
             if (error) throw error
 
-          
-
+            // Force reactivity trigger
             posts.value = data || []
+            triggerRef(posts) // Manually trigger reactivity
             totalCount.value = count || 0
+            
+            console.log('Posts fetched:', posts.value.length) // Debug log
         } catch (error) {
             console.error('Error fetching posts:', error)
             posts.value = []
+            triggerRef(posts)
             totalCount.value = 0
         } finally {
             loading.value = false
@@ -114,7 +117,7 @@ export function useBlogPosts() {
         }
     }
 
-    const resetFilters = () => {
+    const resetFilters = async () => {
         filters.value = {
             search: '',
             category: '',
@@ -124,7 +127,7 @@ export function useBlogPosts() {
         }
         sort.value = { field: 'created_at', order: 'desc' }
         currentPage.value = 1
-        fetchPosts()
+        await fetchPosts()
     }
 
     const createPost = async (postData: any, imageFile: File) => {
@@ -158,6 +161,11 @@ export function useBlogPosts() {
                     image_url: imageUrl,
                 }])
                 .select()
+
+            // Refresh posts after create
+            if (!error) {
+                await fetchPosts()
+            }
 
             return { data, error }
         } catch (error) {
@@ -218,6 +226,11 @@ export function useBlogPosts() {
                 .eq('id', postId)
                 .select();
 
+            // Refresh posts after update
+            if (!error) {
+                await fetchPosts()
+            }
+
             return { data, error };
         } catch (error) {
             console.error('Error updating blog post:', error);
@@ -254,6 +267,12 @@ export function useBlogPosts() {
                 .delete()
                 .eq('id', postId);
 
+            // Refresh posts after delete - THIS IS KEY!
+            if (!error) {
+                console.log('Post deleted, refreshing posts...')
+                await fetchPosts()
+            }
+
             return { data, error };
         } catch (error) {
             console.error('Error deleting blog post:', error);
@@ -261,19 +280,53 @@ export function useBlogPosts() {
         }
     }
 
+    const fetchCounts = async () => {
+        loading.value = true
+        error.value = null
+
+        const { count: draft, error: errDraft } = await supabase
+            .from('blog_posts')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'Draft')
+
+        if (errDraft) {
+            error.value = errDraft
+            loading.value = false
+            return
+        }
+
+        const { count: published, error: errPublished } = await supabase
+            .from('blog_posts')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'Published')
+
+        if (errPublished) {
+            error.value = errPublished
+            loading.value = false
+            return
+        }
+
+        draftCount.value = draft ?? 0
+        publishedCount.value = published ?? 0
+        loading.value = false
+    }
+
     return {
-        posts: readonly(posts),
-        loading: readonly(loading),
-        totalCount: readonly(totalCount),
-        currentPage: readonly(currentPage),
+        draftCount,
+        publishedCount,
+        posts, 
+        loading,
+        totalCount,
+        currentPage,
         pageSize,
         totalPages,
-        filters: readonly(filters),
-        sort: readonly(sort),
+        filters,
+        sort,
         fetchPosts,
         updateSearch,
         updateFilter,
         updateSort,
+        fetchCounts,
         changePage,
         resetFilters,
         createPost,

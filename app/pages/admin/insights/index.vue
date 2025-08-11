@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { BlogCategories } from '~/shared/constants';
+import { columns } from "~/components/admin/insights/components/Columns";
+import { BlogCategories } from "~/shared/constants";
+import DataTable from "~/components/admin/insights/components/DataTable.vue";
 
 definePageMeta({
   layout: "admin",
@@ -9,24 +11,28 @@ definePageMeta({
 useHead({
   title: "Insights (Blog Management)",
 });
+
+
+const blogPosts = useBlogPosts();
+
 </script>
 
 <template>
-  <div>
-    <div class="flex flex-col space-y-6">
-      <div class="flex justify-between gap-2">
-        <HeadingSmall
-          title="Insights (Blog Management)"
-          description="Manage insights (Blog Management)"
-        />
-        <AdminInsightsHeaderAction label="Article" />
-      </div>
-
+  <AdminLayoutPage
+    title="Insights (Blog Management)"
+    description="Manage insights (Blog Management)"
+    sticky
+  >
+    <template #actions>
+      <AdminInsightsHeaderAction label="Article" />
+    </template>
+    <template #cardHeader>
       <AdminInsightsCard />
-
-      <AdminInsightsDataTable />
+    </template>
+    <div class="overflow-x-auto">
+      <DataTable  :blogPosts="blogPosts" :columns="columns"  />
     </div>
-  </div>
+  </AdminLayoutPage>
 </template>
 
 <style scoped></style>
