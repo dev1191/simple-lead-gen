@@ -4,9 +4,11 @@ export interface Vendor {
 id:string;
 email:string;
 name:string;
-service_list:string;
+service_listed:string;
 total_leads:string;
-lead_this_month:string
+monthly_leads:string
 status:string;
+created_at:string;
+updated_at:string;
 
 }
