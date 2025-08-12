@@ -71,7 +71,7 @@ const sidebarLinks = [
   {
     title: "Frontend Pages",
     icon: Globe,
-    to: "/admin/pages",
+    to: "/admin/pages/home-page",
     tooltip: "Frontend Pages",
   },
   {

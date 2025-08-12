@@ -19,7 +19,7 @@ defineProps<LayoutHeaderProps>();
     <div class="py-4">
       <slot name="cardHeader" />
     </div>
-    <main class="py-4">
+    <main class="py-2 w-full space-y-12">
       <slot />
     </main>
   </main>

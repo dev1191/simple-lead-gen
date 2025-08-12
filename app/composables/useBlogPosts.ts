@@ -130,19 +130,8 @@ export function useBlogPosts() {
 
             let imageUrl = null
             if (imageFile) {
-                const fileExt = imageFile.name.split(".").pop()
-                const fileName = `${user.id}/${Date.now()}-${fileExt}`
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('blog-images')
-                    .upload(fileName, imageFile)
-
-                if (uploadError) throw uploadError
-
-                const { data: { publicUrl } } = supabase.storage
-                    .from('blog-images')
-                    .getPublicUrl(uploadData.path)
-
-                imageUrl = publicUrl
+                const { uploadFile } = useUpload()
+                imageUrl = await uploadFile(imageFile, 'uploads', user.id)
             }
 
             const { data, error } = await supabase
@@ -183,22 +172,12 @@ export function useBlogPosts() {
                     const urlParts = existingPost.image_url.split('/')
                     const fileName = urlParts[urlParts.length - 1]
                     const oldPath = `${user.id}/${fileName}`
-                    await supabase.storage.from('blog-images').remove([oldPath])
+                    await supabase.storage.from('uploads').remove([oldPath])
                 }
 
-                const fileExt = newImageFile.name.split(".").pop()
-                const fileName = `${user.id}/${Date.now()}-${fileExt}`
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('blog-images')
-                    .upload(fileName, newImageFile)
+                const { uploadFile } = useUpload()
+                updatePayload.image_url = await uploadFile(newImageFile, 'uploads', user.id)
 
-                if (uploadError) throw uploadError
-
-                const { data: { publicUrl } } = supabase.storage
-                    .from('blog-images')
-                    .getPublicUrl(uploadData.path)
-
-                updatePayload.image_url = publicUrl
             }
 
             const { data, error } = await supabase

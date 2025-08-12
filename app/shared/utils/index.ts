@@ -3,6 +3,10 @@ export function slugify(text: string): string {
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/[\s\W-]+/g, "-") // Replace spaces and non-word chars with hyphen
-    .replace(/^-+|-+$/g, ""); // Remove starting and ending hyphens
+    // Replace spaces and non-alphanumeric chars (except hyphen) with hyphen
+    .replace(/[\s\W]+/g, "-")
+    // Replace multiple hyphens with a single hyphen
+    .replace(/-+/g, "-")
+    // Remove starting and ending hyphens
+    .replace(/^-+|-+$/g, "");
 }

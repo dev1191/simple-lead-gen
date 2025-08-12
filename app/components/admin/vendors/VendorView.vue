@@ -31,13 +31,13 @@ const formatDate = (date: string | null) => {
         <div class="grid grid-cols-2 gap-4">
           <div>
             <p class="text-sm font-medium text-gray-500">Vendor Name</p>
-            <p class="text-base font-semibold text-gray-900">
+            <p class="text-base font-semibold text-gray-900 dark:text-accent-foreground">
               {{ vendor.name }}
             </p>
           </div>
           <div>
             <p class="text-sm font-medium text-gray-500">Contact Email</p>
-            <p class="text-base text-gray-900">{{ vendor.email }}</p>
+            <p class="text-base text-gray-900 dark:text-accent-foreground">{{ vendor.email }}</p>
           </div>
         </div>
 
@@ -96,7 +96,7 @@ const formatDate = (date: string | null) => {
           </div>
           <div>
             <p class="text-sm font-medium text-gray-500">Created At</p>
-            <p class="text-base text-gray-900">
+            <p class="text-base text-gray-900 dark:text-accent-foreground">
               {{ formatDate(vendor.created_at) }}
             </p>
           </div>

@@ -2,13 +2,13 @@
 import { ref, watch, computed } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { UploadCloud, X } from 'lucide-vue-next';
+import { Image, UploadCloud, X } from 'lucide-vue-next';
 
 const props = defineProps<{
   modelValue?: File | File[] | string | string[] | null;
   accept?: string;
   multiple?: boolean;
-  previewUrl?:string | string[]
+  previewUrl?: string | string[];
 }>();
 
 const emit = defineEmits<{
@@ -16,8 +16,9 @@ const emit = defineEmits<{
 }>();
 
 const fileInput = ref<HTMLInputElement | null>(null);
-
 const files = ref<File[]>([]);
+
+// Initialize previewUrls from previewUrl prop
 const previewUrls = ref<string[]>(
   props.previewUrl
     ? Array.isArray(props.previewUrl)
@@ -26,7 +27,22 @@ const previewUrls = ref<string[]>(
     : []
 );
 
-// Normalize modelValue to array of File or URL string
+// Watch previewUrl prop changes independently
+watch(
+  () => props.previewUrl,
+  (val) => {
+    if (!val) {
+      previewUrls.value = [];
+    } else if (Array.isArray(val)) {
+      previewUrls.value = val;
+    } else {
+      previewUrls.value = [val];
+    }
+  },
+  { immediate: true }
+);
+
+// Watch modelValue prop changes and update files & previewUrls
 watch(
   () => props.modelValue,
   (val) => {
@@ -34,17 +50,21 @@ watch(
       files.value = [];
       previewUrls.value = [];
     } else if (Array.isArray(val)) {
-      // Separate files vs strings
       files.value = val.filter((v): v is File => v instanceof File);
-      previewUrls.value = val
-        .filter((v) => typeof v === 'string') as string[];
-      // If any files, generate preview URLs
+      previewUrls.value = val.filter((v) => typeof v === 'string') as string[];
+
+      // Generate preview URLs from files, avoid duplicates
       files.value.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          previewUrls.value.push(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            if (!previewUrls.value.includes(result)) {
+              previewUrls.value.push(result);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
       });
     } else if (val instanceof File) {
       files.value = [val];
@@ -71,16 +91,14 @@ function onFileChange(event: Event) {
   const selectedFiles = Array.from(target.files);
 
   if (props.multiple) {
-    // Add newly selected files
     files.value = [...files.value, ...selectedFiles];
   } else {
     files.value = [selectedFiles[0]];
   }
 
-  // Generate preview URLs for new files
   previewUrls.value = [];
   files.value.forEach((file) => {
-    if (file instanceof File && file.type.startsWith('image/')) {
+    if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = () => {
         previewUrls.value.push(reader.result as string);
@@ -107,6 +125,7 @@ const hasFiles = computed(() => files.value.length > 0 || previewUrls.value.leng
 const isSingle = computed(() => !props.multiple && previewUrls.value.length === 1);
 </script>
 
+
 <template>
   <div class="space-y-4">
     <Card
@@ -125,7 +144,7 @@ const isSingle = computed(() => !props.multiple && previewUrls.value.length === 
       <!-- Upload prompt -->
       <template v-if="!hasFiles">
         <div class="flex flex-col items-center justify-center space-y-2 text-center w-full h-48 select-none p-4">
-          <UploadCloud class="text-muted-foreground group-hover:text-primary h-8 w-8 transition-colors" />
+          <Image class="text-muted-foreground group-hover:text-primary h-8 w-8 transition-colors" />
           <p class="text-muted-foreground text-sm">
             <span class="text-foreground font-medium">Click to upload</span> or drag and drop
           </p>
