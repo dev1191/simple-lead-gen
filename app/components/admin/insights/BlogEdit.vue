@@ -17,7 +17,7 @@ import { BlogCategories } from "~/shared/constants";
 const props = defineProps<{ post: BlogPost; modelValue: boolean }>();
 const emit = defineEmits(["update:modelValue", "confirm", "close"]);
 
-const { updatePost,fetchPosts } = useBlogPosts();
+const { updatePost, fetchPosts } = useBlogPosts();
 
 const isOpen = ref<boolean>(props.modelValue);
 const post = ref(props.post);
@@ -32,8 +32,8 @@ const formSchema = toTypedSchema(
     category: z.string().min(1, "Please select a category"),
     content: z.string().min(1, "Content is required"),
     tags: z.array(z.string()).min(1, "Please select at least one tag"),
-    seo_title: z.string(),
-    seo_description: z.string(),
+    seo_title: z.string().min(1, "SEO Title is required"),
+    seo_description: z.string().min(1, "SEO Description is required"),
     status: z.enum(["Draft", "Published"]),
   })
 );
@@ -242,7 +242,6 @@ const onSubmit = async () => {
                   accept="image/*"
                   @change="handleFileChange"
                 />
-                
               </FormControl>
               <FormMessage />
             </FormItem>

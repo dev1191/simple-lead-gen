@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import Layout from "~/components/admin/pages/Layout.vue";
+import Faq from "~/components/admin/pages/Faq/Index.vue";
+
 definePageMeta({
   layout: "admin",
   middleware: ["auth"],
@@ -12,7 +14,7 @@ useHead({
 
 <template>
   <Layout>
-    <h1>FAQ page</h1>
+        <Faq/>
   </Layout>
 </template>
 
