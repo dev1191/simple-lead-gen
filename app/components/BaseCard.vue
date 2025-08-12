@@ -1,4 +1,3 @@
-<!-- components/BaseCard.vue -->
 <script setup lang="ts">
 import {
   Card,
@@ -9,23 +8,36 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const { title, description, className,height } = defineProps<{
+const { title, description, className, height } = defineProps<{
   title?: string;
   description?: string;
-  className?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl";
-  height?: string
+  className?: "full" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl";
+  height?: string;
 }>();
 
+const maxWidthMap: Record<string, string> = {
+  full: "w-full",
+  sm: "max-w-sm mx-auto",
+  md: "max-w-md mx-auto",
+  lg: "max-w-lg mx-auto",
+  xl: "max-w-xl mx-auto",
+  "2xl": "max-w-2xl mx-auto",
+  "3xl": "max-w-3xl mx-auto",
+  "4xl": "max-w-4xl mx-auto",
+  "5xl": "max-w-5xl mx-auto",
+};
+
 const maxWidthClass = computed(() => {
-  return ` max-w-${className || "xl"} ${height || ''}`;
+  const baseClass = maxWidthMap[className || "xl"] || maxWidthMap["xl"];
+  return `${baseClass} ${height || ""}`;
 });
 </script>
 
 <template>
   <Card :class="maxWidthClass">
     <CardHeader v-if="title || description">
-      <CardTitle >{{ title }}</CardTitle>
-      <CardDescription >{{ description }}</CardDescription>
+      <CardTitle class="text-xl font-semibold">{{ title }}</CardTitle>
+      <CardDescription>{{ description }}</CardDescription>
     </CardHeader>
 
     <CardContent>

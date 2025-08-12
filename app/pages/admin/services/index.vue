@@ -20,7 +20,14 @@ const services = useServices();
     description="Manage all service management"
     sticky
   >
-    <template #actions> </template>
+    <template #actions>
+      <NuxtLink to="/admin/services/create">
+        <Button class="space-x-1">
+          <Icon name="Plus" :size="20" />
+          <span>Add New Service</span>
+        </Button>
+      </NuxtLink>
+    </template>
 
     <div class="overflow-x-auto">
       <DataTable :services="services" :columns="columns" />
