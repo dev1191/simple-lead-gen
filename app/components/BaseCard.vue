@@ -11,8 +11,18 @@ import {
 const { title, description, className, height } = defineProps<{
   title?: string;
   description?: string;
-  className?: "full" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl";
+  className?:
+    | "full"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "5xl";
   height?: string;
+  isFooter: { type: Boolean; default: false };
 }>();
 
 const maxWidthMap: Record<string, string> = {
@@ -44,7 +54,7 @@ const maxWidthClass = computed(() => {
       <slot />
     </CardContent>
 
-    <CardFooter class="flex justify-end gap-2">
+    <CardFooter v-if="isFooter" class="flex justify-end gap-2">
       <slot name="footer" />
     </CardFooter>
   </Card>
