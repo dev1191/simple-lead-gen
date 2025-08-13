@@ -8,22 +8,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const { title, description, className, height } = defineProps<{
-  title?: string;
-  description?: string;
-  className?:
-    | "full"
-    | "sm"
-    | "md"
-    | "lg"
-    | "xl"
-    | "2xl"
-    | "3xl"
-    | "4xl"
-    | "5xl";
-  height?: string;
-  isFooter: { type: Boolean; default: false };
-}>();
+const { title, description, className = "full", height, isFooter } =
+  defineProps<{
+    title?: string;
+    description?: string;
+    className?:
+      | "full"
+      | "sm"
+      | "md"
+      | "lg"
+      | "xl"
+      | "2xl"
+      | "3xl"
+      | "4xl"
+      | "5xl";
+    height?: string;
+    isFooter: boolean;
+  }>();
 
 const maxWidthMap: Record<string, string> = {
   full: "w-full",
@@ -38,7 +39,7 @@ const maxWidthMap: Record<string, string> = {
 };
 
 const maxWidthClass = computed(() => {
-  const baseClass = maxWidthMap[className || "xl"] || maxWidthMap["xl"];
+  const baseClass = maxWidthMap[className] || maxWidthMap["full"];
   return `${baseClass} ${height || ""}`;
 });
 </script>
