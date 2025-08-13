@@ -29,8 +29,9 @@ const formSchema = toTypedSchema(
     slug: z.string().min(2).max(200),
     name: z.string().optional(),
     content: z.string().min(1, "Content is required"),
-    seo_title: z.string().min(1, "SEO Title is required"),
-    seo_description: z.string().min(1, "SEO Description is required"),
+    seo_title: z.string().min(1, "Meta Title is required"),
+    seo_description: z.string().min(1, "Meta Description is required"),
+    seo_keyword:z.string().min(1, "Meta Keywords is required"),
     status: z.enum(["Draft", "Published"]),
   })
 );
@@ -46,6 +47,7 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue,validate } 
       content: "",
       seo_title: "",
       seo_description: "",
+      seo_keyword:"",
     },
   });
 
@@ -226,7 +228,7 @@ onMounted(async () => {
         </FormField>
 
         <Separator />
-        <h2 class="text-2xl font-bold">SEO Settings</h2>
+          <h2 class="text-2xl font-bold">SEO Metadata</h2>
 
         <FormField
           v-slot="{ componentField }"
@@ -235,12 +237,12 @@ onMounted(async () => {
         >
           <FormItem>
             <FormLabel>
-              SEO Title <span class="text-red-500">*</span>
+              Meta Title <span class="text-red-500">*</span>
             </FormLabel>
             <FormControl>
               <Input
                 type="text"
-                placeholder="Enter SEO title"
+                placeholder="Enter meta title"
                 v-bind="componentField"
               />
             </FormControl>
@@ -255,11 +257,30 @@ onMounted(async () => {
         >
           <FormItem>
             <FormLabel>
-              SEO Description <span class="text-red-500">*</span>
+              Meta Description <span class="text-red-500">*</span>
             </FormLabel>
             <FormControl>
               <Textarea
-                placeholder="Enter SEO description"
+                placeholder="Enter meta description"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+           <FormField
+          v-slot="{ componentField }"
+          name="seo_keyword"
+          :validate-on-blur="!isFieldDirty"
+        >
+          <FormItem>
+            <FormLabel>
+              Meta Keywords<span class="text-red-500">*</span>
+            </FormLabel>
+            <FormControl>
+              <Input
+                placeholder="Enter meta keywords separated by commas"
                 v-bind="componentField"
               />
             </FormControl>

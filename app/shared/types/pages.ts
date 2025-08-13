@@ -8,6 +8,7 @@ export interface Page {
     image_url: string
     seo_title: string;
     seo_description: string;
+    seo_keyword:string;
     created_at: string
     updated_at: string
     published_at: string

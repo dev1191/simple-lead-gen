@@ -26,7 +26,7 @@ const formSchema = toTypedSchema(
   z.object({
     question: z.string().min(2).max(200),
     answer: z.string().min(2),
-    category: z.string().optional(),
+    category: z.string(),
   })
 );
 
@@ -36,7 +36,7 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
     initialValues: {
       question: "",
       answer: "",
-      category: "",
+      category: "Brand",
     },
   });
 
@@ -66,7 +66,7 @@ const handleFormSubmit = () => {
 </script>
 
 <template>
-  <AdminLayoutPage title="FAQ" description="" sticky>
+  <AdminLayoutPage title="Manage FAQ" description="" sticky>
     <template #actions>
       <Button class="space-x-1" @click="isSheetModal = true">
         <Icon name="Plus" :size="20" />
@@ -89,6 +89,26 @@ const handleFormSubmit = () => {
         <form @submit.prevent="onSubmit" id="faq-form">
           <!-- Left Column: Title, Category, Content -->
           <div class="flex flex-col space-y-6">
+
+              <FormField v-slot="{ componentField }" name="category">
+          <FormItem>
+            <FormLabel>Category</FormLabel>
+            <FormControl>
+              <Select v-bind="componentField">
+                <SelectTrigger class="w-full">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Brand">Brand Faq</SelectItem>
+                  <SelectItem value="Partner">Partner Faq</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+
             <!-- Title -->
             <FormField
               v-slot="{ componentField }"
