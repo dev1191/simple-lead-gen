@@ -26,12 +26,13 @@ export function useFaqs() {
     )
 
     // Build query
-    const buildQuery = () => {
+    const buildQuery = (category: string) => {
         let query = supabase
             .from('faqs')
             .select(`
         *
       `, { count: 'exact' })
+            .eq('category', category)
 
         if (filters.value.search) {
             query = query.or(`question.ilike.%${filters.value.search}%,answer.ilike.%${filters.value.search}%`)
@@ -43,13 +44,13 @@ export function useFaqs() {
     }
 
     // Fetch Faqs
-    const fetchFaqs = async () => {
+    const fetchFaqs = async (category: string) => {
         loading.value = true
         try {
             const from = (currentPage.value - 1) * pageSize.value
             const to = from + pageSize.value - 1
 
-            const query = buildQuery()
+            const query = buildQuery(category)
             const { data, error: err, count } = await query.range(from, to)
 
             if (err) throw err

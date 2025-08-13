@@ -68,7 +68,7 @@ const handleFormSubmit = () => {
     mode="edit"
     title="Edit Faq"
     @update:open="handleCancel"
-    size="two"
+    size="xl"
   >
     <template #default>
       <form @submit.prevent="onSubmit" id="faq-form">

@@ -36,7 +36,7 @@ const currentPath = route.path ? route.path : "";
 <template>
   <AdminLayoutPage
     title="Frontend Pages Management"
-    description="Manage Frontend Pages Settings"
+    description="Manage Frontend Pages Management"
     sticky
   >
     <div class="flex flex-col lg:flex-row lg:space-x-12 min-h-screen">
