@@ -38,8 +38,8 @@ onMounted(() => {
 <template>
   <div>
     <div class="grid grid-cols-1 gap-3 rounded-sm mt-2">
-      <Card v-for="faq in faqs" :key="faq.id">
-        <CardContent>
+      <Card v-for="faq in faqs" :key="faq.id" >
+        <CardContent class="h-6" >
           <div class="flex justify-between">
             <div class="text-md font-semibold">{{ faq.question }}</div>
 

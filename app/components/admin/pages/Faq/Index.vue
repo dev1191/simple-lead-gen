@@ -50,7 +50,7 @@ const onSubmit = handleSubmit(async (values) => {
 
     // Show success message
     toast.success("Faqs created successfully!");
-
+    faqs.fetchFaqs(values.category);
     // Reset form and close modal
     resetForm();
     closeSheetModal();
@@ -77,7 +77,7 @@ const handleFormSubmit = () => {
     </template>
 
     <div class="overflow-x-auto">
-      <Tabs default-value="Brand" >
+      <Tabs default-value="Brand">
         <TabsList class="grid grid-cols-2 w-[300px]">
           <TabsTrigger value="Brand"> Brand Faqs </TabsTrigger>
           <TabsTrigger value="Provider"> Provider Faqs </TabsTrigger>

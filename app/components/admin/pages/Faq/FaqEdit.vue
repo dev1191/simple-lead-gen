@@ -17,7 +17,7 @@ const formSchema = toTypedSchema(
   z.object({
     question: z.string().min(2).max(200),
     answer: z.string().min(2),
-    category: z.string(),
+    category: z.string().optional(),
   })
 );
 
@@ -39,7 +39,7 @@ const onSubmit = handleSubmit(async (values) => {
 
     // Show success message
     toast.success("Faq update successfully!");
-
+    await faqs.fetchFaqs(values.category);
     // Reset form and close modal
     resetForm();
     handleCancel();
@@ -66,25 +66,7 @@ const handleFormSubmit = () => {
   >
     <template #default>
       <form @submit.prevent="onSubmit" id="faq-form">
-        <!-- Left Column: Title, Category, Content -->
         <div class="flex flex-col space-y-6">
-          <FormField v-slot="{ componentField }" name="category">
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <FormControl>
-                <Select v-bind="componentField">
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Brand">Brand Faq</SelectItem>
-                    <SelectItem value="Provider">Provider Faq</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
           <!-- Title -->
           <FormField
             v-slot="{ componentField }"
