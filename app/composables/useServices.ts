@@ -7,6 +7,7 @@ export function useServices() {
 
     // Shared state
     const services = useState('blogServices', () => [] as any[])
+    const categories = useState('Categories', () => [] as any[])
     const loading = useState('blogServicesLoading', () => false)
     const totalCount = useState('blogServicesTotalCount', () => 0)
     const currentPage = useState('blogServicesCurrentPage', () => 1)
@@ -200,10 +201,36 @@ export function useServices() {
         loading.value = false
     }
 
+
+    const fetchCategories = async () => {
+        loading.value = true
+        try {
+
+        
+            const { data, error: err } = await supabase
+                .from('service_categories')
+                .select(`*,service_sub_categories(id,name)`, { count: 'exact' })
+
+            if (err) throw err
+
+            categories.value = data || []
+
+        } catch (err) {
+            console.error('Error fetching posts:', err)
+            categories.value = []
+
+        } finally {
+            loading.value = false
+        }
+    }
+
+
+
     return {
         activeCount,
         inactiveCount,
         services,
+        categories,
         loading,
         totalCount,
         currentPage,
@@ -212,6 +239,7 @@ export function useServices() {
         filters,
         sort,
         fetchServices,
+        fetchCategories,
         updateSearch,
         updateFilter,
         updateSort,

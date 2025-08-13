@@ -18,7 +18,9 @@ const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(2).max(150),
     tagline: z.string().min(2).max(150),
-    categories: z.array(z.string()),
+    service_categories: z
+      .array(z.string())
+      .min(1, "Select at least one category"),
     provider_name: z.string().min(1, "Provider name is required"),
     provider_email: z.email("Provider email is required"),
     for: z.array(z.string()).refine((value) => value.some((item) => item), {
@@ -31,13 +33,14 @@ const formSchema = toTypedSchema(
   })
 );
 
+const { fetchCategories, categories } = useServices();
 const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
   useForm({
     validationSchema: formSchema,
     initialValues: {
       name: "",
       tagline: "",
-      categories: [],
+      service_categories: [],
       logo: "",
       banner: "",
       provider_name: "",
@@ -46,22 +49,6 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
       seo_description: "",
     },
   });
-
-const categories = [
-  {
-    id: "cat1",
-    name: "Category A",
-    subcategories: [
-      { id: "sub1", name: "Sub A1" },
-      { id: "sub2", name: "Sub A2" },
-    ],
-  },
-  {
-    id: "cat2",
-    name: "Category B",
-    subcategories: [{ id: "sub3", name: "Sub B1" }],
-  },
-];
 
 const forItems = [
   {
@@ -89,11 +76,17 @@ const forItems = [
 const selected = ref<string[]>([]);
 
 const onSubmit = () => {};
+
+onMounted(() => fetchCategories());
 </script>
 
 <template>
   <form @submit.prevent="onSubmit" id="service-form">
-    <BaseCard className="5xl" title="Section 1: Basic Information">
+    <BaseCard
+      className="5xl"
+      title="Section 1: Basic Information"
+      :isFooter="false"
+    >
       <template #default>
         <div class="grid grid-cols-2 gap-8 w-full mb-6">
           <!-- Name -->
@@ -143,8 +136,8 @@ const onSubmit = () => {};
         <div class="grid grid-cols-1 gap-8 w-full mb-6">
           <!-- Categories -->
           <FormField
-            v-slot="{ componentField }"
-            name="categories"
+           v-slot="{ value, handleChange }"
+            name="service_categories"
             :validate-on-blur="!isFieldDirty"
           >
             <FormItem>
@@ -153,7 +146,8 @@ const onSubmit = () => {};
               </FormLabel>
               <FormControl>
                 <MultiSelectSubSelect
-                  v-bind="componentField"
+                  :model-value="value"
+                  @update:model-value="handleChange"
                   :categories="categories"
                   placeholder="Choose categories & subs"
                 />
@@ -238,7 +232,12 @@ const onSubmit = () => {};
       </template>
     </BaseCard>
 
-    <BaseCard class="mt-4" className="5xl" title="Section 2: Service Details">
+    <BaseCard
+      class="mt-4"
+      className="5xl"
+      title="Section 2: Service Details"
+      :isFooter="false"
+    >
       <template #default>
         <div class="grid grid-cols-1 gap-8 w-full mb-6">
           <!-- Name -->
@@ -271,28 +270,7 @@ const onSubmit = () => {};
               <FormLabel>
                 Who is this for?<span class="text-red-500">*</span>
               </FormLabel>
-             
-              <FormField
-                v-for="item in forItems"
-                v-slot="{ value, handleChange }"
-                :key="item.id"
-                type="checkbox"
-                :value="item.id"
-                :unchecked-value="false"
-                name="items"
-              >
-                <FormItem class="flex flex-col">
-                  <FormControl>
-                    <Checkbox
-                      :model-value="value.includes(item.id)"
-                      @update:model-value="handleChange"
-                    />
-                  </FormControl>
-                  <FormLabel class="font-normal">
-                    {{ item.label }}
-                  </FormLabel>
-                </FormItem>
-              </FormField>
+
               <FormMessage />
             </FormItem>
           </FormField>
