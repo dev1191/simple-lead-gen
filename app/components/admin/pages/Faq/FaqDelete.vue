@@ -32,7 +32,7 @@ const handleDelete = async () => {
     const { data, error: deleteError } = await deleteFaq(props.faq.id);
     if (deleteError) throw deleteError;
     toast.success("Faq delete successfully");
-    await fetchFaqs();
+    await fetchFaqs(props.faq.category);
     // Close dialog
     isOpen.value = false;
   } catch (err) {
@@ -50,7 +50,7 @@ const handleDelete = async () => {
     @confirm="handleDelete"
     :loading="loading"
     title="Delete Faq?"
-    description="Are you sure you want to delete this faq? This action is irreversible."
+    description="Are you sure you want to delete this faqs? This action is irreversible."
   />
 </template>
 

@@ -49,7 +49,7 @@ const onSubmit = handleSubmit(async (values) => {
     const response = await faqs.createFaq(values);
 
     // Show success message
-    toast.success("Faq created successfully!");
+    toast.success("Faqs created successfully!");
 
     // Reset form and close modal
     resetForm();
@@ -72,7 +72,7 @@ const handleFormSubmit = () => {
     <template #actions>
       <Button class="space-x-1" @click="isSheetModal = true">
         <Icon name="Plus" :size="20" />
-        <span>New Faq</span>
+        <span>New FAQ</span>
       </Button>
     </template>
 
@@ -112,7 +112,7 @@ const handleFormSubmit = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Brand">Brand Faq</SelectItem>
-                      <SelectItem value="Partner">Partner Faq</SelectItem>
+                      <SelectItem value="Provider">Provider Faq</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
