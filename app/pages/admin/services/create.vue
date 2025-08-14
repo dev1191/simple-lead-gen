@@ -15,7 +15,7 @@ useHead({
 </script>
 
 <template>
-  <AdminLayoutPage title="Create Service" description="Create service" sticky>
+  <AdminLayoutPage title="Create Service" description="Create your service listing to reach more customers" sticky>
     <div>
         <ServiceForm />
     </div>

@@ -15,8 +15,7 @@ import DynamicInputList from "~/components/DynamicInputList.vue";
 import Checkbox from "~/components/ui/checkbox/Checkbox.vue";
 import { fileWithAspectRatio } from "../../../shared/utils";
 
-const logo = ref<File>(null);
-const banner = ref<File>(null);
+
 const clientLogoFiles = ref<File>(null);
 const isLoading = ref(false);
 
@@ -43,9 +42,9 @@ const formSchema = toTypedSchema(
     pricing: z.string().optional(),
     turnaround_time: z.string("Typical turnaround time is required"),
     url: z.string().optional(),
-    description: z.string().min(1, "SEO Description is required"),
+    description: z.string().min(1, "Detailed description of your service is required"),
     free_consulatation: z.boolean().optional(),
-    client_logos: z.array(z.instanceof(File)).optional(),
+    client_logos: z.array(z.string()).optional(),
     servers: z
       .array(z.enum(["malaysia", "singapore", "global"]))
       .min(1, "Please select at least one country serve"),
@@ -86,8 +85,8 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
       client_logos: [],
       servers: [],
       url: "",
-      banner_url: undefined,
-      logo_url: undefined,
+      banner_url: null,
+      logo_url: null,
       provider_name: "",
       provider_email: "",
       description: "",
@@ -177,9 +176,7 @@ const onSubmit = handleSubmit(
       // Add file uploads to form data if needed
       const submitData = {
         ...formData,
-        logo: logo.value,
-        banner: banner.value,
-        client_logo_files: clientLogoFiles.value,
+        client_logos: clientLogoFiles.value,
       };
 
       console.log("Form submitted with data:", submitData);
@@ -200,7 +197,6 @@ const onSubmit = handleSubmit(
     // This callback runs when validation fails
     console.log("Validation errors:", errors);
     toast.error("Please fix the errors in the form");
-    scrollToFirstError();
   }
 );
 
@@ -368,6 +364,7 @@ onMounted(() => fetchCategories());
             </FormItem>
           </FormField>
         </div>
+
       </template>
     </BaseCard>
 
@@ -634,13 +631,12 @@ onMounted(() => fetchCategories());
             </FormItem>
           </FormField>
 
-          <FormField name="client_logos" v-slot="{ value, handleChange }">
+          <FormField name="clientLogoFiles">
             <FormItem>
               <FormLabel>Client Logos (optional)</FormLabel>
               <FormControl>
                 <FileUploader
-                  v-model="value"
-                  @update:model-value="handleChange"
+                  v-model="clientLogoFiles"
                   :previewUrl="values.client_logos"
                   multiple
                   placeholder="Upload client logos to showcase your work"
@@ -667,11 +663,11 @@ onMounted(() => fetchCategories());
                 >Which Countries Do You Serve?
                 <span class="text-red-500">*</span></FormLabel
               >
-              <div class="flex flex-row gap-4">
+              <div class="flex flex-col gap-2">
                 <FormItem
                   v-for="server in serverOptions"
                   :key="server.value"
-                  class="flex flex-row gap-x-3 space-y-0 p-2"
+                  class="flex flex-row gap-x-2 space-y-0 p-1"
                 >
                   <FormControl>
                     <Checkbox
@@ -688,8 +684,9 @@ onMounted(() => fetchCategories());
                       "
                     />
                   </FormControl>
-                  <div class="space-y-1 leading-none flex-1">
+                  <div class="flex flex-row gap-8 leading-none ">
                     <FormLabel>{{ server.label }}</FormLabel>
+                    <FormDescription v-if="server.value === 'global'">(Auto-includes Malaysia and Singapore)</FormDescription>
                   </div>
                 </FormItem>
               </div>
