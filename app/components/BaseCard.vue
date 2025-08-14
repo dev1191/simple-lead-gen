@@ -47,7 +47,7 @@ const maxWidthClass = computed(() => {
 <template>
   <Card :class="maxWidthClass">
     <CardHeader v-if="title || description">
-      <CardTitle class="text-xl font-semibold">{{ title }}</CardTitle>
+      <CardTitle class="text-2xl font-bold text-primary">{{ title }}</CardTitle>
       <CardDescription>{{ description }}</CardDescription>
     </CardHeader>
 

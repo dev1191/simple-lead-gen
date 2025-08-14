@@ -9,6 +9,7 @@ const props = defineProps<{
   accept?: string;
   multiple?: boolean;
   previewUrl?: string | string[];
+  placeholder?:string;
 }>();
 
 const emit = defineEmits<{
@@ -129,7 +130,7 @@ const isSingle = computed(() => !props.multiple && previewUrls.value.length === 
 <template>
   <div class="space-y-4">
     <Card
-      class="w-full border-muted hover:border-primary group relative cursor-pointer border border-dashed p-0 transition-colors"
+      class="w-full border-muted hover:border-primary group relative cursor-pointer border-2 border-dashed  p-0 transition-colors"
       @click="triggerBrowse"
       style="min-height: 12rem;"
     >
@@ -146,7 +147,11 @@ const isSingle = computed(() => !props.multiple && previewUrls.value.length === 
         <div class="flex flex-col items-center justify-center space-y-2 text-center w-full h-48 select-none p-4">
           <Image class="text-muted-foreground group-hover:text-primary h-8 w-8 transition-colors" />
           <p class="text-muted-foreground text-sm">
-            <span class="text-foreground font-medium">Click to upload</span> or drag and drop
+            <span v-if="placeholder" class="text-foreground font-medium">{{ placeholder }}</span>
+            <div v-else>
+              <span  class="text-foreground font-medium">Click to upload</span> or drag and drop
+            </div>
+           
           </p>
         </div>
       </template>
