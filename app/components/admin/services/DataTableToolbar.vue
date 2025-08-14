@@ -14,7 +14,7 @@ import type { Service } from "~/shared/types/service";
 interface DataTableToolbarProps {
   table: Table<Service>;
   globalFilter: string;
-  statusFilter: string;
+  statusFilter: boolean;
   isFiltered:boolean;
 }
 
@@ -23,19 +23,19 @@ const props = defineProps<DataTableToolbarProps>();
 // Emit event to update parent filter
 const emit = defineEmits<{
   (e: "update:globalFilter", value: string): void;
-  (e: "update:statusFilter", value: string): void;
+  (e: "update:statusFilter", value: boolean): void;
   (e:'resetFilters'):void;
 }>();
 
 // Local reactive copy of globalFilter
 const localFilter = ref(props.globalFilter);
-const status = ref(props.statusFilter || "");
+const status = ref(props.statusFilter || false);
 
 
 // Watch for prop changes to update localFilter
 watch(
   () => [props.globalFilter, props.statusFilter],
-  ([globalVal, statusVal, categoryVal]) => {
+  ([globalVal, statusVal]) => {
     localFilter.value = globalVal;
     status.value = statusVal;
   }
@@ -45,7 +45,7 @@ watch(
 // Emit updates when either localFilter or status changes
 watch(
   [localFilter, status],
-  ([newFilter, newStatus, newCategory]) => {
+  ([newFilter, newStatus]) => {
     emit("update:globalFilter", newFilter);
     emit("update:statusFilter", newStatus);
   }
@@ -64,7 +64,7 @@ function onResetFilters() {
         <Input
           id="search"
           type="text"
-          placeholder="Search articles..."
+          placeholder="Search services..."
           class="pl-10"
           v-model="localFilter"
         />
@@ -75,17 +75,17 @@ function onResetFilters() {
         </span>
       </div>
 
-      <Select v-model="status">
+      <!-- <Select v-model="status">
         <SelectTrigger>
           <SelectValue placeholder="Select a Status" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="Active">Active</SelectItem>
-            <SelectItem value="Paused">Paused</SelectItem>
+            <SelectItem :value="true">Active</SelectItem>
+            <SelectItem :value="false">Paused</SelectItem>
           </SelectGroup>
         </SelectContent>
-      </Select>
+      </Select> -->
 
 
       <Button

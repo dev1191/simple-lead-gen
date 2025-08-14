@@ -18,6 +18,7 @@ export function useServices() {
 
     const filters = useState('blogServicesFilters', () => ({
         search: '',
+        status: false
     }))
 
     const sort = useState('blogServicesSort', () => ({
@@ -42,7 +43,9 @@ export function useServices() {
             query = query.or(`name.ilike.%${filters.value.search}%,email.ilike.%${filters.value.search}%`)
         }
 
-
+        if (filters.value.status) {
+            query = query.eq('status', filters.value.status)
+        }
 
         const ascending = sort.value.order === 'asc'
         return query.order(sort.value.field, { ascending })
@@ -100,7 +103,8 @@ export function useServices() {
     const resetFilters = async () => {
         filters.value = {
             search: '',
-    
+            status:false
+
         }
         sort.value = { field: 'created_at', order: 'desc' }
         currentPage.value = 1
@@ -211,7 +215,7 @@ export function useServices() {
         }
     }
 
-      const updateStatus = async (ServiceId: string, status: boolean) => {
+    const updateStatus = async (ServiceId: string, status: boolean) => {
         try {
 
             let updatePayload = { status }
