@@ -113,14 +113,12 @@ export function useVendors() {
         await fetchVendors()
     }
 
-    const createVendor = async (VendorData: any, imageFile: File) => {
+    const createVendor = async (VendorData: any) => {
         try {
 
             const { data, error } = await supabase
                 .from('vendors')
-                .insert([{
-                    ...VendorData,
-                }])
+                .insert(VendorData)
                 .select()
 
             if (!error) await fetchVendors()

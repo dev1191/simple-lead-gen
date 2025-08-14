@@ -1,6 +1,6 @@
 // composables/useBlogServices.ts
 import { useSupabaseClient } from '#imports'
-import { slugify } from '../shared/utils'
+import type { Service } from '~/shared/types/service'
 
 export function useServices() {
     const supabase = useSupabaseClient()
@@ -18,9 +18,6 @@ export function useServices() {
 
     const filters = useState('blogServicesFilters', () => ({
         search: '',
-        name: '',
-        email: '',
-        status: '',
     }))
 
     const sort = useState('blogServicesSort', () => ({
@@ -37,16 +34,14 @@ export function useServices() {
         let query = supabase
             .from('services')
             .select(`
-        *
+        *,
+       vendors(id,name,email)
       `, { count: 'exact' })
 
         if (filters.value.search) {
             query = query.or(`name.ilike.%${filters.value.search}%,email.ilike.%${filters.value.search}%`)
         }
 
-        if (filters.value.status) {
-            query = query.eq('status', filters.value.status)
-        }
 
 
         const ascending = sort.value.order === 'asc'
@@ -105,38 +100,121 @@ export function useServices() {
     const resetFilters = async () => {
         filters.value = {
             search: '',
-            name: '',
-            email: '',
-            status: ''
+    
         }
         sort.value = { field: 'created_at', order: 'desc' }
         currentPage.value = 1
         await fetchServices()
     }
 
-    const createService = async (ServiceData: any, imageFile: File) => {
+    const createService = async (ServiceData: any) => {
         try {
 
-            const { data, error } = await supabase
+            const { createVendor } = useVendors();
+            const { data: vendor, error: vendorError } = await createVendor({
+                name: ServiceData.provider_name,
+                email: ServiceData.provider_email,
+            })
+
+
+            if (vendorError) throw vendorError
+
+            const serviceInsert: Service = {
+                service_name: ServiceData.service_name,
+                service_tagline: ServiceData.service_tagline,
+                logo_url: ServiceData.logo_url,
+                banner_url: ServiceData.banner_url,
+                description: ServiceData.description,
+                business_types: ServiceData.business_types,
+                type_of_service: ServiceData.type_of_service,
+                highlights: ServiceData.highlights,
+                included: ServiceData.included,
+                currency_code: ServiceData.currency_code,
+                pricing: ServiceData.pricing,
+                turnaround_time: ServiceData.turnaround_time,
+                free_consulatation: ServiceData.free_consulatation,
+                url: ServiceData.url,
+                client_logos: ServiceData.client_logos,
+                servers: ServiceData.servers,
+                vendor_id: vendor[0].id
+            };
+            const { data: newService, error } = await supabase
                 .from('services')
-                .insert([{
-                    ...ServiceData,
-                }])
+                .insert(serviceInsert)
                 .select()
+
+
+            if (ServiceData.service_categories && ServiceData.service_categories.length > 0) {
+                const categoryAssociations = ServiceData.service_categories.map(categoryId => ({
+                    service_id: newService[0].id,
+                    category_id: categoryId
+                }));
+
+                const { error: categoryError } = await supabase
+                    .from('service_categories') // Assuming this is your junction table
+                    .insert(categoryAssociations)
+
+                if (categoryError) {
+                    await supabase.from('services').delete().eq('id', newService[0].id)
+                    throw categoryError
+                }
+
+                // Prepare sub-category associations
+                const subCategoryAssociations = serviceData.service_categories.flatMap(category => {
+                    return (category.sub_categories || []).map(subId => ({
+                        service_id: newService[0].id,
+                        sub_category_id: subId,
+                    }))
+                })
+
+                if (subCategoryAssociations.length > 0) {
+                    const { error: subCategoryError } = await supabase
+                        .from('service_sub_categories')
+                        .insert(subCategoryAssociations)
+
+                    if (subCategoryError) {
+                        // Rollback both category and service
+                        await supabase.from('service_categories').delete().eq('service_id', newService[0].id)
+                        await supabase.from('services').delete().eq('id', newService[0].id)
+                        throw subCategoryError
+                    }
+                }
+            }
+
 
             if (!error) await fetchServices()
 
-            return { data, error }
+            return { newService, error }
         } catch (err) {
             console.error('Error creating blog Service:', err)
             return { data: null, error: err }
         }
     }
 
-    const updateService = async (ServiceId: string, updateData: any, newImageFile = null) => {
+    const updateService = async (ServiceId: string, updateData: any) => {
         try {
 
             let updatePayload = { ...updateData }
+
+            const { data, error } = await supabase
+                .from('services')
+                .update(updatePayload)
+                .eq('id', ServiceId)
+                .select()
+
+            if (!error) await fetchServices()
+
+            return { data, error }
+        } catch (err) {
+            console.error('Error updating blog Service:', err)
+            return { data: null, error: err }
+        }
+    }
+
+      const updateStatus = async (ServiceId: string, status: boolean) => {
+        try {
+
+            let updatePayload = { status }
 
             const { data, error } = await supabase
                 .from('services')
@@ -177,7 +255,7 @@ export function useServices() {
         const { count: draft, error: errDraft } = await supabase
             .from('services')
             .select('id', { count: 'exact', head: true })
-            .eq('status', 'Active')
+            .eq('status', true)
 
         if (errDraft) {
             error.value = errDraft
@@ -188,7 +266,7 @@ export function useServices() {
         const { count: published, error: errPublished } = await supabase
             .from('services')
             .select('id', { count: 'exact', head: true })
-            .eq('status', 'Inactive')
+            .eq('status', false)
 
         if (errPublished) {
             error.value = errPublished
@@ -206,7 +284,7 @@ export function useServices() {
         loading.value = true
         try {
 
-        
+
             const { data, error: err } = await supabase
                 .from('categories')
                 .select(`*,sub_categories(id,name)`, { count: 'exact' })
@@ -248,6 +326,7 @@ export function useServices() {
         resetFilters,
         createService,
         updateService,
+        updateStatus,
         deleteService
     }
 }

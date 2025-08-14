@@ -15,16 +15,15 @@ import DynamicInputList from "~/components/DynamicInputList.vue";
 import Checkbox from "~/components/ui/checkbox/Checkbox.vue";
 import { fileWithAspectRatio } from "../../../shared/utils";
 
-
 const clientLogoFiles = ref<File>(null);
 const isLoading = ref(false);
 
 const formSchema = toTypedSchema(
   z.object({
-    name: z.string().min(2).max(150),
+    service_name: z.string().min(2).max(150),
     service_tagline: z.string().min(2).max(150),
     service_categories: z
-      .array(z.string())
+      .array(z.object())
       .min(1, "Select at least one category"),
     highlights: z.array(z.string()).min(3, "Select at least three highlights"),
     included: z.array(z.string()).min(3, "Select at least three highlights"),
@@ -42,7 +41,9 @@ const formSchema = toTypedSchema(
     pricing: z.string().optional(),
     turnaround_time: z.string("Typical turnaround time is required"),
     url: z.string().optional(),
-    description: z.string().min(1, "Detailed description of your service is required"),
+    description: z
+      .string()
+      .min(1, "Detailed description of your service is required"),
     free_consulatation: z.boolean().optional(),
     client_logos: z.array(z.string()).optional(),
     servers: z
@@ -66,7 +67,9 @@ const serverOptions = [
   },
 ];
 
-const { fetchCategories, categories } = useServices();
+const { fetchCategories, categories, createService } = useServices();
+const { uploadFile } = useUpload();
+
 const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
   useForm({
     validationSchema: formSchema,
@@ -144,45 +147,54 @@ const handleBusinessTypeChange = (
   }
 };
 
-// Function to scroll to first error
-const scrollToFirstError = () => {
-  nextTick(() => {
-    const firstErrorElement =
-      document.querySelector('[data-error="true"]') ||
-      document.querySelector(".text-red-500:not(.text-red-500 span)") ||
-      document.querySelector('[role="alert"]');
-
-    if (firstErrorElement) {
-      firstErrorElement.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    } else {
-      // Fallback: scroll to top of form
-      document.getElementById("service-form")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  });
-};
-
 // Proper form submission handler
 const onSubmit = handleSubmit(
   async (formData) => {
     try {
       isLoading.value = true;
+      let clientLogoUrls = [...(formData.client_logos || [])];
+      let logoUrl = "";
+      let bannerUrl = "";
+      // Upload all files in parallel
+      if (clientLogoFiles.value && clientLogoFiles.value.length > 0) {
+        const uploadPromises = clientLogoFiles.value.map(
+          async (file) => await uploadFile(file, "uploads", "services")
+        );
+
+        const newUrls = await Promise.all(uploadPromises);
+        clientLogoUrls.push(...newUrls); // ✅ Spread new URLs into existing array
+
+        setFieldValue("client_logos", clientLogoUrls);
+      }
+
+      // Upload image if file selected
+      if (formData.logo_url) {
+        logoUrl = await uploadFile(formData.logo_url, "uploads", "services");
+        setFieldValue("logo_url", logoUrl);
+      }
+
+      // Upload image if file selected
+      if (formData.banner_url) {
+        bannerUrl = await uploadFile(
+          formData.banner_url,
+          "uploads",
+          "services"
+        );
+        setFieldValue("banner_url", bannerUrl);
+      }
 
       // Add file uploads to form data if needed
       const submitData = {
         ...formData,
-        client_logos: clientLogoFiles.value,
+        logo_url: logoUrl,
+        banner_url: bannerUrl,
+        client_logos: clientLogoUrls,
       };
 
       console.log("Form submitted with data:", submitData);
 
       // Your API call here
-      // await submitService(submitData);
+      await createService(submitData);
 
       toast.success("Service listing created successfully!");
       // resetForm();
@@ -220,7 +232,7 @@ onMounted(() => fetchCategories());
           <!-- Name -->
           <FormField
             v-slot="{ componentField }"
-            name="name"
+            name="service_name"
             :validate-on-blur="!isFieldDirty"
           >
             <FormItem>
@@ -303,7 +315,7 @@ onMounted(() => fetchCategories());
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField name="banner">
+          <FormField name="banner_url" v-slot="{ value, handleChange }">
             <FormItem>
               <FormLabel
                 >Cover Banner (16:9)
@@ -311,7 +323,8 @@ onMounted(() => fetchCategories());
               >
               <FormControl>
                 <FileUploader
-                  v-model="banner"
+                  :model-value="value"
+                  @update:model-value="handleChange"
                   placeholder="Upload your banner (landscape format)"
                 />
               </FormControl>
@@ -364,7 +377,6 @@ onMounted(() => fetchCategories());
             </FormItem>
           </FormField>
         </div>
-
       </template>
     </BaseCard>
 
@@ -397,7 +409,7 @@ onMounted(() => fetchCategories());
             </FormItem>
           </FormField>
 
-          <FormField v-slot="{ value, handleChange }" name="business_types">
+          <FormField name="business_types" v-slot="{ value, handleChange }">
             <FormItem>
               <FormLabel class="text-base"
                 >Who is this for?<span class="text-red-500">*</span>
@@ -413,11 +425,11 @@ onMounted(() => fetchCategories());
                   <FormControl>
                     <Checkbox
                       class="h-5 w-5"
-                      :checked="value?.includes(businessType.value)"
-                      @update:checked="
-                        (checked) =>
+                      :model-value="value?.includes(businessType.value)"
+                      @update:model-value="
+                        (val) =>
                           handleBusinessTypeChange(
-                            checked,
+                            val,
                             businessType.value,
                             value,
                             handleChange
@@ -672,8 +684,8 @@ onMounted(() => fetchCategories());
                   <FormControl>
                     <Checkbox
                       class="h-5 w-5"
-                      :checked="value?.includes(server.value)"
-                      @update:checked="
+                      :model-value="value?.includes(server.value)"
+                      @update:model-value="
                         (checked) =>
                           handleServerChange(
                             checked,
@@ -684,9 +696,11 @@ onMounted(() => fetchCategories());
                       "
                     />
                   </FormControl>
-                  <div class="flex flex-row gap-8 leading-none ">
+                  <div class="flex flex-row gap-8 leading-none">
                     <FormLabel>{{ server.label }}</FormLabel>
-                    <FormDescription v-if="server.value === 'global'">(Auto-includes Malaysia and Singapore)</FormDescription>
+                    <FormDescription v-if="server.value === 'global'"
+                      >(Auto-includes Malaysia and Singapore)</FormDescription
+                    >
                   </div>
                 </FormItem>
               </div>

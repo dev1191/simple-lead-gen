@@ -9,7 +9,7 @@ import type { Vendor } from "~/shared/types/vendor";
 
 export const columns: ColumnDef<Vendor>[] = [
     {
-        accessorKey: "title",
+        accessorKey: "service_name",
         header: "Service Name",
     },
 
@@ -17,12 +17,16 @@ export const columns: ColumnDef<Vendor>[] = [
         accessorKey: "category",
         header: "Category",
     },
+        {
+        accessorKey: "vendors.name",
+        header: "Provider Name",
+    },
     {
-        accessorKey: "price",
+        accessorKey: "pricing",
         header: "Price per Lead",
     },
     {
-        accessorKey: "price",
+        accessorKey: "vendors.email",
         header: "Contact Email",
     },
     {
@@ -31,10 +35,10 @@ export const columns: ColumnDef<Vendor>[] = [
         cell: ({ row }) => {
             const value = row.getValue("status");
             const className =
-                value === "Active"
-                    ? "bg-green-200 text-green-700 font-semibold rounded"
-                    : "bg-slate-200 text-slate-700 font-semibold rounded";
-            return h(Badge, { class: className, variant: "secondary" }, () => value);
+                value 
+                    ? "bg-green-200 text-green-700 font-semibold rounded-xl"
+                    : "bg-yellow-200 text-yellow-700 font-semibold rounded-xl";
+            return h(Badge, { class: className, variant: "secondary" }, () =>  value ? 'Active' :'Pause');
         },
     },
     {
