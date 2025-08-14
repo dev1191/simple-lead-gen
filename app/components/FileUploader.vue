@@ -161,7 +161,7 @@ const isSingle = computed(() => !props.multiple && previewUrls.value.length === 
           <img
             :src="previewUrls[0]"
             alt="Preview"
-            class="w-full h-full object-cover rounded-md"
+            class="w-full h-50 object-cover rounded-md"
             draggable="false"
           />
           <Button
@@ -181,7 +181,7 @@ const isSingle = computed(() => !props.multiple && previewUrls.value.length === 
           <div
             v-for="(url, index) in previewUrls"
             :key="url + index"
-            class="relative w-24 h-24 rounded-md border overflow-hidden"
+            class="relative w-35 h-35 rounded-md border overflow-hidden"
             @click.stop
           >
             <img

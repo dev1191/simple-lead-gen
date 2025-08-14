@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import DynamicInputList from "~/components/DynamicInputList.vue";
 import Checkbox from "~/components/ui/checkbox/Checkbox.vue";
+import { fileWithAspectRatio } from "../../../shared/utils";
 
 const logo = ref<File>(null);
 const banner = ref<File>(null);
@@ -35,17 +36,16 @@ const formSchema = toTypedSchema(
       .refine((value) => value.some((item) => item), {
         message: "You have to select at least one item.",
       }),
-    banner_url: z.string().optional(),
-    logo_url: z.string().optional(),
+    logo_url: fileWithAspectRatio(1, 1), // 1:1 aspect ratio
+    banner_url: fileWithAspectRatio(16, 9), // 16:9 aspect ratio
     type_of_service: z.string(),
     currency_code: z.string().optional(),
     pricing: z.string().optional(),
     turnaround_time: z.string("Typical turnaround time is required"),
     url: z.string().optional(),
-    seo_title: z.string().min(1, "SEO Title is required"),
     description: z.string().min(1, "SEO Description is required"),
     free_consulatation: z.boolean().optional(),
-    client_logos: z.array(z.string()).optional(),
+    client_logos: z.array(z.instanceof(File)).optional(),
     servers: z
       .array(z.enum(["malaysia", "singapore", "global"]))
       .min(1, "Please select at least one country serve"),
@@ -86,11 +86,10 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
       client_logos: [],
       servers: [],
       url: "",
-      banner_url: "",
-      logo_url: "",
+      banner_url: undefined,
+      logo_url: undefined,
       provider_name: "",
       provider_email: "",
-      seo_title: "",
       description: "",
     },
   });
@@ -291,7 +290,7 @@ onMounted(() => fetchCategories());
         </div>
 
         <div class="grid grid-cols-2 gap-8 w-full mb-6">
-          <FormField name="logo">
+          <FormField name="logo_url" v-slot="{ value, handleChange }">
             <FormItem>
               <FormLabel
                 >Company Logo (1:1)<span class="text-red-500"
@@ -300,7 +299,8 @@ onMounted(() => fetchCategories());
               >
               <FormControl>
                 <FileUploader
-                  v-model="logo"
+                  :model-value="value"
+                  @update:model-value="handleChange"
                   placeholder="Upload your logo (square format)"
                 />
               </FormControl>
@@ -361,29 +361,6 @@ onMounted(() => fetchCategories());
                 <Input
                   type="email"
                   placeholder="Enter provider email address"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </div>
-
-        <!-- SEO Fields (were missing from initial values) -->
-        <div class="grid grid-cols-1 gap-8 w-full mb-6">
-          <FormField
-            v-slot="{ componentField }"
-            name="seo_title"
-            :validate-on-blur="!isFieldDirty"
-          >
-            <FormItem>
-              <FormLabel>
-                SEO Title <span class="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  placeholder="Enter SEO title"
                   v-bind="componentField"
                 />
               </FormControl>
@@ -657,12 +634,13 @@ onMounted(() => fetchCategories());
             </FormItem>
           </FormField>
 
-          <FormField name="clientLogoFiles">
+          <FormField name="client_logos" v-slot="{ value, handleChange }">
             <FormItem>
               <FormLabel>Client Logos (optional)</FormLabel>
               <FormControl>
                 <FileUploader
-                  v-model="clientLogoFiles"
+                  v-model="value"
+                  @update:model-value="handleChange"
                   :previewUrl="values.client_logos"
                   multiple
                   placeholder="Upload client logos to showcase your work"
