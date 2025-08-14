@@ -27,7 +27,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  'update:modelValue': [value: SelectedCategory[]]
+  "update:modelValue": [value: SelectedCategory[]];
 }>();
 
 // Track expansion state
@@ -35,15 +35,15 @@ const expanded = ref<Record<string, boolean>>({});
 
 // Check if a category or subcategory is selected
 const isItemSelected = (id: string): boolean => {
-  return props.modelValue.some(cat => {
+  return props.modelValue.some((cat) => {
     if (cat.id === id) return true;
-    return cat.sub_categories.some(sub => sub.id === id);
+    return cat.sub_categories.some((sub) => sub.id === id);
   });
 };
 
 // Get selected subcategories of a category
 const getSelectedSubcategories = (categoryId: string): SubCategory[] => {
-  const selectedCat = props.modelValue.find(cat => cat.id === categoryId);
+  const selectedCat = props.modelValue.find((cat) => cat.id === categoryId);
   return selectedCat ? selectedCat.sub_categories : [];
 };
 
@@ -54,32 +54,41 @@ const toggleCategory = (category: Category) => {
 
   if (isSelected) {
     // Remove category completely
-    newModelValue = newModelValue.filter(cat => cat.id !== category.id);
+    newModelValue = newModelValue.filter((cat) => cat.id !== category.id);
   } else {
     // Add category with all subcategories
     const newCategory: SelectedCategory = {
       id: category.id,
       name: category.name,
-      sub_categories: category.service_sub_categories || []
+      sub_categories: category.service_sub_categories || [],
     };
     newModelValue.push(newCategory);
   }
 
-  emit('update:modelValue', newModelValue);
+  emit("update:modelValue", newModelValue);
 };
 
 // Toggle subcategory selection
-const toggleSubcategory = (subcategory: SubCategory, parentCategory: Category) => {
+const toggleSubcategory = (
+  subcategory: SubCategory,
+  parentCategory: Category
+) => {
   let newModelValue = [...props.modelValue];
-  const existingCategoryIndex = newModelValue.findIndex(cat => cat.id === parentCategory.id);
+  const existingCategoryIndex = newModelValue.findIndex(
+    (cat) => cat.id === parentCategory.id
+  );
 
   if (existingCategoryIndex >= 0) {
     const existingCategory = newModelValue[existingCategoryIndex];
-    const subExists = existingCategory.sub_categories.some(sub => sub.id === subcategory.id);
+    const subExists = existingCategory.sub_categories.some(
+      (sub) => sub.id === subcategory.id
+    );
 
     if (subExists) {
       // Remove subcategory
-      existingCategory.sub_categories = existingCategory.sub_categories.filter(sub => sub.id !== subcategory.id);
+      existingCategory.sub_categories = existingCategory.sub_categories.filter(
+        (sub) => sub.id !== subcategory.id
+      );
       if (existingCategory.sub_categories.length === 0) {
         newModelValue.splice(existingCategoryIndex, 1);
       }
@@ -92,12 +101,12 @@ const toggleSubcategory = (subcategory: SubCategory, parentCategory: Category) =
     const newCategory: SelectedCategory = {
       id: parentCategory.id,
       name: parentCategory.name,
-      sub_categories: [subcategory]
+      sub_categories: [subcategory],
     };
     newModelValue.push(newCategory);
   }
 
-  emit('update:modelValue', newModelValue);
+  emit("update:modelValue", newModelValue);
 };
 
 // Toggle expansion
@@ -132,9 +141,12 @@ const getCategoryCheckboxState = (category: Category) => {
 
     <template v-for="cat in categories" :key="cat.id">
       <!-- Category row -->
-      <div class="flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded">
+      <div
+        class="flex items-center justify-between px-2 py-1 hover:bg-gray-50 rounded"
+      >
         <div class="flex items-center gap-2 flex-1">
           <Checkbox
+            class="w-5 h-5"
             :checked="getCategoryCheckboxState(cat)"
             @click="toggleCategory(cat)"
           />
@@ -146,7 +158,9 @@ const getCategoryCheckboxState = (category: Category) => {
           </span>
         </div>
         <div
-          v-if="cat.service_sub_categories && cat.service_sub_categories.length > 0"
+          v-if="
+            cat.service_sub_categories && cat.service_sub_categories.length > 0
+          "
           @click="toggleExpand(cat.id)"
           class="cursor-pointer p-1"
         >
@@ -156,13 +170,17 @@ const getCategoryCheckboxState = (category: Category) => {
       </div>
 
       <!-- Subcategories -->
-      <div v-if="isExpanded(cat.id) && cat.service_sub_categories" class="pl-8 space-y-1">
+      <div
+        v-if="isExpanded(cat.id) && cat.service_sub_categories"
+        class="pl-8 space-y-1"
+      >
         <div
           v-for="sub in cat.service_sub_categories"
           :key="sub.id"
           class="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded"
         >
           <Checkbox
+            class="w-5 h-5"
             :checked="isItemSelected(sub.id)"
             @click="toggleSubcategory(sub, cat)"
           />

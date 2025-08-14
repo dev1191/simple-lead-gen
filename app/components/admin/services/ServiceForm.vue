@@ -17,10 +17,12 @@ import Checkbox from "~/components/ui/checkbox/Checkbox.vue";
 const logo = ref<File>(null);
 const banner = ref<File>(null);
 const clientLogoFiles = ref<File>(null);
+const isLoading = ref(false);
+
 const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(2).max(150),
-    tagline: z.string().min(2).max(150),
+    service_tagline: z.string().min(2).max(150),
     service_categories: z
       .array(z.string())
       .min(1, "Select at least one category"),
@@ -33,7 +35,8 @@ const formSchema = toTypedSchema(
       .refine((value) => value.some((item) => item), {
         message: "You have to select at least one item.",
       }),
-    tags: z.array(z.string()).min(1, "Please select at least one tag"),
+    banner_url: z.string().optional(),
+    logo_url: z.string().optional(),
     type_of_service: z.string(),
     currency_code: z.string().optional(),
     pricing: z.string().optional(),
@@ -65,12 +68,12 @@ const serverOptions = [
 ];
 
 const { fetchCategories, categories } = useServices();
-const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
+const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
   useForm({
     validationSchema: formSchema,
     initialValues: {
       name: "",
-      tagline: "",
+      service_tagline: "",
       service_categories: [],
       type_of_service: "",
       business_types: [],
@@ -81,12 +84,14 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
       turnaround_time: "within-48-hours",
       free_consulatation: false,
       client_logos: [],
+      servers: [],
       url: "",
-      banner: "",
+      banner_url: "",
+      logo_url: "",
       provider_name: "",
       provider_email: "",
       seo_title: "",
-      seo_description: "",
+      description: "",
     },
   });
 
@@ -114,10 +119,10 @@ const businessTypeOptions = [
 ];
 
 const handleServerChange = (
-  checked :any,
-  serverValue:any,
-  currentValue:any,
-  handleChange:any,
+  checked: any,
+  serverValue: any,
+  currentValue: any,
+  handleChange: any
 ) => {
   const newValue = currentValue || [];
   if (checked) {
@@ -127,17 +132,83 @@ const handleServerChange = (
   }
 };
 
-
-const handleBusinessTypeChange = (checked:any, businessValue:any, currentValue:any, handleChange:any) => {
-  const newValue = currentValue || []
+const handleBusinessTypeChange = (
+  checked: any,
+  businessValue: any,
+  currentValue: any,
+  handleChange: any
+) => {
+  const newValue = currentValue || [];
   if (checked) {
-    handleChange([...newValue, businessValue])
+    handleChange([...newValue, businessValue]);
   } else {
-    handleChange(newValue.filter(item => item !== businessValue))
+    handleChange(newValue.filter((item) => item !== businessValue));
   }
-}
+};
 
-const onSubmit = async () => {};
+// Function to scroll to first error
+const scrollToFirstError = () => {
+  nextTick(() => {
+    const firstErrorElement =
+      document.querySelector('[data-error="true"]') ||
+      document.querySelector(".text-red-500:not(.text-red-500 span)") ||
+      document.querySelector('[role="alert"]');
+
+    if (firstErrorElement) {
+      firstErrorElement.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    } else {
+      // Fallback: scroll to top of form
+      document.getElementById("service-form")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  });
+};
+
+// Proper form submission handler
+const onSubmit = handleSubmit(
+  async (formData) => {
+    try {
+      isLoading.value = true;
+
+      // Add file uploads to form data if needed
+      const submitData = {
+        ...formData,
+        logo: logo.value,
+        banner: banner.value,
+        client_logo_files: clientLogoFiles.value,
+      };
+
+      console.log("Form submitted with data:", submitData);
+
+      // Your API call here
+      // await submitService(submitData);
+
+      toast.success("Service listing created successfully!");
+      // resetForm();
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Failed to create listing. Please try again.");
+    } finally {
+      isLoading.value = false;
+    }
+  },
+  (errors) => {
+    // This callback runs when validation fails
+    console.log("Validation errors:", errors);
+    toast.error("Please fix the errors in the form");
+    scrollToFirstError();
+  }
+);
+
+// Alternative submit handler for the button click
+const handleButtonSubmit = () => {
+  onSubmit();
+};
 
 onMounted(() => fetchCategories());
 </script>
@@ -172,10 +243,10 @@ onMounted(() => fetchCategories());
             </FormItem>
           </FormField>
 
-          <!-- Name -->
+          <!-- Tagline -->
           <FormField
             v-slot="{ componentField }"
-            name="tagline"
+            name="service_tagline"
             :validate-on-blur="!isFieldDirty"
           >
             <FormItem>
@@ -186,7 +257,7 @@ onMounted(() => fetchCategories());
               <FormControl>
                 <Input
                   type="text"
-                  placeholder="Enter tagline"
+                  placeholder="Describe your service in one line..."
                   v-bind="componentField"
                 />
               </FormControl>
@@ -228,7 +299,10 @@ onMounted(() => fetchCategories());
                 ></FormLabel
               >
               <FormControl>
-                <FileUploader v-model="logo" placeholder="Upload your logo (square format)" />
+                <FileUploader
+                  v-model="logo"
+                  placeholder="Upload your logo (square format)"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -240,7 +314,10 @@ onMounted(() => fetchCategories());
                 <span class="text-red-500">*</span></FormLabel
               >
               <FormControl>
-                <FileUploader v-model="banner" placeholder="Upload your banner (landscape format)" />
+                <FileUploader
+                  v-model="banner"
+                  placeholder="Upload your banner (landscape format)"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -248,7 +325,7 @@ onMounted(() => fetchCategories());
         </div>
 
         <div class="grid grid-cols-2 gap-8 w-full mb-6">
-          <!-- Name -->
+          <!-- Provider Name -->
           <FormField
             v-slot="{ componentField }"
             name="provider_name"
@@ -269,7 +346,7 @@ onMounted(() => fetchCategories());
             </FormItem>
           </FormField>
 
-          <!-- Name -->
+          <!-- Provider Email -->
           <FormField
             v-slot="{ componentField }"
             name="provider_email"
@@ -282,8 +359,31 @@ onMounted(() => fetchCategories());
               </FormLabel>
               <FormControl>
                 <Input
-                  type="text"
+                  type="email"
                   placeholder="Enter provider email address"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+
+        <!-- SEO Fields (were missing from initial values) -->
+        <div class="grid grid-cols-1 gap-8 w-full mb-6">
+          <FormField
+            v-slot="{ componentField }"
+            name="seo_title"
+            :validate-on-blur="!isFieldDirty"
+          >
+            <FormItem>
+              <FormLabel>
+                SEO Title <span class="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Enter SEO title"
                   v-bind="componentField"
                 />
               </FormControl>
@@ -302,7 +402,7 @@ onMounted(() => fetchCategories());
     >
       <template #default>
         <div class="grid grid-cols-1 gap-8 w-full mb-6">
-          <!-- Name -->
+          <!-- Description -->
           <FormField
             v-slot="{ componentField }"
             name="description"
@@ -315,7 +415,7 @@ onMounted(() => fetchCategories());
               <FormControl>
                 <Textarea
                   type="text"
-                  placeholder="Provide a deatailed description of your service..."
+                  placeholder="Provide a detailed description of your service..."
                   v-bind="componentField"
                 />
               </FormControl>
@@ -325,8 +425,12 @@ onMounted(() => fetchCategories());
 
           <FormField v-slot="{ value, handleChange }" name="business_types">
             <FormItem>
-              <FormLabel class="text-base">Who is this for?<span class="text-red-500">*</span> </FormLabel>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              <FormLabel class="text-base"
+                >Who is this for?<span class="text-red-500">*</span>
+              </FormLabel>
+              <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"
+              >
                 <FormItem
                   v-for="businessType in businessTypeOptions"
                   :key="businessType.value"
@@ -461,7 +565,7 @@ onMounted(() => fetchCategories());
                   <!-- Price Input -->
                   <FormField
                     v-slot="{ componentField: priceField }"
-                    name="price"
+                    name="pricing"
                   >
                     <FormItem class="flex-1">
                       <FormControl>
@@ -528,7 +632,6 @@ onMounted(() => fetchCategories());
               </FormControl>
               <div class="space-y-1 leading-none">
                 <FormLabel>Free Consultation Offered</FormLabel>
-
                 <FormMessage />
               </div>
             </FormItem>
@@ -575,7 +678,7 @@ onMounted(() => fetchCategories());
     <BaseCard
       class="mt-4"
       className="5xl"
-      title="Section 4:  Region Serviced"
+      title="Section 4: Region Serviced"
       :isFooter="false"
     >
       <template #default>
@@ -590,7 +693,7 @@ onMounted(() => fetchCategories());
                 <FormItem
                   v-for="server in serverOptions"
                   :key="server.value"
-                  class="flex flex-row items-start gap-x-3 space-y-0 p-2"
+                  class="flex flex-row gap-x-3 space-y-0 p-2"
                 >
                   <FormControl>
                     <Checkbox
@@ -620,12 +723,7 @@ onMounted(() => fetchCategories());
     </BaseCard>
 
     <div class="flex flex-center gap-4 mt-6 justify-center">
-      <Button
-        type="button"
-        class="w-60 h-12"
-        @click="onSubmit"
-        :disabled="isLoading"
-      >
+      <Button type="submit" class="w-50 h-12" :disabled="isLoading">
         <Icon
           name="Loader2"
           v-if="isLoading"

@@ -208,8 +208,8 @@ export function useServices() {
 
         
             const { data, error: err } = await supabase
-                .from('service_categories')
-                .select(`*,service_sub_categories(id,name)`, { count: 'exact' })
+                .from('categories')
+                .select(`*,sub_categories(id,name)`, { count: 'exact' })
 
             if (err) throw err
 
