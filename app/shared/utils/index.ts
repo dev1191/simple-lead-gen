@@ -18,23 +18,33 @@ export function slugify(text: string): string {
 
 
 
-
-
 export const fileWithAspectRatio = (widthRatio: number, heightRatio: number) =>
-  z.instanceof(File).refine(
-    (file) =>
-      new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const img = new Image();
-          img.onload = () => {
-            resolve(Math.abs(img.width / img.height - widthRatio / heightRatio) < 0.01);
+  z.union([
+    z.string().refine(
+      (val) => {
+        try {
+          const url = new URL(val);
+          return url.protocol === "http:" || url.protocol === "https:";
+        } catch {
+          return false;
+        }
+      },
+      { message: "Must be a valid URL" }
+    ),
+    z.instanceof(File).refine(
+      (file) =>
+        new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+              const aspectRatio = img.width / img.height;
+              resolve(Math.abs(aspectRatio - widthRatio / heightRatio) < 0.01);
+            };
+            img.src = reader.result as string;
           };
-          img.src = reader.result as string;
-        };
-        reader.readAsDataURL(file);
-      }),
-    {
-      message: "Invalid aspect ratio",
-    }
-  );
+          reader.readAsDataURL(file);
+        }),
+      { message: `Invalid aspect ratio ${widthRatio}:${heightRatio}` }
+    ),
+  ]);

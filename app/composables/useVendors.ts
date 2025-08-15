@@ -144,9 +144,10 @@ export function useVendors() {
         }
     }
 
-    const updateVendor = async (VendorId: string, updateData: any, newImageFile = null) => {
+    const updateVendor = async (VendorId: string, updateData: any) => {
         try {
 
+            console.log("VendorId",VendorId)
             let updatePayload = { ...updateData }
 
             const { data, error } = await supabase
@@ -159,7 +160,7 @@ export function useVendors() {
 
             return { data, error }
         } catch (err) {
-            console.error('Error updating blog Vendor:', err)
+            console.error('Error updating vendor:', err)
             return { data: null, error: err }
         }
     }

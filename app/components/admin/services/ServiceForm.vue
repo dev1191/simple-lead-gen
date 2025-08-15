@@ -42,6 +42,7 @@ const formSchema = toTypedSchema(
     included: z.array(z.string()).min(3, "Select at least three highlights"),
     provider_name: z.string().min(1, "Provider name is required"),
     provider_email: z.email("Provider email is required"),
+    vendor_id: z.string().optional(),
     business_types: z
       .array(z.string())
       .refine((value) => value.some((item) => item), {
@@ -80,7 +81,8 @@ const serverOptions = [
   },
 ];
 
-const { fetchCategories, categories, createService } = useServices();
+const { fetchCategories, categories, createService, updateService } =
+  useServices();
 const { uploadFile } = useUpload();
 
 const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
@@ -106,6 +108,7 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
       provider_name: "",
       provider_email: "",
       description: "",
+      vendor_id: "",
     },
   });
 
@@ -185,24 +188,26 @@ const onSubmit = handleSubmit(
       let bannerUrl = "";
       // Upload all files in parallel
       if (clientLogoFiles.value && clientLogoFiles.value.length > 0) {
-        const uploadPromises = clientLogoFiles.value.map(
-          async (file) => await uploadFile(file, "uploads", "services")
-        );
+        const uploadPromises = clientLogoFiles.value
+          .filter((file: File) => file instanceof File) // ✅ Only files
+          .map((file) => uploadFile(file, "uploads", "services"));
 
         const newUrls = await Promise.all(uploadPromises);
-        clientLogoUrls.push(...newUrls); // ✅ Spread new URLs into existing array
 
-        setFieldValue("client_logos", clientLogoUrls);
+        // Combine with existing URLs safely
+        const updatedUrls = [...clientLogoUrls, ...newUrls];
+
+        setFieldValue("client_logos", updatedUrls);
       }
 
       // Upload image if file selected
-      if (formData.logo_url) {
+      if (formData.logo_url && formData.logo_url instanceof File) {
         logoUrl = await uploadFile(formData.logo_url, "uploads", "services");
         setFieldValue("logo_url", logoUrl);
       }
 
       // Upload image if file selected
-      if (formData.banner_url) {
+      if (formData.banner_url && formData.banner_url instanceof File) {
         bannerUrl = await uploadFile(
           formData.banner_url,
           "uploads",
@@ -222,7 +227,11 @@ const onSubmit = handleSubmit(
       console.log("Form submitted with data:", submitData);
 
       // call composable useService
-      await createService(submitData);
+      if (props.isEditable) {
+        await updateService(props.service.id, submitData);
+      } else {
+        await createService(submitData);
+      }
 
       toast.success("Service listing created successfully!");
       // resetForm();
@@ -748,7 +757,7 @@ onMounted(() => fetchCategories());
           :size="18"
           class="mr-2 h-4 w-4 animate-spin"
         />
-        Create Listing
+        {{ isEditable ? "Update" : "Create" }} Listing
       </Button>
     </div>
   </form>

@@ -36,7 +36,10 @@ export function useServices() {
             .from('services')
             .select(`
         *,
-       vendors(id,name,email)
+       vendors(id,name,email),
+       service_categories(
+            categories(id,name)
+            )
       `, { count: 'exact' })
 
         if (filters.value.search) {
@@ -444,7 +447,8 @@ export function useServices() {
             ...cleanServiceData,
             provider_name: serviceData.vendors.name,
             provider_email: serviceData.vendors.email,
-            service_categories: transformedCategories
+            service_categories: transformedCategories,
+            vendor_id: serviceData.vendors.id
         };
     }
 

@@ -14,10 +14,24 @@ export const columns: ColumnDef<Vendor>[] = [
     },
 
     {
-        accessorKey: "category",
+        accessorKey: "service_categories",
         header: "Category",
+        cell: ({ row }) => {
+            const value: Array<{ categories: { id: string; name: string } }> =
+                row.getValue("service_categories");
+
+            if (!value || value.length === 0) return null;
+
+            return value.map((item) =>
+                h(
+                    Badge,
+                    { key: item.categories.id, class: "mr-1", variant: "secondary" },
+                    () => item.categories.name
+                )
+            );
+        },
     },
-        {
+    {
         accessorKey: "vendors.name",
         header: "Provider Name",
     },
@@ -35,10 +49,10 @@ export const columns: ColumnDef<Vendor>[] = [
         cell: ({ row }) => {
             const value = row.getValue("status");
             const className =
-                value 
+                value
                     ? "bg-green-200 text-green-700 font-semibold rounded-xl"
                     : "bg-yellow-200 text-yellow-700 font-semibold rounded-xl";
-            return h(Badge, { class: className, variant: "secondary" }, () =>  value ? 'Active' :'Pause');
+            return h(Badge, { class: className, variant: "secondary" }, () => value ? 'Active' : 'Pause');
         },
     },
     {

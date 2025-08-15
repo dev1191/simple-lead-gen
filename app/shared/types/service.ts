@@ -31,6 +31,6 @@ export interface Service {
     url: string;
     client_logos: string[];
     servers: string[];
-    vendor_id: string;
+    vendor_id?: string;
     status: boolean
 }
