@@ -69,6 +69,33 @@ const serverOptions = [
   },
 ];
 
+const bestForOptions = [
+  {
+    value: "solopreneurs",
+    label: "Solopreneurs",
+  },
+  {
+    value: "startups",
+    label: "Startups",
+  },
+  {
+    value: "smes",
+    label: "SMEs",
+  },
+  {
+    value: "agencies",
+    label: "Agencies",
+  },
+  {
+    value: "remote_teams",
+    label: "Remote Teams",
+  },
+  {
+    value: "product-base-brands",
+    label: "Product-Based Brands",
+  },
+];
+
 const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
   useForm({
     validationSchema: formSchema,
@@ -102,6 +129,20 @@ watch(
   },
   { immediate: true }
 );
+
+const handleBestForChange = (
+  checked: any,
+  businessValue: any,
+  currentValue: any,
+  handleChange: any
+) => {
+  const newValue = currentValue || [];
+  if (checked) {
+    handleChange([...newValue, businessValue]);
+  } else {
+    handleChange(newValue.filter((item) => item !== businessValue));
+  }
+};
 
 const onSubmit = () => {};
 </script>
@@ -206,14 +247,16 @@ const onSubmit = () => {};
                     class="flex items-center space-x-2 p-1 hover:bg-accent/50 transition-colors cursor-pointer"
                   >
                     <Checkbox
-                    class="w-5 h-5"
+                      class="w-5 h-5"
                       :model-value="value?.includes(subcategory.value) || false"
                       @update:model-value="
                         (checked) =>
                           handleChange(
                             checked
                               ? [...(value || []), subcategory.value]
-                              : (value || []).filter((v) => v !== subcategory.value)
+                              : (value || []).filter(
+                                  (v) => v !== subcategory.value
+                                )
                           )
                       "
                     />
@@ -223,6 +266,195 @@ const onSubmit = () => {};
                   </div>
                 </div>
               </div>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 w-full mb-6">
+          <FormField name="logo_url" v-slot="{ value, handleChange }">
+            <FormItem>
+              <FormLabel
+                >Logo Upload (1:1)<span class="text-red-500">*</span></FormLabel
+              >
+              <FormControl>
+                <FileUploader
+                  :model-value="value"
+                  @update:model-value="handleChange"
+                  placeholder="Upload 1:1 ratio logo"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField name="banner_url" v-slot="{ value, handleChange }">
+            <FormItem>
+              <FormLabel>Screenshot / Banner (Optional)</FormLabel>
+              <FormControl>
+                <FileUploader
+                  :model-value="value"
+                  @update:model-value="handleChange"
+                  placeholder="Upload promo banner"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </template>
+    </BaseCard>
+
+    <BaseCard
+      class="mt-4"
+      className="5xl"
+      title="Section 2: Tool Details"
+      :isFooter="false"
+    >
+      <template #default>
+        <div class="grid grid-cols-1 gap-8 w-full mb-6">
+          <!-- Description -->
+          <FormField
+            v-slot="{ componentField }"
+            name="description"
+            :validate-on-blur="!isFieldDirty"
+          >
+            <FormItem>
+              <FormLabel>
+                Product Description <span class="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  type="text"
+                  rows="6"
+                  placeholder="Provide a detailed description of your tool..."
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField
+            v-slot="{ componentField }"
+            name="problem_solved"
+            :validate-on-blur="!isFieldDirty"
+          >
+            <FormItem>
+              <FormLabel>
+                Main Problem Solved <span class="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  type="text"
+                  rows="4"
+                  placeholder="What primary problem does your tool solve?"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField name="business_types" v-slot="{ value, handleChange }">
+            <FormItem>
+              <FormLabel class="text-base"
+                >Who is this for?<span class="text-red-500">*</span>
+              </FormLabel>
+              <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"
+              >
+                <FormItem
+                  v-for="businessType in bestForOptions"
+                  :key="businessType.value"
+                  class="flex flex-row items-start gap-x-3 space-y-0 p-2"
+                >
+                  <FormControl>
+                    <Checkbox
+                      class="h-5 w-5"
+                      :model-value="value?.includes(businessType.value)"
+                      @update:model-value="
+                        (val) =>
+                          handleBestForChange(
+                            val,
+                            businessType.value,
+                            value,
+                            handleChange
+                          )
+                      "
+                    />
+                  </FormControl>
+                  <FormLabel class="flex items-center gap-2">
+                    {{ businessType.label }}
+                  </FormLabel>
+                </FormItem>
+              </div>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </template>
+    </BaseCard>
+
+    <BaseCard
+      class="mt-4"
+      className="5xl"
+      title="Section 3: Display Information"
+      :isFooter="false"
+    >
+      <template #default>
+        <div class="grid grid-cols-1 gap-8 w-full mb-6">
+          <FormField v-slot="{ value, handleChange }" name="core_features">
+            <FormItem>
+              <FormLabel
+                >Core Features (3-5)
+                <span class="text-red-500">*</span></FormLabel
+              >
+              <FormControl>
+                <DynamicInputList
+                  :model-value="value"
+                  @update:model-value="handleChange"
+                  :max-items="5"
+                  placeholder="Enter a key feature"
+                  label="Core"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+        <div class="grid grid-cols-2 gap-8 w-full mb-6">
+          <FormField v-slot="{ value, handleChange }" name="pros">
+            <FormItem>
+              <FormLabel
+                >Pros</FormLabel
+              >
+              <FormControl>
+                <DynamicInputList
+                  :model-value="value"
+                  @update:model-value="handleChange"
+                  :max-items="5"
+                  placeholder="Enter a key feature"
+                  label="Pros"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ value, handleChange }" name="cons">
+            <FormItem>
+              <FormLabel
+                >Cons</FormLabel
+              >
+              <FormControl>
+                <DynamicInputList
+                  :model-value="value"
+                  @update:model-value="handleChange"
+                  :max-items="5"
+                  placeholder="Enter a key feature"
+                  label="Cons"
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>

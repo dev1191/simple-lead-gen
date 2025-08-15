@@ -8,6 +8,7 @@ interface Props {
   modelValue: string[] | null | undefined;
   placeholder?: string;
   maxItems?: number;
+  label?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -96,7 +97,7 @@ onMounted(() => {
       class="flex items-center gap-1"
     >
       <Plus class="w-4 h-4" />
-      Add Item
+      Add {{ label ? label : "Item" }}
     </Button>
   </div>
 </template>
