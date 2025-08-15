@@ -1,0 +1,23 @@
+export interface Tool {
+    id:string;
+    name:string;
+    tagline:string;
+    category:string,
+    sub_category:string[],
+    logo_url:string;
+    banner_url:string;
+    description:string;
+    problem_solved:string;
+    best_for:string[];
+    core_features:string[];
+    pros:string[];
+    cons:string[];
+    pricing_model:string;
+    currency_code:string;
+    pricing:string;
+    cta_label:string;
+    free_trial:boolean;
+    integrations:string[];
+    platforms:string[];
+    operate:string[]
+}
