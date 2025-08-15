@@ -424,7 +424,6 @@ export function useServices() {
         serviceData.service_sub_categories.forEach(ssc => {
             const subCategory = ssc.sub_categories;
             const parentCategory = categoryMap.get(subCategory.category_id);
-            console.log("parentCategory", parentCategory)
             if (parentCategory) {
                 parentCategory.sub_categories.push({
                     id: subCategory.id,

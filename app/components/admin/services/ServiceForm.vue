@@ -84,6 +84,7 @@ const serverOptions = [
 const { fetchCategories, categories, createService, updateService } =
   useServices();
 const { uploadFile } = useUpload();
+const router = useRouter();
 
 const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
   useForm({
@@ -198,13 +199,18 @@ const onSubmit = handleSubmit(
         const updatedUrls = [...clientLogoUrls, ...newUrls];
 
         setFieldValue("client_logos", updatedUrls);
+      }else{
+        clientLogoUrls =  formData.client_logos
       }
 
       // Upload image if file selected
       if (formData.logo_url && formData.logo_url instanceof File) {
         logoUrl = await uploadFile(formData.logo_url, "uploads", "services");
         setFieldValue("logo_url", logoUrl);
+      }else{
+        logoUrl =  formData.logo_url
       }
+
 
       // Upload image if file selected
       if (formData.banner_url && formData.banner_url instanceof File) {
@@ -214,7 +220,10 @@ const onSubmit = handleSubmit(
           "services"
         );
         setFieldValue("banner_url", bannerUrl);
+      }else{
+        bannerUrl =  formData.banner_url
       }
+
 
       // Add file uploads to form data if needed
       const submitData = {
@@ -224,7 +233,7 @@ const onSubmit = handleSubmit(
         client_logos: clientLogoUrls,
       };
 
-      console.log("Form submitted with data:", submitData);
+      //console.log("Form submitted with data:", submitData);
 
       // call composable useService
       if (props.isEditable) {
@@ -234,7 +243,8 @@ const onSubmit = handleSubmit(
       }
 
       toast.success("Service listing created successfully!");
-      // resetForm();
+      resetForm();
+      router.push('/admin/services')
     } catch (error) {
       console.error("Submission error:", error);
       toast.error("Failed to create listing. Please try again.");
@@ -249,10 +259,6 @@ const onSubmit = handleSubmit(
   }
 );
 
-// Alternative submit handler for the button click
-const handleButtonSubmit = () => {
-  onSubmit();
-};
 
 onMounted(() => fetchCategories());
 </script>

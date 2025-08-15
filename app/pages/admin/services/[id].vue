@@ -23,7 +23,7 @@ onMounted(async () => {
 <template>
   <AdminLayoutPage
     title="Edit Service"
-    description="Create your service listing to reach more customers"
+    description="Edit your service listing to reach more customers"
     sticky
   >
     <div>
