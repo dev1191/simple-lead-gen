@@ -15,7 +15,9 @@ const props = withDefaults(defineProps<Props>(), {
   maxItems: 6,
 });
 
-const items = ref<string[]>(Array.isArray(props.modelValue) ? [...props.modelValue] : []);
+const items = ref<string[]>(
+  Array.isArray(props.modelValue) ? [...props.modelValue] : []
+);
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string[]): void;
@@ -77,6 +79,7 @@ onMounted(() => {
       />
       <!-- Show remove button if there is more than 1 item -->
       <Button
+        type="button"
         v-if="items.length > 1"
         variant="outline"
         size="icon"
@@ -86,6 +89,7 @@ onMounted(() => {
       </Button>
     </div>
     <Button
+      type="button"
       v-if="canAdd"
       variant="outline"
       @click="addItem"

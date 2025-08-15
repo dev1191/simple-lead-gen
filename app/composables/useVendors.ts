@@ -115,18 +115,32 @@ export function useVendors() {
 
     const createVendor = async (VendorData: any) => {
         try {
+            //  Check if vendor with this email already exists
+            const { data: existingVendor, error: checkError } = await supabase
+                .from("vendors")
+                .select("*")
+                .eq("email", VendorData.email)
+                .maybeSingle();
 
+            if (checkError) throw checkError;
+
+            //  If exists, return existing vendor
+            if (existingVendor) {
+                return { data: [existingVendor], error: null };
+            }
+
+            //  Otherwise, insert new vendor
             const { data, error } = await supabase
-                .from('vendors')
+                .from("vendors")
                 .insert(VendorData)
-                .select()
+                .select();
 
-            if (!error) await fetchVendors()
+            if (!error) await fetchVendors();
 
-            return { data, error }
+            return { data, error };
         } catch (err) {
-            console.error('Error creating blog Vendor:', err)
-            return { data: null, error: err }
+            console.error("Error creating Vendor:", err);
+            return { data: null, error: err };
         }
     }
 

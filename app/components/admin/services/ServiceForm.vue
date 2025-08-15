@@ -14,16 +14,29 @@ import {
 import DynamicInputList from "~/components/DynamicInputList.vue";
 import Checkbox from "~/components/ui/checkbox/Checkbox.vue";
 import { fileWithAspectRatio } from "../../../shared/utils";
+import type { Service } from "~/shared/types/service";
 
 const clientLogoFiles = ref<File>(null);
 const isLoading = ref(false);
+const props = defineProps<{ service: Service; isEditable: boolean }>();
 
 const formSchema = toTypedSchema(
   z.object({
     service_name: z.string().min(2).max(150),
     service_tagline: z.string().min(2).max(150),
     service_categories: z
-      .array(z.object())
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          sub_categories: z.array(
+            z.object({
+              id: z.string(),
+              name: z.string(),
+            })
+          ),
+        })
+      )
       .min(1, "Select at least one category"),
     highlights: z.array(z.string()).min(3, "Select at least three highlights"),
     included: z.array(z.string()).min(3, "Select at least three highlights"),
@@ -74,7 +87,7 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
   useForm({
     validationSchema: formSchema,
     initialValues: {
-      name: "",
+      service_name: "",
       service_tagline: "",
       service_categories: [],
       type_of_service: "",
@@ -95,6 +108,21 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
       description: "",
     },
   });
+
+// Watch for props.service to be loaded and transformed
+watch(
+  () => props.service,
+  (newService) => {
+    if (newService) {
+      resetForm({
+        values: {
+          ...newService, // transformed data
+        },
+      });
+    }
+  },
+  { immediate: true }
+);
 
 const businessTypeOptions = [
   {
@@ -193,7 +221,7 @@ const onSubmit = handleSubmit(
 
       console.log("Form submitted with data:", submitData);
 
-      // Your API call here
+      // call composable useService
       await createService(submitData);
 
       toast.success("Service listing created successfully!");
@@ -276,8 +304,8 @@ onMounted(() => fetchCategories());
         <div class="grid grid-cols-1 gap-8 w-full mb-6">
           <!-- Categories -->
           <FormField
-            v-slot="{ value, handleChange }"
             name="service_categories"
+            v-slot="{ value, handleChange }"
             :validate-on-blur="!isFieldDirty"
           >
             <FormItem>
@@ -401,6 +429,7 @@ onMounted(() => fetchCategories());
               <FormControl>
                 <Textarea
                   type="text"
+                  rows="8"
                   placeholder="Provide a detailed description of your service..."
                   v-bind="componentField"
                 />

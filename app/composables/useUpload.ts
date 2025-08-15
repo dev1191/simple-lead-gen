@@ -40,5 +40,14 @@ export function useUpload() {
     return publicUrl
   }
 
-  return { uploadFile }
+
+  async function deleteFile(image_url: string, folder?: string) {
+    const urlParts = image_url.split('/')
+    const fileName = urlParts[urlParts.length - 1]
+    const oldPath = `${folder}/${fileName}`
+    await supabase.storage.from('uploads').remove([oldPath])
+
+  }
+
+  return { uploadFile, deleteFile }
 }

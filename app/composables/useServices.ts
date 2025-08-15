@@ -103,7 +103,7 @@ export function useServices() {
     const resetFilters = async () => {
         filters.value = {
             search: '',
-            status:false
+            status: false
 
         }
         sort.value = { field: 'created_at', order: 'desc' }
@@ -151,7 +151,7 @@ export function useServices() {
             if (ServiceData.service_categories && ServiceData.service_categories.length > 0) {
                 const categoryAssociations = ServiceData.service_categories.map(categoryId => ({
                     service_id: newService[0].id,
-                    category_id: categoryId
+                    category_id: categoryId.id
                 }));
 
                 const { error: categoryError } = await supabase
@@ -164,10 +164,10 @@ export function useServices() {
                 }
 
                 // Prepare sub-category associations
-                const subCategoryAssociations = serviceData.service_categories.flatMap(category => {
+                const subCategoryAssociations = ServiceData.service_categories.flatMap(category => {
                     return (category.sub_categories || []).map(subId => ({
                         service_id: newService[0].id,
-                        sub_category_id: subId,
+                        sub_category_id: subId.id,
                     }))
                 })
 
@@ -195,27 +195,91 @@ export function useServices() {
         }
     }
 
-    const updateService = async (ServiceId: string, updateData: any) => {
+    const updateService = async (serviceId: string, ServiceData: any) => {
         try {
+            const { updateVendor } = useVendors();
 
-            let updatePayload = { ...updateData }
+            // 1️⃣ Update Vendor
+            const { error: vendorError } = await updateVendor(ServiceData.vendor_id, {
+                name: ServiceData.provider_name,
+                email: ServiceData.provider_email,
+            });
 
-            const { data, error } = await supabase
-                .from('services')
-                .update(updatePayload)
-                .eq('id', ServiceId)
-                .select()
+            if (vendorError) throw vendorError;
 
-            if (!error) await fetchServices()
+            // 2️⃣ Update Service
+            const serviceUpdate: Service = {
+                service_name: ServiceData.service_name,
+                service_tagline: ServiceData.service_tagline,
+                logo_url: ServiceData.logo_url,
+                banner_url: ServiceData.banner_url,
+                description: ServiceData.description,
+                business_types: ServiceData.business_types,
+                type_of_service: ServiceData.type_of_service,
+                highlights: ServiceData.highlights,
+                included: ServiceData.included,
+                currency_code: ServiceData.currency_code,
+                pricing: ServiceData.pricing,
+                turnaround_time: ServiceData.turnaround_time,
+                free_consulatation: ServiceData.free_consulatation,
+                url: ServiceData.url,
+                client_logos: ServiceData.client_logos,
+                servers: ServiceData.servers,
+                vendor_id: ServiceData.vendor_id,
+            };
 
-            return { data, error }
+            const { error: serviceError } = await supabase
+                .from("services")
+                .update(serviceUpdate)
+                .eq("id", serviceId);
+
+            if (serviceError) throw serviceError;
+
+            // 3️⃣ Update Categories (reset then insert)
+            await supabase.from("service_categories").delete().eq("service_id", serviceId);
+
+            if (ServiceData.service_categories?.length > 0) {
+                const categoryAssociations = ServiceData.service_categories.map((categoryId) => ({
+                    service_id: serviceId,
+                    category_id: categoryId.id,
+                }));
+
+                const { error: categoryError } = await supabase
+                    .from("service_categories")
+                    .insert(categoryAssociations);
+
+                if (categoryError) throw categoryError;
+            }
+
+            // 4️⃣ Update Sub-Categories (reset then insert)
+            await supabase.from("service_sub_categories").delete().eq("service_id", serviceId);
+
+            const subCategoryAssociations = ServiceData.service_categories?.flatMap((category) =>
+                (category.sub_categories || []).map((subId) => ({
+                    service_id: serviceId,
+                    sub_category_id: subId.id,
+                }))
+            ) || [];
+
+            if (subCategoryAssociations.length > 0) {
+                const { error: subCategoryError } = await supabase
+                    .from("service_sub_categories")
+                    .insert(subCategoryAssociations);
+
+                if (subCategoryError) throw subCategoryError;
+            }
+
+            // 5️⃣ Refresh data
+            await fetchServices();
+
+            return { success: true, error: null };
         } catch (err) {
-            console.error('Error updating blog Service:', err)
-            return { data: null, error: err }
+            console.error("Error updating Service:", err);
+            return { success: false, error: err };
         }
-    }
+    };
 
-    const updateStatus = async (ServiceId: string, status: boolean) => {
+    const updateStatus = async (serviceId: string, status: boolean) => {
         try {
 
             let updatePayload = { status }
@@ -223,7 +287,7 @@ export function useServices() {
             const { data, error } = await supabase
                 .from('services')
                 .update(updatePayload)
-                .eq('id', ServiceId)
+                .eq('id', serviceId)
                 .select()
 
             if (!error) await fetchServices()
@@ -250,6 +314,36 @@ export function useServices() {
             console.error('Error deleting blog Service:', err)
             return { data: null, error: err }
         }
+    }
+
+
+    // get page by slug
+    async function getService(serviceId: string): Promise<Service | null> {
+        const { data, error } = await supabase
+            .from('services')
+            .select(`
+                *,
+            vendors(id,name,email),
+            service_categories(
+            categories(id,name)
+            ),
+            service_sub_categories (
+                sub_categories(
+                    id,
+                    name,
+                    category_id
+                )
+            )
+            `)
+            .eq('id', serviceId)
+            .limit(1)
+            .single()
+
+        if (error && error.code !== 'PGRST116') {
+            throw error
+        }
+
+        return transformServiceData(data)
     }
 
     const fetchCounts = async () => {
@@ -307,6 +401,53 @@ export function useServices() {
     }
 
 
+    // Transform the data to match your original structure
+    function transformServiceData(serviceData: any) {
+        // Create a map to group subcategories by their parent category
+        const categoryMap = new Map();
+
+        // First, add all categories
+        serviceData.service_categories.forEach(sc => {
+            const category = sc.categories;
+            categoryMap.set(category.id, {
+                id: category.id,
+                name: category.name,
+                sub_categories: []
+            });
+        });
+
+
+        // Then, add subcategories to their respective parent categories
+        serviceData.service_sub_categories.forEach(ssc => {
+            const subCategory = ssc.sub_categories;
+            const parentCategory = categoryMap.get(subCategory.category_id);
+            console.log("parentCategory", parentCategory)
+            if (parentCategory) {
+                parentCategory.sub_categories.push({
+                    id: subCategory.id,
+                    name: subCategory.name
+                });
+            }
+        });
+
+        // Convert categories map to array and clean up service data
+        const transformedCategories = Array.from(categoryMap.values());
+
+        // Return the service with clean structure (remove the raw relationships)
+        const {
+            service_categories,
+            service_sub_categories,
+            ...cleanServiceData
+        } = serviceData;
+
+        return {
+            ...cleanServiceData,
+            provider_name: serviceData.vendors.name,
+            provider_email: serviceData.vendors.email,
+            service_categories: transformedCategories
+        };
+    }
+
 
     return {
         activeCount,
@@ -328,6 +469,7 @@ export function useServices() {
         fetchCounts,
         changePage,
         resetFilters,
+        getService,
         createService,
         updateService,
         updateStatus,

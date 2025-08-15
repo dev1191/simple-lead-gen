@@ -4,7 +4,6 @@ import Icon from "~/components/Icon.vue";
 import { type Row } from "@tanstack/vue-table";
 
 import ViewModal from "./ServiceView.vue";
-import EditModal from "./ServiceEdit.vue";
 import DeleteModal from "./ServiceDelete.vue";
 import { useServices } from "../../../composables/useServices";
 import type { Service } from "~/shared/types/service";
@@ -21,7 +20,6 @@ const { updateStatus } = useServices();
 // Map action types to components
 const componentsMap = {
   pause: ViewModal,
-  edit: EditModal,
   delete: DeleteModal,
 };
 
@@ -46,9 +44,12 @@ function closeModal() {
 
 <template>
   <div class="flex items-center gap-4">
-    <Button variant="ghost" size="icon" @click="handleAction('edit')">
-      <Icon name="Edit" :size="20" />
-    </Button>
+    <NuxtLink :to="`/admin/services/${props.row.original.id}`">
+      <Button variant="ghost" size="icon">
+        <Icon name="Edit" :size="20" />
+      </Button>
+    </NuxtLink>
+
     <Button variant="ghost" size="icon" @click="handleStatus">
       <Icon :name="props.row.original.status ? 'Pause' : 'Play'" :size="20" />
     </Button>

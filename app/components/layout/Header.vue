@@ -1,31 +1,48 @@
 <script setup lang="ts">
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-} from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ChevronRight } from "lucide-vue-next";
 
-interface Breadcrumb {
-  name: string;
-  path: string;
-}
-
 const route = useRoute();
 
-const breadcrumbs = computed(() => {
-  const crumbs = [] as Breadcrumb[];
-  route.path.split("/").forEach((name) => {
-    if (!name) return;
-    const fullPath = route.path.split(`/${name}`)[0];
-    const path = fullPath === `/${name}` ? "/" : fullPath;
-    crumbs.push({ name, path });
+function setLinks() {
+  if (route.fullPath === "/admin/dashboard") {
+    return [{ title: "Dashboard", href: "/admin/dashboard" }];
+  }
+
+  const segments = route.fullPath.split("/").filter((item) => item !== "");
+
+  const breadcrumbs = segments.map((item, index) => {
+    const str = item.replace(/-/g, " ");
+    const title = str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+    return {
+      title,
+      href: `/${segments.slice(0, index + 1).join("/")}`,
+    };
   });
-  return crumbs;
-}) as Ref<Breadcrumb[]>;
+
+  return [{ title: "Dashboard", href: "/admin/dashboard" }, ...breadcrumbs];
+}
+
+const links = ref<
+  {
+    title: string;
+    href: string;
+  }[]
+>(setLinks());
+
+watch(
+  () => route.fullPath,
+  (val) => {
+    if (val) {
+      links.value = setLinks();
+    }
+  }
+);
 </script>
 
 <template>
@@ -33,24 +50,10 @@ const breadcrumbs = computed(() => {
     class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12"
   >
     <div class="flex items-center justify-between w-full px-4">
-      <div class="flex items-center gap-2">
+      <div class="w-full flex items-center gap-2">
         <SidebarTrigger class="-ml-1" />
         <Separator orientation="vertical" class="mr-2 h-4" />
-        <Breadcrumb>
-          <BreadcrumbList class="hidden md:block">
-            <BreadcrumbItem
-              v-for="(breadcrumb, i) in breadcrumbs"
-              :key="i"
-              class="mr-2"
-            >
-              <BreadcrumbLink :href="breadcrumb.path" class="flex items-center">
-                {{ breadcrumb.name }}
-              </BreadcrumbLink>
-
-              <ChevronRight :size="18" v-if="i < breadcrumbs.length - 1" />
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <LayoutBreadcrumb :links="links" />
       </div>
       <div class="flex items-center gap-2">
         <ThemeToggleNav />
