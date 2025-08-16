@@ -1,5 +1,6 @@
 // composables/useTools.ts
 import { useSupabaseClient } from '#imports'
+import type { Tool } from '~/shared/types/tools'
 import { slugify } from '../shared/utils'
 
 export function useTools() {
@@ -199,6 +200,25 @@ export function useTools() {
         loading.value = false
     }
 
+
+    async function getTool(toolId: string): Promise<Tool | null> {
+        const { data, error } = await supabase
+            .from('tools')
+            .select(`
+                *
+            `)
+            .eq('id', toolId)
+            .limit(1)
+            .single()
+
+        if (error && error.code !== 'PGRST116') {
+            throw error
+        }
+
+        return data
+    }
+
+
     return {
         activeCount,
         inactiveCount,
@@ -211,6 +231,7 @@ export function useTools() {
         filters,
         sort,
         fetchTools,
+        getTool,
         updateSearch,
         updateFilter,
         updateSort,
