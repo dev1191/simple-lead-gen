@@ -19,32 +19,55 @@ export function slugify(text: string): string {
 
 
 export const fileWithAspectRatio = (widthRatio: number, heightRatio: number) =>
-  z.union([
-    z.string().refine(
-      (val) => {
-        try {
-          const url = new URL(val);
-          return url.protocol === "http:" || url.protocol === "https:";
-        } catch {
-          return false;
+  z.any().superRefine(async (val, ctx) => {
+    // Case 1: if it's a string -> must be valid URL
+    if (typeof val === "string") {
+      try {
+        const url = new URL(val);
+        if (!(url.protocol === "http:" || url.protocol === "https:")) {
+          ctx.addIssue({
+            code: "custom",
+            message: "Must be a valid URL",
+          });
         }
-      },
-      { message: "Must be a valid URL" }
-    ),
-    z.instanceof(File).refine(
-      (file) =>
-        new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const img = new Image();
-            img.onload = () => {
-              const aspectRatio = img.width / img.height;
-              resolve(Math.abs(aspectRatio - widthRatio / heightRatio) < 0.01);
-            };
-            img.src = reader.result as string;
+      } catch {
+        ctx.addIssue({
+          code: "custom",
+          message: "Must be a valid URL",
+        });
+      }
+      return;
+    }
+
+    // Case 2: if it's a File -> check aspect ratio
+    if (val instanceof File) {
+      const aspectOk = await new Promise<boolean>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const aspectRatio = img.width / img.height;
+            const expected = widthRatio / heightRatio;
+            resolve(Math.abs(aspectRatio - expected) < 0.01); // 1% tolerance
           };
-          reader.readAsDataURL(file);
-        }),
-      { message: `Invalid aspect ratio ${widthRatio}:${heightRatio}` }
-    ),
-  ]);
+          img.onerror = () => resolve(false);
+          img.src = reader.result as string;
+        };
+        reader.readAsDataURL(val);
+      });
+
+      if (!aspectOk) {
+        ctx.addIssue({
+          code: "custom",
+          message: `Invalid aspect ratio: must be ${widthRatio}:${heightRatio}`,
+        });
+      }
+      return;
+    }
+
+    // Case 3: neither File nor string
+    ctx.addIssue({
+      code: "custom",
+      message: "Must be a URL or an uploaded image",
+    });
+  });

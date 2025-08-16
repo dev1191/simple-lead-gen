@@ -5,7 +5,6 @@ import { useForm } from "vee-validate";
 import * as z from "zod";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -14,6 +13,7 @@ import {
 import type { Tool } from "~/shared/types/tools";
 import { fileWithAspectRatio } from "~/shared/utils";
 import { toolCategories } from "~/shared/constants";
+
 
 const isLoading = ref(false);
 const props = defineProps<{ tool: Tool; isEditable: boolean }>();
@@ -26,7 +26,7 @@ const formSchema = toTypedSchema(
     sub_categories: z
       .array(z.string())
       .min(1, "Select at least one sub categories"),
-    logo_url: fileWithAspectRatio(1, 1), // 1:1 aspect ratio
+    logo_url: fileWithAspectRatio(1,1), // File or URL
     banner_url: z.string().optional(), // 16:9 aspect ratio
     description: z
       .string()
@@ -42,11 +42,10 @@ const formSchema = toTypedSchema(
     type_of_tool: z.string(),
     currency_code: z.string().optional(),
     pricing: z.string().optional(),
-    integrations: z.array(z.string()).optional(),
+    integrations: z.string().optional(),
     affiliate_url: z.string().optional(),
     cta_label: z.string().optional(),
     free_trail: z.boolean().optional(),
-    client_logos: z.array(z.string()).optional(),
     operate: z
       .array(z.enum(["malaysia", "singapore", "global"]))
       .min(1, "Tool operate is required"),
@@ -96,11 +95,38 @@ const bestForOptions = [
   },
 ];
 
+const pricingOptions = [
+  { value: "free_forever", label: "Free Forever" },
+  { value: "free_trial", label: "Free Trial Available" },
+  { value: "freemium", label: "Freemium" },
+  { value: "monthly_subscription", label: "Monthly Subscription" },
+  { value: "pay_as_you_go", label: "Pay-as-you-go" },
+  { value: "custom_varies", label: "Custom / Varies" },
+];
+
+const platformOptions = [
+  { value: "web", label: "Web" },
+  { value: "ios", label: "iOS" },
+  { value: "android", label: "Android" },
+  { value: "chrome_extension", label: "Chrome Extension" },
+  { value: "api", label: "API" },
+];
+
 const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
   useForm({
     validationSchema: formSchema,
     initialValues: {
       sub_categories: [],
+      best_for: [],
+      core_features: [],
+      pros: [],
+      cons: [],
+      integrations: "",
+      operate: [],
+      platforms: [],
+      currency_code: "USD",
+      cta_label: "Try Now",
+      free_trail: false,
     },
   });
 
@@ -109,6 +135,20 @@ const availableSubcategories = computed(() => {
   const category = toolCategories.find((cat) => cat.value === values.category);
   return category ? category.subcategories : [];
 });
+
+const handelOperateChange = (
+  checked: any,
+  serverValue: any,
+  currentValue: any,
+  handleChange: any
+) => {
+  const newValue = currentValue || [];
+  if (checked) {
+    handleChange([...newValue, serverValue]);
+  } else {
+    handleChange(newValue.filter((item) => item !== serverValue));
+  }
+};
 
 watch(
   () => values.category,
@@ -132,19 +172,50 @@ watch(
 
 const handleBestForChange = (
   checked: any,
-  businessValue: any,
+  bestForValue: any,
   currentValue: any,
   handleChange: any
 ) => {
   const newValue = currentValue || [];
   if (checked) {
-    handleChange([...newValue, businessValue]);
+    handleChange([...newValue, bestForValue]);
   } else {
-    handleChange(newValue.filter((item) => item !== businessValue));
+    handleChange(newValue.filter((item) => item !== bestForValue));
   }
 };
 
-const onSubmit = () => {};
+const handlePlatformChange = (
+  checked: any,
+  platformValue: any,
+  currentValue: any,
+  handleChange: any
+) => {
+  const newValue = currentValue || [];
+  if (checked) {
+    handleChange([...newValue, platformValue]);
+  } else {
+    handleChange(newValue.filter((item) => item !== platformValue));
+  }
+};
+
+// Proper form submission handler
+const onSubmit = handleSubmit(
+  async (formData) => {
+    try {
+      isLoading.value = true;
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Failed to create tool. Please try again.");
+    } finally {
+      isLoading.value = false;
+    }
+  },
+  (errors) => {
+    // This callback runs when validation fails
+    console.log("Validation errors:", errors);
+    toast.error("Please fix the errors in the form");
+  }
+);
 </script>
 
 <template>
@@ -355,14 +426,12 @@ const onSubmit = () => {};
             </FormItem>
           </FormField>
 
-          <FormField name="business_types" v-slot="{ value, handleChange }">
+          <FormField name="best_for" v-slot="{ value, handleChange }">
             <FormItem>
               <FormLabel class="text-base"
-                >Who is this for?<span class="text-red-500">*</span>
+                >Best for<span class="text-red-500">*</span>
               </FormLabel>
-              <div
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"
-              >
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
                 <FormItem
                   v-for="businessType in bestForOptions"
                   :key="businessType.value"
@@ -425,9 +494,7 @@ const onSubmit = () => {};
         <div class="grid grid-cols-2 gap-8 w-full mb-6">
           <FormField v-slot="{ value, handleChange }" name="pros">
             <FormItem>
-              <FormLabel
-                >Pros</FormLabel
-              >
+              <FormLabel>Pros</FormLabel>
               <FormControl>
                 <DynamicInputList
                   :model-value="value"
@@ -443,9 +510,7 @@ const onSubmit = () => {};
 
           <FormField v-slot="{ value, handleChange }" name="cons">
             <FormItem>
-              <FormLabel
-                >Cons</FormLabel
-              >
+              <FormLabel>Cons</FormLabel>
               <FormControl>
                 <DynamicInputList
                   :model-value="value"
@@ -459,8 +524,253 @@ const onSubmit = () => {};
             </FormItem>
           </FormField>
         </div>
+
+        <div class="grid grid-cols-2 gap-8 w-full mb-6">
+          <FormField v-slot="{ componentField }" name="pricing_model">
+            <FormItem>
+              <FormLabel>
+                Pricing Model <span class="text-red-500">*</span>
+              </FormLabel>
+              <Select v-bind="componentField">
+                <FormControl>
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select a pricing model" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="pricing in pricingOptions"
+                      :key="pricing.value"
+                      :value="pricing.value"
+                    >
+                      {{ pricing.label }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="pricing">
+            <FormItem>
+              <FormLabel>Starting Price (Optional)</FormLabel>
+              <FormControl>
+                <div class="flex gap-2">
+                  <!-- Currency Select -->
+                  <FormField
+                    v-slot="{ componentField: currencyField }"
+                    name="currency_code"
+                  >
+                    <FormItem class="flex-shrink-0">
+                      <FormControl>
+                        <Select v-bind="currencyField">
+                          <SelectTrigger class="w-24">
+                            <SelectValue placeholder="USD" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="MYR">MYR</SelectItem>
+                            <SelectItem value="SGD">SGD</SelectItem>
+                            <SelectItem value="USD">USD</SelectItem>
+                            <SelectItem value="GBP">GBP</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  </FormField>
+
+                  <!-- Price Input -->
+                  <FormField
+                    v-slot="{ componentField: priceField }"
+                    name="pricing"
+                  >
+                    <FormItem class="flex-1">
+                      <FormControl>
+                        <Input
+                          type="number"
+                          :min="0"
+                          v-bind="priceField"
+                          placeholder="Enter starting price"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  </FormField>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8 w-full mb-6">
+          <FormField
+            v-slot="{ componentField }"
+            name="affiliate_url"
+            :validate-on-blur="!isFieldDirty"
+          >
+            <FormItem>
+              <FormLabel> Affiliate / Redirect Link </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Enter affiliate / redirect link"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField
+            v-slot="{ componentField }"
+            name="cta_label"
+            :validate-on-blur="!isFieldDirty"
+          >
+            <FormItem>
+              <FormLabel> CTA Label for Button </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Enter CTA label for button"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField
+            v-slot="{ value, handleChange }"
+            type="checkbox"
+            name="free_trail"
+          >
+            <FormItem class="flex flex-row items-start gap-x-3 space-y-0 p-4">
+              <FormControl>
+                <Checkbox
+                  class="h-5 w-5"
+                  :model-value="value"
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+              <div class="space-y-1 leading-none">
+                <FormLabel>Free Trial Available? </FormLabel>
+                <FormMessage />
+              </div>
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="integrations">
+            <FormItem>
+              <FormLabel>Integrations (optional)</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Enter comma-separated input"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
       </template>
     </BaseCard>
+
+    <BaseCard
+      class="mt-4"
+      className="5xl"
+      title="Section 4: Region Operated/ Supported"
+      :isFooter="false"
+    >
+      <template #default>
+        <div class="grid grid-cols-1 gap-8 w-full mb-6">
+          <FormField v-slot="{ value, handleChange }" name="operate">
+            <FormItem>
+              <FormLabel class="text-base"
+                >Where Does This Tool Operate or Offer Support?
+                <span class="text-red-500">*</span></FormLabel
+              >
+              <div
+                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 mt-4"
+              >
+                <FormItem
+                  v-for="server in serverOptions"
+                  :key="server.value"
+                  class="flex flex-row gap-x-2 space-y-0 p-1"
+                >
+                  <FormControl>
+                    <Checkbox
+                      class="h-5 w-5"
+                      :model-value="value?.includes(server.value)"
+                      @update:model-value="
+                        (checked) =>
+                          handelOperateChange(
+                            checked,
+                            server.value,
+                            value,
+                            handleChange
+                          )
+                      "
+                    />
+                  </FormControl>
+                  <div class="flex flex-row gap-8 leading-none">
+                    <FormLabel>{{ server.label }}</FormLabel>
+                  </div>
+                </FormItem>
+              </div>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField name="platforms" v-slot="{ value, handleChange }">
+            <FormItem>
+              <FormLabel class="text-base">Platforms Supported </FormLabel>
+              <div
+                class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4"
+              >
+                <FormItem
+                  v-for="platform in platformOptions"
+                  :key="platform.value"
+                  class="flex flex-row items-start gap-x-3 space-y-0 p-2"
+                >
+                  <FormControl>
+                    <Checkbox
+                      class="h-5 w-5"
+                      :model-value="value?.includes(platform.value)"
+                      @update:model-value="
+                        (val) =>
+                          handlePlatformChange(
+                            val,
+                            platform.value,
+                            value,
+                            handleChange
+                          )
+                      "
+                    />
+                  </FormControl>
+                  <FormLabel class="flex items-center gap-2">
+                    {{ platform.label }}
+                  </FormLabel>
+                </FormItem>
+              </div>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </template>
+    </BaseCard>
+
+    <div class="flex flex-center gap-4 mt-6 justify-center">
+      <Button type="submit" class="w-50 h-12" :disabled="isLoading">
+        <Icon
+          name="Loader2"
+          v-if="isLoading"
+          :size="18"
+          class="mr-2 h-4 w-4 animate-spin"
+        />
+        {{ isEditable ? "Update" : "Create" }} Tool for Review
+      </Button>
+    </div>
   </form>
 </template>
 
