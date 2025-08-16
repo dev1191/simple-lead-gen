@@ -115,20 +115,6 @@ export function useTools() {
 
     const createTool = async (ToolData: any) => {
         try {
-            //  Check if tool with this email already exists
-            const { data: existingTool, error: checkError } = await supabase
-                .from("tools")
-                .select("*")
-                .eq("email", ToolData.email)
-                .maybeSingle();
-
-            if (checkError) throw checkError;
-
-            //  If exists, return existing tool
-            if (existingTool) {
-                return { data: [existingTool], error: null };
-            }
-
             //  Otherwise, insert new tool
             const { data, error } = await supabase
                 .from("tools")
@@ -147,7 +133,7 @@ export function useTools() {
     const updateTool = async (ToolId: string, updateData: any) => {
         try {
 
-            console.log("ToolId",ToolId)
+            console.log("ToolId", ToolId)
             let updatePayload = { ...updateData }
 
             const { data, error } = await supabase

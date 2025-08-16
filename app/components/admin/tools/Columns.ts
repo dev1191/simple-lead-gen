@@ -14,17 +14,22 @@ export const columns: ColumnDef<Vendor>[] = [
     },
 
     {
-        accessorKey: "vendors.name",
-        header: "Provider Name",
+        accessorKey: "category",
+        header: "Category",
     },
     {
-        accessorKey: "pricing",
-        header: "Price per Lead",
+        accessorKey: "affiliate_url",
+        header: "Affiliate Link",
     },
     {
-        accessorKey: "vendors.email",
-        header: "Contact Email",
+        accessorKey: "clicks",
+        header: "Clicks",
     },
+    {
+        accessorKey: "conversions",
+        header: "Conversions",
+    },
+
     {
         accessorKey: "status",
         header: "Status",
@@ -33,8 +38,8 @@ export const columns: ColumnDef<Vendor>[] = [
             const className =
                 value
                     ? "bg-green-200 text-green-700 font-semibold rounded-xl"
-                    : "bg-yellow-200 text-yellow-700 font-semibold rounded-xl";
-            return h(Badge, { class: className, variant: "secondary" }, () => value ? 'Active' : 'Pause');
+                    : "bg-slate-200 text-slate-700 font-semibold rounded-xl";
+            return h(Badge, { class: className, variant: "secondary" }, () => value ? 'Active' : 'Inactive');
         },
     },
     {

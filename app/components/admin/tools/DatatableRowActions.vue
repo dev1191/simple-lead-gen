@@ -48,9 +48,6 @@ function closeModal() {
       </Button>
     </NuxtLink>
 
-    <Button variant="ghost" size="icon" @click="handleStatus">
-      <Icon :name="props.row.original.status ? 'Pause' : 'Play'" :size="20" />
-    </Button>
     <Button variant="ghost" size="icon" @click="handleAction('delete')">
       <Icon name="Trash2" :size="20" class="text-red-800" />
     </Button>

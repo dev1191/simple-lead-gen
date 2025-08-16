@@ -14,7 +14,6 @@ import type { Tool } from "~/shared/types/tools";
 import { fileWithAspectRatio } from "~/shared/utils";
 import { toolCategories } from "~/shared/constants";
 
-
 const isLoading = ref(false);
 const props = defineProps<{ tool: Tool; isEditable: boolean }>();
 
@@ -26,7 +25,7 @@ const formSchema = toTypedSchema(
     sub_categories: z
       .array(z.string())
       .min(1, "Select at least one sub categories"),
-    logo_url: fileWithAspectRatio(1,1), // File or URL
+    logo_url: fileWithAspectRatio(1, 1), // File or URL
     banner_url: z.string().optional(), // 16:9 aspect ratio
     description: z
       .string()
@@ -39,9 +38,8 @@ const formSchema = toTypedSchema(
     pros: z.array(z.string()).optional(),
     cons: z.array(z.string()).optional(),
     pricing_model: z.string("Pricing model is required"),
-    type_of_tool: z.string(),
     currency_code: z.string().optional(),
-    pricing: z.string().optional(),
+    pricing: z.number().optional(),
     integrations: z.string().optional(),
     affiliate_url: z.string().optional(),
     cta_label: z.string().optional(),
@@ -198,11 +196,65 @@ const handlePlatformChange = (
   }
 };
 
+
+const  { uploadFile } = useUpload();
+const { createTool,updateTool } = useTools()
+const router = useRouter();
+
 // Proper form submission handler
 const onSubmit = handleSubmit(
   async (formData) => {
     try {
       isLoading.value = true;
+
+      let logoUrl = "";
+      let bannerUrl = "";
+
+        // Upload image if file selected
+      if (formData.logo_url && formData.logo_url instanceof File) {
+        logoUrl = await uploadFile(formData.logo_url, "uploads", "tools");
+        setFieldValue("logo_url", logoUrl);
+      } else {
+        logoUrl = formData.logo_url;
+      }
+
+      // Upload image if file selected
+      if (formData.banner_url && formData.banner_url instanceof File) {
+        bannerUrl = await uploadFile(
+          formData.banner_url,
+          "uploads",
+          "tools"
+        );
+        setFieldValue("banner_url", bannerUrl);
+      } else {
+        bannerUrl = formData.banner_url;
+      }
+
+
+      // Add file uploads to form data if needed
+      const submitData = {
+        ...formData,
+        logo_url: logoUrl,
+        banner_url: bannerUrl,
+        operate:
+          Array.isArray(formData.operate) && formData.operate.includes("global")
+            ? ["malaysia", "singapore"]
+            : formData.operate,
+      };
+      
+      // call composable useTool
+      if (props.isEditable) {
+        await updateTool(props.tool.id, submitData);
+      } else {
+        await createTool(submitData);
+      }
+
+      toast.success("Tool created successfully!");
+     resetForm();
+     router.push("/admin/tools");
+
+
+
     } catch (error) {
       console.error("Submission error:", error);
       toast.error("Failed to create tool. Please try again.");
