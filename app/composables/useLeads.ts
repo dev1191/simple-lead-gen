@@ -30,7 +30,8 @@ export function useLeads() {
         let query = supabase
             .from('leads')
             .select(`
-        *
+        *,
+        vendors(id,name,email)
       `, { count: 'exact' })
 
         if (filters.value.search) {

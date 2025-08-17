@@ -126,7 +126,7 @@ export function useServices() {
 
             if (vendorError) throw vendorError
 
-            const serviceInsert: Service = {
+            const serviceInsert: Service = [{
                 service_name: ServiceData.service_name,
                 service_tagline: ServiceData.service_tagline,
                 logo_url: ServiceData.logo_url,
@@ -144,7 +144,8 @@ export function useServices() {
                 client_logos: ServiceData.client_logos,
                 servers: ServiceData.servers,
                 vendor_id: vendor[0].id
-            };
+            }];
+            
             const { data: newService, error } = await supabase
                 .from('services')
                 .insert(serviceInsert)

@@ -134,7 +134,7 @@ export function useVendors() {
             //  Otherwise, insert new vendor
             const { data, error } = await supabase
                 .from("vendors")
-                .insert(VendorData)
+                .insert([VendorData])
                 .select();
 
             if (!error) await fetchVendors();
