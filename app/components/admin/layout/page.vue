@@ -16,10 +16,10 @@ defineProps<LayoutHeaderProps>();
       </template>
     </AdminLayoutHeader>
 
-    <div class="py-4">
+    <div class="py-2">
       <slot name="cardHeader" />
     </div>
-    <main class="py-2 w-full space-y-12">
+    <main class="py-1 w-full space-y-12">
       <slot />
     </main>
   </main>

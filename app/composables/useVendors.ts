@@ -1,5 +1,6 @@
 // composables/useBlogVendors.ts
 import { useSupabaseClient } from '#imports'
+import type { Vendor } from '~/shared/types/vendor'
 import { slugify } from '../shared/utils'
 
 export function useVendors() {
@@ -7,6 +8,7 @@ export function useVendors() {
 
     // Shared state
     const vendors = useState('blogVendors', () => [] as any[])
+    const lists = useState('vendorLists', () => [] as Vendor[])
     const loading = useState('blogVendorsLoading', () => false)
     const totalCount = useState('blogVendorsTotalCount', () => 0)
     const currentPage = useState('blogVendorsCurrentPage', () => 1)
@@ -147,7 +149,7 @@ export function useVendors() {
     const updateVendor = async (VendorId: string, updateData: any) => {
         try {
 
-            console.log("VendorId",VendorId)
+            console.log("VendorId", VendorId)
             let updatePayload = { ...updateData }
 
             const { data, error } = await supabase
@@ -213,9 +215,33 @@ export function useVendors() {
         loading.value = false
     }
 
+
+    const getVendors = async () => {
+        loading.value = true
+        try {
+            const { data, error: err } = await supabase
+                .from('vendors')
+                .select(`id,name,email)`, { count: 'exact' })
+                .eq('status','Active')
+
+            if (err) throw err
+
+            lists.value = data || []
+
+        } catch (err) {
+            console.error('Error fetching posts:', err)
+            lists.value = []
+
+        } finally {
+            loading.value = false
+        }
+    }
+
+
     return {
         activeCount,
         inactiveCount,
+        lists,
         vendors,
         loading,
         totalCount,
@@ -229,6 +255,7 @@ export function useVendors() {
         updateFilter,
         updateSort,
         fetchCounts,
+        getVendors,
         changePage,
         resetFilters,
         createVendor,

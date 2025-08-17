@@ -5,6 +5,10 @@ import {
 import Badge from "~/components/ui/badge/Badge.vue";
 import DataTableRowActions from "./DatatableRowActions.vue";
 import type { Vendor } from "~/shared/types/vendor";
+import { ExternalLink } from "lucide-vue-next";
+import { NuxtLink } from "#components";
+import Button from "~/components/ui/button/Button.vue";
+import { toolCategories } from "~/shared/constants";
 
 
 export const columns: ColumnDef<Vendor>[] = [
@@ -16,13 +20,60 @@ export const columns: ColumnDef<Vendor>[] = [
     {
         accessorKey: "category",
         header: "Category",
+        cell: ({ row }) => {
+            const value = row.getValue("category") as string;
+            const category = toolCategories.find((cat) => cat.value === value);
+
+            if (!category) return '-';
+
+            return h(
+                Badge,
+                { variant: "secondary",class:"font-semibold" }, // you can use "default", "secondary", "outline", etc.
+                { default: () => category.label }
+            );
+        },
+
     },
     {
         accessorKey: "affiliate_url",
         header: "Affiliate Link",
+        cell: ({ row }) => {
+            const value = row.getValue("affiliate_url") as string;
+
+            if (!value) return null;
+
+            return h(
+                "div",
+                { class: "flex items-center gap-2" },
+                [
+                    // show plain value
+                    h("span", value),
+
+                    // shadcn-vue Button wrapping NuxtLink
+                    h(
+                        NuxtLink,
+                        {
+                            to: value,
+                            target: "_blank",
+                            rel: "noopener noreferrer"
+                        },
+                        {
+                            default: () =>
+                                h(
+                                    Button,
+                                    { variant: "ghost", size: "icon", class: "text-slate-600" },
+                                    {
+                                        default: () => h(ExternalLink, { class: "w-4 h-4" })
+                                    }
+                                )
+                        }
+                    )
+                ]
+            );
+        },
     },
     {
-        accessorKey: "clicks",
+        accessorKey: "clicks_count",
         header: "Clicks",
     },
     {

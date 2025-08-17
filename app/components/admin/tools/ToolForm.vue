@@ -150,7 +150,7 @@ const handelOperateChange = (
 
 watch(
   () => values.category,
-  () => setFieldValue("sub_categories", [])
+  () => setFieldValue("sub_categories",  values.sub_categories)
 );
 
 // Watch for props.tool to be loaded and transformed
@@ -252,9 +252,6 @@ const onSubmit = handleSubmit(
       toast.success("Tool created successfully!");
      resetForm();
      router.push("/admin/tools");
-
-
-
     } catch (error) {
       console.error("Submission error:", error);
       toast.error("Failed to create tool. Please try again.");

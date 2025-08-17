@@ -384,8 +384,6 @@ export function useServices() {
     const fetchCategories = async () => {
         loading.value = true
         try {
-
-
             const { data, error: err } = await supabase
                 .from('categories')
                 .select(`*,sub_categories(id,name)`, { count: 'exact' })

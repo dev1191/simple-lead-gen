@@ -67,7 +67,6 @@ export function useTools() {
 
             tools.value = data || []
             totalCount.value = count || 0
-            await fetchCounts()
         } catch (err) {
             console.error('Error fetching Tools:', err)
             tools.value = []
@@ -176,7 +175,7 @@ export function useTools() {
         const { count: draft, error: errDraft } = await supabase
             .from('tools')
             .select('id', { count: 'exact', head: true })
-            .eq('status', 'Active')
+            .eq('status',true)
 
         if (errDraft) {
             error.value = errDraft
@@ -187,7 +186,7 @@ export function useTools() {
         const { count: published, error: errPublished } = await supabase
             .from('tools')
             .select('id', { count: 'exact', head: true })
-            .eq('status', 'Inactive')
+            .eq('status', false)
 
         if (errPublished) {
             error.value = errPublished

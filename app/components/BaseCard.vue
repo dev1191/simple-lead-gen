@@ -8,23 +8,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const { title, description, className = "full", height, isFooter } =
-  defineProps<{
-    title?: string;
-    description?: string;
-    className?:
-      | "full"
-      | "sm"
-      | "md"
-      | "lg"
-      | "xl"
-      | "2xl"
-      | "3xl"
-      | "4xl"
-      | "5xl";
-    height?: string;
-    isFooter: boolean;
-  }>();
+const {
+  title,
+  description,
+  className = "full",
+  height,
+  isFooter,
+} = defineProps<{
+  title?: string;
+  description?: string;
+  icon?: string;
+  className?:
+    | "full"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "5xl";
+  height?: string;
+  isFooter: boolean;
+}>();
 
 const maxWidthMap: Record<string, string> = {
   full: "w-full",
@@ -47,7 +53,12 @@ const maxWidthClass = computed(() => {
 <template>
   <Card :class="maxWidthClass">
     <CardHeader v-if="title || description">
-      <CardTitle class="text-2xl font-semibold text-primary">{{ title }}</CardTitle>
+      <CardTitle class="text-2xl font-semibold text-primary">
+        <div class="flex flex-row gap-1">
+          <Icon v-if="icon" :name="icon" class="w-5 h-5" />
+          <div class="text=xl font-semibold">{{ title }}</div>
+        </div>
+      </CardTitle>
       <CardDescription>{{ description }}</CardDescription>
     </CardHeader>
 
