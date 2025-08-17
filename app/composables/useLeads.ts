@@ -14,7 +14,13 @@ export function useLeads() {
 
     const filters = useState('LeadsFilters', () => ({
         search: '',
+        provider_id: '',
+        listing_type: '',
+        start_date: '',
+        end_date: ''
     }))
+
+    console.log("filters", filters.value)
 
     const sort = useState('LeadsSort', () => ({
         field: 'created_at',
@@ -32,11 +38,24 @@ export function useLeads() {
             .select(`
         *,
         vendors(id,name,email),
-        services(*)
+        services(*),
+        tools(*)
       `, { count: 'exact' })
 
         if (filters.value.search) {
             query = query.or(`question.ilike.%${filters.value.search}%,answer.ilike.%${filters.value.search}%`)
+        }
+
+        if (filters.value.provider_id) {
+            query = query.eq('vendor_id', filters.value.provider_id)
+        }
+
+        if (filters.value.listing_type) {
+            query = query.eq('type', filters.value.listing_type)
+        }
+        if (filters.value.start_date && filters.value.end_date) {
+            query = query.gte('created_at', filters.value.start_date)
+                .lte('created_at', filters.value.end_date)
         }
 
 
@@ -74,6 +93,7 @@ export function useLeads() {
     }
 
     const updateFilter = (key: string, value: any) => {
+
         (filters.value as any)[key] = value
         currentPage.value = 1
         fetchLeads()

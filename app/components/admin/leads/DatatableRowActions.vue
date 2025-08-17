@@ -24,6 +24,10 @@ function handleAction(type: keyof typeof componentsMap) {
   isDialogOpen.value = true;
 }
 
+function handleForward() {
+
+}
+
 
 
 function closeModal() {
@@ -35,6 +39,10 @@ function closeModal() {
 
 <template>
   <div class="flex items-center gap-4">
+
+        <Button variant="outline" size="sm" @click="handleForward">
+            Forward
+    </Button>
 
     <Button variant="ghost" size="icon" @click="handleAction('view')">
       <Icon name="Eye" :size="20" class="text-red-800" />

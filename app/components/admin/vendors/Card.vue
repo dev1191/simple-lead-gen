@@ -1,8 +1,7 @@
 <script setup lang="ts">
+const { vendors, activeCount, fetchCounts, fetchVendors } = useVendors();
 
-const { vendors, activeCount, fetchCounts, fetchVendors } =
-  useVendors();
-
+const { totalCount } = useServices();
 onMounted(() => {
   fetchCounts();
   fetchVendors();
@@ -25,11 +24,10 @@ onMounted(() => {
     </BaseCard>
     <BaseCard size="sm" height="h-30" :isFooter="false">
       <template #default>
-        <h2 class="text-3xl font-bold">0</h2>
+        <h2 class="text-3xl font-bold">{{ totalCount }}</h2>
         <div class="text-md text-card-foreground">Total Services Listed</div>
       </template>
     </BaseCard>
-
   </div>
 </template>
 

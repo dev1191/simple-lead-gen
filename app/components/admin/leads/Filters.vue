@@ -27,11 +27,9 @@ const getFiltersPayload = () => {
 
 // Watch combined filters and update leads once
 watch(
-  () => toRaw(filters),
+  () => filters,
   (newFilters) => {
     const payload = getFiltersPayload();
-    console.log("payload",payload)
-    // Clear old filters first (optional)
     resetFilters().then(() => {
       Object.entries(payload).forEach(([key, value]) => updateFilter(key, value));
     });
@@ -86,8 +84,8 @@ const handleResetFilters = () => {
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="service">Service</SelectItem>
-            <SelectItem value="tool">Tool</SelectItem>
+            <SelectItem value="Service">Service</SelectItem>
+            <SelectItem value="Tool">Tool</SelectItem>
           </SelectContent>
         </Select>
       </div>
