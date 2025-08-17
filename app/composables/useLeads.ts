@@ -176,25 +176,20 @@ export function useLeads() {
     }
 
 
-    async function sendCustomEmail() {
-        try {
-            const { data, error } = await supabase.functions.invoke('send-email', {
-                body: {
-                    to: 'devrajthapa1191@gmail.com',
-                    subject: 'Welcome to our app!',
-                    body: '<h1>Hello!</h1><p>Thanks for signing up.</p>',
-                },
-            });
 
-            if (error) {
-                console.error('Error sending email:', error);
-            } else {
-                console.log('Email sent:', data);
-            }
-        } catch (err) {
-            console.error('Function invocation error:', err);
+    const sendEmail = async (payload: { email: string; subject: string; message: string }) => {
+        const { data, error } = await supabase.functions.invoke("send-email", {
+            body: payload,
+        })
+
+        if (error) {
+            console.error('Error sending email:', error);
+        } else {
+            console.log('Email sent:', data);
         }
+        return { sendEmail }
     }
+
 
 
 
@@ -208,7 +203,7 @@ export function useLeads() {
         filters,
         sort,
         fetchLeads,
-        sendCustomEmail,
+        sendEmail,
         updateSearch,
         updateFilter,
         updateSort,

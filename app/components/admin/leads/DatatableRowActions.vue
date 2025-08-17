@@ -14,7 +14,7 @@ const currentComponent = ref<keyof typeof componentsMap | null>(null);
 // Control dialog open state
 const isDialogOpen = ref(false);
 
-const {sendCustomEmail } = useLeads()
+const { sendEmail } = useLeads();
 // Map action types to components
 const componentsMap = {
   view: ViewModal,
@@ -25,9 +25,12 @@ function handleAction(type: keyof typeof componentsMap) {
   isDialogOpen.value = true;
 }
 
-function handleForward() {
-
-    sendCustomEmail();
+async function handleForward() {
+  await sendEmail({
+    email: "devrajthapa1191@gmail.com",
+    subject: "New Enquiry",
+    message: "dev hello dev",
+  });
 }
 
 function closeModal() {
@@ -47,7 +50,8 @@ function closeModal() {
         <AlertDialogHeader>
           <AlertDialogTitle>Forward this enquiry?</AlertDialogTitle>
           <AlertDialogDescription>
-            The enquiry details will be sent to the provider's registered email address. Please confirm before proceeding.
+            The enquiry details will be sent to the provider's registered email
+            address. Please confirm before proceeding.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -80,6 +80,9 @@ importers:
       reka-ui:
         specifier: ^2.4.1
         version: 2.4.1(typescript@5.9.2)(vue@3.5.18(typescript@5.9.2))
+      resend:
+        specifier: ^6.0.1
+        version: 6.0.1
       shadcn-nuxt:
         specifier: 2.2.0
         version: 2.2.0(magicast@0.3.5)
@@ -5276,6 +5279,15 @@ packages:
 
   require-package-name@2.0.1:
     resolution: {integrity: sha512-uuoJ1hU/k6M0779t3VMVIYpb2VMJk05cehCaABFhXaibcbvfgR8wKiozLjVFSzJPmQMRqIcO0HMyTFqfV09V6Q==}
+
+  resend@6.0.1:
+    resolution: {integrity: sha512-xNZ0gKAOqQcH83lXsqNOwBbpKROnsZpQr9mXRdG6hrHTF9G9Il2pkoTRtq7rJzXMvCZX+I79oahsbSeaYOWRFA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@react-email/render': ^1.1.0
+    peerDependenciesMeta:
+      '@react-email/render':
+        optional: true
 
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
@@ -12045,6 +12057,8 @@ snapshots:
   require-directory@2.1.1: {}
 
   require-package-name@2.0.1: {}
+
+  resend@6.0.1: {}
 
   resolve-from@4.0.0: {}
 
