@@ -30,6 +30,7 @@ watch(
   () => toRaw(filters),
   (newFilters) => {
     const payload = getFiltersPayload();
+    console.log("payload",payload)
     // Clear old filters first (optional)
     resetFilters().then(() => {
       Object.entries(payload).forEach(([key, value]) => updateFilter(key, value));

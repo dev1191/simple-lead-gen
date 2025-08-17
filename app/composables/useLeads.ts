@@ -31,7 +31,8 @@ export function useLeads() {
             .from('leads')
             .select(`
         *,
-        vendors(id,name,email)
+        vendors(id,name,email),
+        services(*)
       `, { count: 'exact' })
 
         if (filters.value.search) {
