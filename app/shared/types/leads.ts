@@ -11,4 +11,7 @@ export interface Lead {
     user_name: string;
     user_email: string;
     type:string;
+    status:string;
+    message:string;
+    created_at:string
 }

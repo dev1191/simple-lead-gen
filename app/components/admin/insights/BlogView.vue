@@ -24,6 +24,7 @@ const formatDate = (date: string | null) => {
     title="View Article"
     @update:open="handleCancel"
     size="four"
+    isFooter
   >
     <template #default>
       <!-- Header -->

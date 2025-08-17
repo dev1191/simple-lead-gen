@@ -16,6 +16,7 @@ const props = defineProps<{
   title?: string;
   description?: string;
   size?: string;
+  isFooter?: boolean
 }>();
 
 const emit = defineEmits<{
@@ -61,7 +62,7 @@ const sizeClasses: Record<string, string> = {
       </div>
 
       <!-- Fixed Footer -->
-      <DialogFooter class="px-6 pb-6 pt-4 border-t flex-shrink-0 flex justify-end gap-3">
+      <DialogFooter v-if="isFooter" class="px-6 pb-6 pt-4 border-t flex-shrink-0 flex justify-end gap-3">
         <DialogClose as-child>
           <Button type="button" variant="outline">Close</Button>
         </DialogClose>

@@ -75,6 +75,7 @@ const onSubmit = async () => {
     description="Update vendor details"
     @update:open="handleCancel"
     size="md"
+    isFooter
   >
     <template #default>
       <form

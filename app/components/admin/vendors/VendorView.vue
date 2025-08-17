@@ -24,6 +24,7 @@ const formatDate = (date: string | null) => {
     title="View Vendor"
     @update:open="handleCancel"
     size="two"
+    isFooter
   >
     <template #default>
       <div class="space-y-4">

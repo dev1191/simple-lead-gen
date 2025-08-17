@@ -97,6 +97,7 @@ const handleFormSubmit = () => {
       description=""
       @update:open="closeSheetModal"
       size="xl"
+      isFooter
     >
       <template #default>
         <form @submit.prevent="onSubmit" id="faq-form">

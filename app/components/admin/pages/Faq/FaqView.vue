@@ -19,6 +19,7 @@ const handleCancel = () => {
     title="View Faq"
     @update:open="handleCancel"
     size="two"
+    isFooter
   >
     <template #default>
       <div class="space-y-4">

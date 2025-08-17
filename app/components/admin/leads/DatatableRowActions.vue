@@ -14,6 +14,7 @@ const currentComponent = ref<keyof typeof componentsMap | null>(null);
 // Control dialog open state
 const isDialogOpen = ref(false);
 
+const {sendCustomEmail } = useLeads()
 // Map action types to components
 const componentsMap = {
   view: ViewModal,
@@ -26,9 +27,8 @@ function handleAction(type: keyof typeof componentsMap) {
 
 function handleForward() {
 
+    sendCustomEmail();
 }
-
-
 
 function closeModal() {
   isDialogOpen.value = false;
@@ -39,10 +39,23 @@ function closeModal() {
 
 <template>
   <div class="flex items-center gap-4">
-
-        <Button variant="outline" size="sm" @click="handleForward">
-            Forward
-    </Button>
+    <AlertDialog>
+      <AlertDialogTrigger as-child>
+        <Button variant="outline" size="sm"> Forward </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Forward this enquiry?</AlertDialogTitle>
+          <AlertDialogDescription>
+            The enquiry details will be sent to the provider's registered email address. Please confirm before proceeding.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction @click="handleForward">Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
 
     <Button variant="ghost" size="icon" @click="handleAction('view')">
       <Icon name="Eye" :size="20" class="text-red-800" />

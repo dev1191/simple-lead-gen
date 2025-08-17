@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { BlogCategories } from "~/shared/constants";
-import { slugify } from "~/shared/utils";
+
 
 const { createPost,fetchPosts} = useBlogPosts();
 const { label } = defineProps<{
@@ -111,6 +111,7 @@ const handleFormSubmit = () => {
     description=""
     @update:open="closeSheetModal"
     size="six"
+    isFooter
   >
     <template #default>
       <form

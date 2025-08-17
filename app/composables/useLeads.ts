@@ -20,8 +20,6 @@ export function useLeads() {
         end_date: ''
     }))
 
-    console.log("filters", filters.value)
-
     const sort = useState('LeadsSort', () => ({
         field: 'created_at',
         order: 'desc' as 'asc' | 'desc'
@@ -178,6 +176,27 @@ export function useLeads() {
     }
 
 
+    async function sendCustomEmail() {
+        try {
+            const { data, error } = await supabase.functions.invoke('send-email', {
+                body: {
+                    to: 'devrajthapa1191@gmail.com',
+                    subject: 'Welcome to our app!',
+                    body: '<h1>Hello!</h1><p>Thanks for signing up.</p>',
+                },
+            });
+
+            if (error) {
+                console.error('Error sending email:', error);
+            } else {
+                console.log('Email sent:', data);
+            }
+        } catch (err) {
+            console.error('Function invocation error:', err);
+        }
+    }
+
+
 
     return {
         leads,
@@ -189,6 +208,7 @@ export function useLeads() {
         filters,
         sort,
         fetchLeads,
+        sendCustomEmail,
         updateSearch,
         updateFilter,
         updateSort,

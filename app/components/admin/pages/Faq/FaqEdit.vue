@@ -63,6 +63,7 @@ const handleFormSubmit = () => {
     title="Edit Faq"
     @update:open="handleCancel"
     size="xl"
+    isFooter
   >
     <template #default>
       <form @submit.prevent="onSubmit" id="faq-form">

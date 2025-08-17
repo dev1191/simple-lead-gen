@@ -100,6 +100,7 @@ const onSubmit = async () => {
     title="Edit Article"
     @update:open="handleCancel"
     size="six"
+    isFooter
   >
     <template #default>
       <form
