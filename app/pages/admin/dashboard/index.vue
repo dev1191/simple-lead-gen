@@ -364,7 +364,7 @@ if (isSupported) {
           <CardDescription>Common administrative tasks</CardDescription>
         </CardHeader>
         <CardContent>
-          <div class="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
+          <div class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
             <Button variant="outline" @click="navigateTo('/admin/services')">
               <Settings class="w-4 h-4 mr-2" />
               Manage Services
@@ -375,11 +375,7 @@ if (isSupported) {
             </Button>
             <Button variant="outline" @click="navigateTo('/admin/tools')">
               <Wrench class="w-4 h-4 mr-2" />
-              Tool Analytics
-            </Button>
-            <Button variant="outline" @click="exportData">
-              <Download class="w-4 h-4 mr-2" />
-              Export Data
+              Tools
             </Button>
           </div>
         </CardContent>
