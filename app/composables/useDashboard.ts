@@ -47,7 +47,7 @@ export const useDashboard = () => {
   const supabase = useSupabaseClient()
   const loading = ref(false)
   const error = ref<string | null>(null)
-  
+
   // Reactive dashboard data
   const dashboardData = ref<DashboardData>({
     kpis: {
@@ -74,7 +74,7 @@ export const useDashboard = () => {
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
     const startOfYear = new Date(now.getFullYear(), 0, 1)
-    
+
     return {
       startOfMonth: startOfMonth.toISOString(),
       startOfLastMonth: startOfLastMonth.toISOString(),
@@ -86,7 +86,7 @@ export const useDashboard = () => {
   // Fetch KPIs
   const fetchKPIs = async (): Promise<DashboardKPIs> => {
     const { startOfMonth, startOfLastMonth, endOfLastMonth } = getDateRanges()
-    
+
     try {
       // Fetch leads data
       const [
@@ -102,37 +102,37 @@ export const useDashboard = () => {
         supabase
           .from('leads')
           .select('*', { count: 'exact', head: true }),
-        
+
         // Leads this month
         supabase
           .from('leads')
           .select('*', { count: 'exact', head: true })
           .gte('created_at', startOfMonth),
-        
+
         // Leads last month (for growth calculation)
         supabase
           .from('leads')
           .select('*', { count: 'exact', head: true })
           .gte('created_at', startOfLastMonth)
           .lt('created_at', startOfMonth),
-        
+
         // Active services
         supabase
           .from('services')
           .select('*', { count: 'exact', head: true })
           .eq('status', true),
-        
+
         // Total services
         supabase
           .from('services')
           .select('*', { count: 'exact', head: true }),
-        
+
         // New listings this month
         supabase
           .from('services')
           .select('*', { count: 'exact', head: true })
           .gte('created_at', startOfMonth),
-        
+
         // Tool clicks (if tracking exists)
         supabase
           .from('tool_clicks')
@@ -143,9 +143,9 @@ export const useDashboard = () => {
       ])
 
       // Calculate growth percentages
-      const leadsGrowth = leadsLastMonth ? 
+      const leadsGrowth = leadsLastMonth ?
         ((leadsThisMonth - leadsLastMonth) / leadsLastMonth) * 100 : 0
-      
+
       const servicesGrowth = 0 // You can implement this similarly if needed
 
       return {
@@ -175,7 +175,7 @@ export const useDashboard = () => {
         // Fallback if RPC doesn't exist - fetch raw data and group
         const sixMonthsAgo = new Date()
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
-        
+
         const { data: leadsData, error: leadsError } = await supabase
           .from('leads')
           .select('created_at')
@@ -214,20 +214,28 @@ export const useDashboard = () => {
   // Fetch top categories
   const fetchTopCategories = async (): Promise<TopCategory[]> => {
     try {
+      // Join service_categories → categories
       const { data, error } = await supabase
-        .from('services')
-        .select('category')
-        .not('category', 'is', null)
+        .from('service_categories')
+        .select(`
+        category_id,
+        categories(name),
+        service_id
+      `)
 
       if (error) throw error
 
       // Count categories
       const categoryCount = new Map<string, number>()
       const total = data?.length || 0
-      
-      data?.forEach(service => {
-        if (service.category) {
-          categoryCount.set(service.category, (categoryCount.get(service.category) || 0) + 1)
+
+      data?.forEach(item => {
+        const categoryName = item.categories?.name || item.category_id
+        if (categoryName) {
+          categoryCount.set(
+            categoryName,
+            (categoryCount.get(categoryName) || 0) + 1
+          )
         }
       })
 
@@ -249,7 +257,7 @@ export const useDashboard = () => {
   // Generate alerts based on data
   const generateAlerts = async (): Promise<DashboardAlert[]> => {
     const alerts: DashboardAlert[] = []
-    
+
     try {
       // Check for paused services
       const { count: pausedServices } = await supabase
@@ -271,11 +279,11 @@ export const useDashboard = () => {
       // Check for services with no recent activity (example)
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-      
+
       const { count: inactiveServices } = await supabase
         .from('services')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active')
+        .eq('status', true)
         .lt('updated_at', thirtyDaysAgo.toISOString())
 
       if (inactiveServices && inactiveServices > 0) {
@@ -373,11 +381,11 @@ export const useDashboard = () => {
     dashboardData: readonly(dashboardData),
     loading: readonly(loading),
     error: readonly(error),
-    
+
     // Actions
     fetchDashboardData,
     refreshKPIs,
-    
+
     // Auto-refresh controls
     pauseAutoRefresh: pause,
     resumeAutoRefresh: resume

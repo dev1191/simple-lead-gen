@@ -19,11 +19,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Import Lucide icons
 import {
   RefreshCw,
-  Loader2,
   AlertCircle,
   Users,
   Activity,
@@ -34,7 +34,6 @@ import {
   Info,
   Settings,
   Wrench,
-  Download,
 } from "lucide-vue-next";
 import { useDocumentVisibility } from "@vueuse/core";
 
@@ -60,72 +59,43 @@ const maxLeads = computed(() => {
   return Math.max(...dashboardData.value.monthlyLeads.map((m) => m.leads), 1);
 });
 
-// Helper functions
-const formatNumber = (num: number): string => {
-  return new Intl.NumberFormat().format(num);
-};
-
-const formatGrowth = (growth: number): string => {
-  const sign = growth > 0 ? "+" : "";
-  return `${sign}${growth}%`;
-};
-
-const growthClass = (growth: number): string => {
-  if (growth > 0) return "text-green-600";
-  if (growth < 0) return "text-red-600";
-  return "text-muted-foreground";
-};
-
-const formatMonth = (date: Date): string => {
-  return date.toLocaleDateString("en-US", { month: "short" });
-};
+// Helpers
+const formatNumber = (num: number): string => new Intl.NumberFormat().format(num);
+const formatGrowth = (growth: number): string => `${growth > 0 ? "+" : ""}${growth}%`;
+const growthClass = (growth: number): string =>
+  growth > 0 ? "text-green-600" : growth < 0 ? "text-red-600" : "text-muted-foreground";
+const formatMonth = (date: Date): string =>
+  date.toLocaleDateString("en-US", { month: "short" });
 
 // Actions
-const refreshData = async () => {
-  await fetchDashboardData();
-};
-
-const exportData = () => {
-  // Implement data export functionality
-  console.log("Exporting dashboard data...");
-  // You could create a CSV/Excel export here
-};
+const refreshData = async () => await fetchDashboardData();
+const exportData = () => console.log("Exporting dashboard data...");
 
 // Lifecycle
 onMounted(async () => {
-  // Initial data fetch
   await fetchDashboardData();
-
-  // Resume auto-refresh when component is mounted
   resumeAutoRefresh();
 });
+onUnmounted(() => pauseAutoRefresh());
 
-onUnmounted(() => {
-  // Pause auto-refresh when component is unmounted
-  pauseAutoRefresh();
-});
-
-// Handle visibility change to pause/resume auto-refresh
+// Visibility handler
 const { isSupported, visibility } = useDocumentVisibility();
-
 if (isSupported) {
   watch(visibility, (current) => {
     if (current === "visible") {
       resumeAutoRefresh();
-      refreshKPIs(); // Refresh data when tab becomes visible
-    } else {
-      pauseAutoRefresh();
-    }
+      refreshKPIs();
+    } else pauseAutoRefresh();
   });
 }
 </script>
 
 <template>
   <div class="p-2 space-y-6">
-    <!-- Header with Refresh -->
+    <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 class="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
         <p class="text-muted-foreground">
           Overview of your platform activity and performance
         </p>
@@ -136,23 +106,57 @@ if (isSupported) {
       </Button>
     </div>
 
-    <!-- Loading State -->
-    <div
-      v-if="loading && !dashboardData.kpis.totalLeads"
-      class="flex items-center justify-center h-64"
-    >
-      <div class="text-center">
-        <Loader2 class="w-8 h-8 animate-spin mx-auto mb-4" />
-        <p class="text-muted-foreground">Loading dashboard data...</p>
-      </div>
-    </div>
-
     <!-- Error State -->
-    <Alert v-else-if="error" variant="destructive">
+    <Alert v-if="error" variant="destructive">
       <AlertCircle class="h-4 w-4" />
       <AlertTitle>Error</AlertTitle>
       <AlertDescription>{{ error }}</AlertDescription>
     </Alert>
+
+    <!-- Loading State -->
+    <div v-else-if="loading" class="space-y-6">
+      <!-- KPI Skeletons -->
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card v-for="i in 4" :key="i">
+          <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+            <Skeleton class="h-4 w-24" />
+            <Skeleton class="h-5 w-5 rounded-full" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton class="h-8 w-20 mb-2" />
+            <Skeleton class="h-4 w-32" />
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Charts Skeleton -->
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card class="col-span-4">
+          <CardHeader>
+            <Skeleton class="h-4 w-40 mb-2" />
+            <Skeleton class="h-3 w-64" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton class="h-80 w-full" />
+          </CardContent>
+        </Card>
+        <Card class="col-span-3">
+          <CardHeader>
+            <Skeleton class="h-4 w-32 mb-2" />
+            <Skeleton class="h-3 w-48" />
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <div v-for="i in 5" :key="i" class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <Skeleton class="h-2 w-2 rounded-full" />
+                <Skeleton class="h-4 w-20" />
+              </div>
+              <Skeleton class="h-4 w-10" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
 
     <!-- Dashboard Content -->
     <div v-else class="space-y-6">
@@ -160,9 +164,7 @@ if (isSupported) {
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <!-- Total Leads -->
         <Card>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
-          >
+          <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle class="text-sm font-medium">Total Leads</CardTitle>
             <Users class="h-5 w-5 text-muted-foreground" />
           </CardHeader>
@@ -171,17 +173,14 @@ if (isSupported) {
               {{ formatNumber(dashboardData.kpis.totalLeads) }}
             </div>
             <p class="text-xs text-muted-foreground">
-              {{ formatNumber(dashboardData.kpis.totalLeadsThisMonth) }} this
-              month
+              {{ formatNumber(dashboardData.kpis.totalLeadsThisMonth) }} this month
             </p>
           </CardContent>
         </Card>
 
         <!-- Active Services -->
         <Card>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
-          >
+          <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle class="text-sm font-medium">Active Services</CardTitle>
             <Activity class="h-5 w-5 text-muted-foreground" />
           </CardHeader>
@@ -190,17 +189,14 @@ if (isSupported) {
               {{ formatNumber(dashboardData.kpis.activeServices) }}
             </div>
             <p class="text-xs text-muted-foreground">
-              of {{ formatNumber(dashboardData.kpis.totalServices) }} total
-              services
+              of {{ formatNumber(dashboardData.kpis.totalServices) }} total services
             </p>
           </CardContent>
         </Card>
 
         <!-- Tool Clicks -->
         <Card>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
-          >
+          <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle class="text-sm font-medium">Tool Clicks</CardTitle>
             <MousePointerClick class="h-5 w-5 text-muted-foreground" />
           </CardHeader>
@@ -214,9 +210,7 @@ if (isSupported) {
 
         <!-- New Listings -->
         <Card>
-          <CardHeader
-            class="flex flex-row items-center justify-between space-y-0 pb-2"
-          >
+          <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle class="text-sm font-medium">New Listings</CardTitle>
             <PlusCircle class="h-5 w-5 text-muted-foreground" />
           </CardHeader>
@@ -240,25 +234,20 @@ if (isSupported) {
         <Card class="col-span-4">
           <CardHeader>
             <CardTitle>Monthly Leads Trend</CardTitle>
-            <CardDescription
-              >Lead generation over the last 6 months</CardDescription
-            >
+            <CardDescription>Lead generation over the last 6 months</CardDescription>
           </CardHeader>
           <CardContent class="pl-2">
             <div v-if="dashboardData.monthlyLeads.length > 0">
-              <!-- Using a simple line chart representation -->
               <div class="h-80 flex items-end justify-between space-x-2">
                 <div
-                  v-for="(month, index) in dashboardData.monthlyLeads"
+                  v-for="month in dashboardData.monthlyLeads"
                   :key="month.month"
                   class="flex-1 flex flex-col items-center"
                 >
                   <div
                     class="bg-primary w-full rounded-t transition-all hover:opacity-80"
                     :style="{ height: `${(month.leads / maxLeads) * 200}px` }"
-                    :title="`${month.leads} leads in ${formatMonth(
-                      month.date
-                    )}`"
+                    :title="`${month.leads} leads in ${formatMonth(month.date)}`"
                   ></div>
                   <div class="text-xs text-muted-foreground mt-2 text-center">
                     {{ formatMonth(month.date) }}
@@ -267,10 +256,7 @@ if (isSupported) {
                 </div>
               </div>
             </div>
-            <div
-              v-else
-              class="h-80 flex items-center justify-center text-muted-foreground"
-            >
+            <div v-else class="h-80 flex items-center justify-center text-muted-foreground">
               No data available
             </div>
           </CardContent>
@@ -283,10 +269,7 @@ if (isSupported) {
             <CardDescription>Most popular service categories</CardDescription>
           </CardHeader>
           <CardContent>
-            <div
-              v-if="dashboardData.topCategories.length > 0"
-              class="space-y-4"
-            >
+            <div v-if="dashboardData.topCategories.length > 0" class="space-y-4">
               <div
                 v-for="category in dashboardData.topCategories"
                 :key="category.category"
@@ -294,17 +277,11 @@ if (isSupported) {
               >
                 <div class="flex items-center space-x-3">
                   <div class="w-2 h-2 rounded-full bg-primary"></div>
-                  <span class="text-sm font-medium capitalize">{{
-                    category.category
-                  }}</span>
+                  <span class="text-sm font-medium capitalize">{{ category.category }}</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <span class="text-sm text-muted-foreground">{{
-                    category.count
-                  }}</span>
-                  <Badge variant="secondary" class="text-xs"
-                    >{{ category.percentage }}%</Badge
-                  >
+                  <span class="text-sm text-muted-foreground">{{ category.count }}</span>
+                  <Badge variant="secondary" class="text-xs">{{ category.percentage }}%</Badge>
                 </div>
               </div>
             </div>
@@ -322,9 +299,7 @@ if (isSupported) {
             <Bell class="h-5 w-5" />
             Alerts & Notifications
           </CardTitle>
-          <CardDescription
-            >Important updates that need your attention</CardDescription
-          >
+          <CardDescription>Important updates that need your attention</CardDescription>
         </CardHeader>
         <CardContent>
           <div class="space-y-3">
@@ -334,10 +309,7 @@ if (isSupported) {
               :variant="alert.type === 'error' ? 'destructive' : 'default'"
             >
               <AlertCircle v-if="alert.type === 'error'" class="h-4 w-4" />
-              <AlertTriangle
-                v-else-if="alert.type === 'warning'"
-                class="h-4 w-4"
-              />
+              <AlertTriangle v-else-if="alert.type === 'warning'" class="h-4 w-4" />
               <Info v-else class="h-4 w-4" />
 
               <AlertTitle>{{ alert.title }}</AlertTitle>
@@ -366,16 +338,13 @@ if (isSupported) {
         <CardContent>
           <div class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
             <Button variant="outline" @click="navigateTo('/admin/services')">
-              <Settings class="w-4 h-4 mr-2" />
-              Manage Services
+              <Settings class="w-4 h-4 mr-2" /> Manage Services
             </Button>
             <Button variant="outline" @click="navigateTo('/admin/leads')">
-              <Users class="w-4 h-4 mr-2" />
-              View Leads
+              <Users class="w-4 h-4 mr-2" /> View Leads
             </Button>
             <Button variant="outline" @click="navigateTo('/admin/tools')">
-              <Wrench class="w-4 h-4 mr-2" />
-              Tools
+              <Wrench class="w-4 h-4 mr-2" /> Tools
             </Button>
           </div>
         </CardContent>
@@ -383,7 +352,3 @@ if (isSupported) {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Add any custom styles if needed */
-</style>

@@ -54,7 +54,7 @@ const formSchema = toTypedSchema(
     currency_code: z.string().optional(),
     pricing: z.string().optional(),
     turnaround_time: z.string("Typical turnaround time is required"),
-    url: z.string().optional(),
+    url: z.string(),
     description: z
       .string()
       .min(1, "Detailed description of your service is required"),
