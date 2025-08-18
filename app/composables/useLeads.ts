@@ -1,6 +1,7 @@
 // composables/useLeads.ts
 import { useSupabaseClient } from '#imports'
 import type { Lead } from '~/shared/types/leads'
+import { toast } from "@steveyuowo/vue-hot-toast";
 
 export function useLeads() {
     const supabase = useSupabaseClient()
@@ -184,8 +185,10 @@ export function useLeads() {
 
         if (error) {
             console.error('Error sending email:', error);
+            toast.error(error)
         } else {
             console.log('Email sent:', data);
+            toast.success('Email sent')
         }
         return { sendEmail }
     }

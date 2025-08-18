@@ -26,23 +26,27 @@ function handleAction(type: keyof typeof componentsMap) {
 }
 
 async function handleForward() {
-  const message = `Hello ${props.row.original.vendors.name},
+  const message = `
+<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    Hello ${props.row.original.vendors.name},<br><br>
+    
+    You have received a new lead for ${
+      props.row.original.type === "Service"
+        ? props.row.original.services.service_name
+        : ""
+    }.<br><br>
+    
+    <strong>Company:</strong> {{company_name}}<br>
+    <strong>Contact:</strong> {{contact_name}}<br>
+    <strong>Email:</strong> {{contact_email}}<br><br>
+    
+    Best regards,<br>
+    Lead Gen Team
+</div>`;
 
-          You have received a new lead for ${
-            props.row.original.type == "Service"
-              ? props.row.original.services.service_name
-              : ""
-          }.
-
-          Company: {{company_name}}
-          Contact: {{contact_name}}
-          Email: {{contact_email}}
-
-          Best regards,
-          Lead Gen Team`;
   await sendEmail({
-    email: "devrajthapa1191@gmail.com",
-    subject: "New Enquiry",
+    email: "venturenexthq@gmail.com", //"devrajthapa1191@gmail.com",
+    subject: "New Leads",
     message,
   });
 }
