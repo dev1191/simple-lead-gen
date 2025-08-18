@@ -1,38 +1,98 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
-
-// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
-import { Resend } from "npm:resend"; 
+import { Resend } from "npm:resend";
 
-console.log("Hello from Functions!")
-const resend = new Resend(Deno.env.get("RESEND_API_KEY")!);
 
 Deno.serve(async (req) => {
-  try {
-    const { email, subject, message } = await req.json();
+  // Add CORS headers
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  }
 
-    await resend.emails.send({
-      from: "no-reply@thapa.dev",
-      to: email,
-      subject,
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    // Check if API key exists
+    const apiKey = Deno.env.get("RESEND_API_KEY");
+    if (!apiKey) {
+      console.error("RESEND_API_KEY environment variable is not set");
+      return new Response(
+        JSON.stringify({ error: "Email service not configured" }), 
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    const resend = new Resend(apiKey);
+
+    // Validate request body
+    const body = await req.json();
+
+    const { email, subject, message } = body;
+
+
+    if (!email || !subject || !message) {
+      return new Response(
+        JSON.stringify({ error: "Missing required fields: email, subject, message" }), 
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid email format" }), 
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    console.log(`Attempting to send email to: ${email}`);
+
+    const result = await resend.emails.send({
+      from: "no-reply@thapa.dev", // Make sure this domain is verified in Resend
+      to: [email], // Resend expects an array
+      subject: subject,
       html: `<p>${message}</p>`,
     });
 
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+    console.log("Email sent successfully:", result);
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        id: result.data?.id 
+      }), 
+      { 
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+
+  } catch (error) {
+    console.error("Error sending email:", error);
+    
+    return new Response(
+      JSON.stringify({ 
+        error: error.message || "Failed to send email",
+        details: error.toString()
+      }), 
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   }
 });
-/* To invoke locally:
-
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
-
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/send-email-provider-lead' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
-
-*/

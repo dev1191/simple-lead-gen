@@ -178,7 +178,7 @@ export function useLeads() {
 
 
     const sendEmail = async (payload: { email: string; subject: string; message: string }) => {
-        const { data, error } = await supabase.functions.invoke("send-email", {
+        const { data, error } = await supabase.functions.invoke("send-email-provider-lead", {
             body: payload,
         })
 

@@ -26,10 +26,24 @@ function handleAction(type: keyof typeof componentsMap) {
 }
 
 async function handleForward() {
+  const message = `Hello ${props.row.original.vendors.name},
+
+          You have received a new lead for ${
+            props.row.original.type == "Service"
+              ? props.row.original.services.service_name
+              : ""
+          }.
+
+          Company: {{company_name}}
+          Contact: {{contact_name}}
+          Email: {{contact_email}}
+
+          Best regards,
+          Lead Gen Team`;
   await sendEmail({
     email: "devrajthapa1191@gmail.com",
     subject: "New Enquiry",
-    message: "dev hello dev",
+    message,
   });
 }
 
