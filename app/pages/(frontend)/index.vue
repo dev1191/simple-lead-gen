@@ -1,11 +1,17 @@
 
 <script setup lang="ts">
+import FeaturesSection from '~/components/frontend/landing/FeaturesSection.vue';
+import HeroSection from '~/components/frontend/landing/HeroSection.vue';
+import InsightsSection from '~/components/frontend/landing/InsightsSection.vue';
+
 
 </script>
 
 <template>
     <div>
-            <h1>Home Page</h1>
+         <HeroSection />
+         <FeaturesSection/>
+         <InsightsSection />
     </div>
 </template>
 

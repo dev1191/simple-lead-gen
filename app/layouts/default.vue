@@ -1,14 +1,15 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Header from "~/components/frontend/layout/Header.vue";
+import Footer from "~/components/frontend/layout/Footer.vue";
+</script>
 
 <template>
   <div>
-    <div
-      class="min-h-screen flex flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50"
-    >
-      <main>
-        <slot />
-      </main>
-    </div>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
   </div>
 </template>
 
