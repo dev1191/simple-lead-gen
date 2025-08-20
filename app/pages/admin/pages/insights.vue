@@ -1,19 +1,20 @@
 <script setup lang="ts">
+import Insights from "~/components/admin/pages/Insights.vue";
 import Layout from "~/components/admin/pages/Layout.vue";
-import AboutUs from "~/components/admin/pages/AboutUs.vue"
+
 definePageMeta({
   layout: "admin",
   middleware: ["auth"],
 });
 
 useHead({
-  title: "About Us Settings",
+  title: "Insights(Blog) Settings",
 });
 </script>
 
 <template>
   <Layout>
-      <AboutUs />
+      <Insights />
   </Layout>
 </template>
 

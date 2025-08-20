@@ -20,7 +20,6 @@ const isLoading = ref<boolean>(false);
 const status = ref("");
 
 const { getPage, upsertPage } = usePages();
-const { uploadFile } = useUpload();
 const route = useRoute();
 
 const formSchema = toTypedSchema(
@@ -32,7 +31,6 @@ const formSchema = toTypedSchema(
     seo_title: z.string().min(1, "Meta Title is required"),
     seo_description: z.string().min(1, "Meta Description is required"),
     seo_keyword: z.string().min(1, "Meta Keywords is required"),
-    status: z.enum(["Draft", "Published"]),
   })
 );
 
@@ -40,8 +38,7 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
   useForm({
     validationSchema: formSchema,
     initialValues: {
-      status: "Draft",
-      name: "aboutus",
+      name: "insights",
       slug: "",
       title: "",
       content: "",
@@ -79,15 +76,18 @@ const onSubmit = handleSubmit(async (formValues) => {
   }
 });
 
+const preview = () =>{
+    navigateTo(`/insights`);
+}
+
 onMounted(async () => {
   const pathSegments = route.path.split("/").filter(Boolean);
-  let slug = pathSegments[pathSegments.length - 1] || "aboutus";
+  let slug = pathSegments[pathSegments.length - 1] || "insights";
   slug = slug.replace(/-/g, "");
 
   try {
     const page = await getPage(slug);
     if (page) {
-      status.value = page.status;
       resetForm({
         values: {
           ...page,
@@ -113,7 +113,7 @@ onMounted(async () => {
         "
         >{{ status }}</Badge
       >
-      <Button variant="outline"> <Eye class="w-4 h-4 mr-2" /> Preview</Button>
+      <Button variant="outline" @click="preview"> <Eye class="w-4 h-4 mr-2" /> Preview</Button>
       <Button type="button" @click="onSubmit" :disabled="isLoading">
         <Icon
           name="Loader2"
@@ -181,7 +181,7 @@ onMounted(async () => {
               >Page Content <span class="text-red-500">*</span></FormLabel
             >
             <FormControl>
-              <Textarea placeholder="Enter content" v-bind="componentField" />
+              <Textarea placeholder="Enter content" :row="10" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
