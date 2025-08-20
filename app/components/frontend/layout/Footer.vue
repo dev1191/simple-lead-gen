@@ -225,14 +225,14 @@ const subscribe = () => {
               </li>
               <li>
                 <NuxtLink
-                  to="/privacy"
+                  to="/privacy-policy"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Privacy Policy</NuxtLink
                 >
               </li>
               <li>
                 <NuxtLink
-                  to="/terms"
+                  to="/term-and-condition"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Terms of Service</NuxtLink
                 >

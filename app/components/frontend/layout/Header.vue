@@ -78,9 +78,9 @@ const handleClickOutside = () => {
             Insights
           </NuxtLink>
           <NuxtLink
-            to="/about"
+            to="/about-us"
             class="text-gray-300 hover:text-white transition-colors"
-            :class="{ 'text-orange-400': $route.path === '/about' }"
+            :class="{ 'text-orange-400': $route.path === '/about-us' }"
           >
             About
           </NuxtLink>
@@ -182,9 +182,9 @@ const handleClickOutside = () => {
               Insights
             </NuxtLink>
             <NuxtLink
-              to="/about"
+              to="/about-us"
               class="block text-gray-300 hover:text-white transition-colors py-2"
-              :class="{ 'text-orange-400': $route.path === '/about' }"
+              :class="{ 'text-orange-400': $route.path === '/about-us' }"
               @click="closeMobileMenu"
             >
               About

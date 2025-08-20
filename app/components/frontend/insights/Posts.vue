@@ -15,6 +15,7 @@ import {
 
 import { BlogCategories } from "~/shared/constants";
 import { useBlogPosts } from "~/composables/useBlogPosts";
+import BlogCardSkeleton from "./BlogCardSkeleton.vue";
 
 // composable
 const {
@@ -31,7 +32,6 @@ const {
 
 // Category state
 const activeCategory = ref("all");
-
 const categories = [{ value: "all", label: "All" }, ...BlogCategories];
 
 // Computed
@@ -114,73 +114,79 @@ onMounted(() => {
 
     <!-- Blog Posts Grid -->
     <div class="max-w-7xl mx-auto px-4 py-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-        <Card
-          v-for="post in paginatedPosts"
-          :key="post.id"
-          class="overflow-hidden hover:shadow-lg py-0 transition-shadow duration-300 cursor-pointer group"
-          @click="navigateToPost(post.slug)"
-        >
-          <div class="relative">
-            <!-- Placeholder Image -->
-            <div
-              class="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md"
-            >
-              <template v-if="post.image_url">
-                <img
-                  :src="post.image_url"
-                  alt="Post Image"
-                  class="w-full h-full object-cover"
-                />
-              </template>
-              <template v-else>
-                <ImageIcon class="w-12 h-12 text-gray-400" />
-              </template>
-            </div>
-            <!-- Category Badge -->
-            <Badge
-              :class="getCategoryColor(post.category)"
-              class="absolute top-3 left-3 text-xs px-2 py-1"
-            >
-              {{ post.category }}
-            </Badge>
-          </div>
-
-          <CardContent class="p-6">
-            <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
-              <div class="flex items-center gap-1">
-                <CalendarIcon class="w-4 h-4" />
-                {{ formatDate(post.created_at) }}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Show Skeletons while loading -->
+        <template v-if="loading">
+          <BlogCardSkeleton v-for="i in 6" :key="i" />
+        </template>
+        <template v-else>
+          <Card
+            v-for="post in paginatedPosts"
+            :key="post.id"
+            class="overflow-hidden hover:shadow-lg py-0 transition-shadow duration-300 cursor-pointer group"
+            @click="navigateToPost(post.slug)"
+          >
+            <div class="relative">
+              <!-- Placeholder Image -->
+              <div
+                class="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md"
+              >
+                <template v-if="post.image_url">
+                  <img
+                    :src="post.image_url"
+                    alt="Post Image"
+                    class="w-full h-full object-cover"
+                  />
+                </template>
+                <template v-else>
+                  <ImageIcon class="w-12 h-12 text-gray-400" />
+                </template>
               </div>
-              <!-- <div class="flex items-center gap-1">
+              <!-- Category Badge -->
+              <Badge
+                :class="getCategoryColor(post.category)"
+                class="absolute top-3 left-3 text-xs px-2 py-1"
+              >
+                {{ post.category }}
+              </Badge>
+            </div>
+
+            <CardContent class="p-6">
+              <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                <div class="flex items-center gap-1">
+                  <CalendarIcon class="w-4 h-4" />
+                  {{ formatDate(post.created_at) }}
+                </div>
+                <!-- <div class="flex items-center gap-1">
                 <ClockIcon class="w-4 h-4" />
                 {{ post.readTime }}
               </div> -->
-            </div>
+              </div>
 
-            <h3
-              class="text-xl font-semibold text-gray-900 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2"
-            >
-              {{ post.title }}
-            </h3>
+              <h3
+                class="text-xl font-semibold text-gray-900 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2"
+              >
+                {{ post.title }}
+              </h3>
 
-            <p
-              class="text-gray-600 mb-4 line-clamp-3 prose prose-sm max-w-none"
-              v-html="post.content"
-            ></p>
+              <p
+                class="text-gray-600 mb-4 line-clamp-3 prose prose-sm max-w-none"
+                v-html="post.content"
+              ></p>
 
-            <Button
-              variant="ghost"
-              class="text-orange-600 hover:text-orange-700 hover:bg-orange-50 p-0 h-auto font-medium"
-              @click.stop="navigateToPost(post.slug)"
-            >
-              Read More
-              <ArrowRightIcon
-                class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
-              />
-            </Button>
-          </CardContent>
-        </Card>
+              <Button
+                variant="ghost"
+                class="text-orange-600 hover:text-orange-700 hover:bg-orange-50 p-0 h-auto font-medium"
+                @click.stop="navigateToPost(post.slug)"
+              >
+                Read More
+                <ArrowRightIcon
+                  class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+                />
+              </Button>
+            </CardContent>
+          </Card>
+        </template>
       </div>
 
       <!-- Pagination -->
