@@ -93,7 +93,7 @@ onMounted(() => {
     <!-- Category Navigation -->
     <div class="bg-white shadow-sm border-b">
       <div class="max-w-7xl mx-auto px-4 py-6">
-        <div class="flex flex-wrap justify-center items-center gap-10">
+        <div class="flex flex-wrap justify-center items-center gap-20">
           <Button
             v-for="category in categories"
             :key="category.value"
@@ -114,19 +114,28 @@ onMounted(() => {
 
     <!-- Blog Posts Grid -->
     <div class="max-w-7xl mx-auto px-4 py-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
         <Card
           v-for="post in paginatedPosts"
           :key="post.id"
-          class="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer group"
+          class="overflow-hidden hover:shadow-lg py-0 transition-shadow duration-300 cursor-pointer group"
           @click="navigateToPost(post.slug)"
         >
           <div class="relative">
             <!-- Placeholder Image -->
             <div
-              class="w-full h-48 bg-gray-200 flex items-center justify-center"
+              class="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md"
             >
-              <ImageIcon class="w-12 h-12 text-gray-400" />
+              <template v-if="post.image_url">
+                <img
+                  :src="post.image_url"
+                  alt="Post Image"
+                  class="w-full h-full object-cover"
+                />
+              </template>
+              <template v-else>
+                <ImageIcon class="w-12 h-12 text-gray-400" />
+              </template>
             </div>
             <!-- Category Badge -->
             <Badge
@@ -141,12 +150,12 @@ onMounted(() => {
             <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
               <div class="flex items-center gap-1">
                 <CalendarIcon class="w-4 h-4" />
-                {{ formatDate(post.date) }}
+                {{ formatDate(post.created_at) }}
               </div>
-              <div class="flex items-center gap-1">
+              <!-- <div class="flex items-center gap-1">
                 <ClockIcon class="w-4 h-4" />
                 {{ post.readTime }}
-              </div>
+              </div> -->
             </div>
 
             <h3
