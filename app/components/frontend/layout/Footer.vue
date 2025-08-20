@@ -42,7 +42,7 @@ const subscribe = () => {
 <template>
   <footer class="bg-slate-900 text-white">
     <!-- Newsletter Section -->
-    <div class="bg-orange-500 py-12 px-6">
+    <div class="bg-orange-500 py-8 px-6">
       <div class="max-w-7xl mx-auto text-center">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">
           Stay Updated with Yotta
@@ -52,26 +52,33 @@ const subscribe = () => {
           marketplace updates delivered to your inbox.
         </p>
 
-        <div class="max-w-md mx-auto">
-          <div class="flex gap-2">
-            <Input
+        <div class="py-4 flex flex-col items-center text-center">
+          <!-- Subscription Form -->
+          <form
+            @submit.prevent="subscribe"
+            class="flex w-full max-w-2xl items-center rounded-full bg-white p-1 shadow-md"
+          >
+            <input
               v-model="email"
               type="email"
               placeholder="Enter your email address"
-              class="flex-1 bg-white text-gray-900 border-0"
+              class="flex-1 rounded-full border-none px-4 py-2 text-gray-700 focus:outline-none"
+              required
             />
-            <Button
-              @click="subscribe"
-              class="bg-slate-900 hover:bg-slate-800 text-white px-6"
+
+            <button
+              type="submit"
+              class="rounded-full bg-gray-900 px-6 py-2 text-white font-medium hover:bg-gray-800 transition"
             >
               Subscribe
-            </Button>
-          </div>
-        </div>
+            </button>
+          </form>
 
-        <p class="text-sm mt-4 opacity-80">
-          Join 10,000+ entrepreneurs. Unsubscribe anytime.
-        </p>
+          <!-- Text Below -->
+          <p class="mt-2 text-sm text-white/80">
+            Join 10,000+ entrepreneurs. Unsubscribe anytime.
+          </p>
+        </div>
       </div>
     </div>
 
