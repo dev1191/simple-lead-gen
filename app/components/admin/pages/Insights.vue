@@ -21,18 +21,17 @@ const status = ref("");
 
 const { getPage, upsertPage } = usePages();
 const { uploadFile } = useUpload();
-const route = useRoute()
+const route = useRoute();
 
 const formSchema = toTypedSchema(
   z.object({
     title: z.string().min(2).max(200),
     slug: z.string().min(2).max(200),
     name: z.string().optional(),
-    image_url: z.string().optional(),
     content: z.string().min(1, "Content is required"),
     seo_title: z.string().min(1, "Meta Title is required"),
     seo_description: z.string().min(1, "Meta Description is required"),
-    seo_keyword:z.string().min(1, "Meta Keywords is required"),
+    seo_keyword: z.string().min(1, "Meta Keywords is required"),
     status: z.enum(["Draft", "Published"]),
   })
 );
@@ -45,11 +44,10 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
       name: "aboutus",
       slug: "",
       title: "",
-      image_url: "",
       content: "",
       seo_title: "",
       seo_description: "",
-      seo_keyword:""
+      seo_keyword: "",
     },
   });
 
@@ -65,18 +63,9 @@ const onSubmit = handleSubmit(async (formValues) => {
   isLoading.value = true;
 
   try {
-    let imageUrl = formValues.image_url;
-
-    // Upload image if file selected
-    if (imageFile.value) {
-      imageUrl = await uploadFile(imageFile.value, "uploads", "pages");
-      setFieldValue("image_url", imageUrl);
-    }
-
     // Prepare page data to save
     const pageData = {
       ...formValues,
-      image_url: imageUrl,
     };
 
     const result = await upsertPage(pageData);
@@ -98,11 +87,10 @@ onMounted(async () => {
   try {
     const page = await getPage(slug);
     if (page) {
-        status.value = page.status;
+      status.value = page.status;
       resetForm({
         values: {
           ...page,
-          imageFile: null,
         },
       });
     }
@@ -113,18 +101,18 @@ onMounted(async () => {
 </script>
 
 <template>
-  <AdminLayoutPage title="Editing: About Us" description="" sticky>
+  <AdminLayoutPage title="Editing: Insights(Blog)" description="" sticky>
     <template #actions>
-              <Badge
-              v-if="status"
-          variant="secondary"
-          :class="
-            status === 'Published'
-              ? 'bg-green-200 text-green-700 font-semibold'
-              : 'bg-yellow-200 text-yellow-700 font-semibold'
-          "
-          >{{ status }}</Badge
-        >
+      <Badge
+        v-if="status"
+        variant="secondary"
+        :class="
+          status === 'Published'
+            ? 'bg-green-200 text-green-700 font-semibold'
+            : 'bg-yellow-200 text-yellow-700 font-semibold'
+        "
+        >{{ status }}</Badge
+      >
       <Button variant="outline"> <Eye class="w-4 h-4 mr-2" /> Preview</Button>
       <Button type="button" @click="onSubmit" :disabled="isLoading">
         <Icon
@@ -193,11 +181,7 @@ onMounted(async () => {
               >Page Content <span class="text-red-500">*</span></FormLabel
             >
             <FormControl>
-              <EditorTextEditor
-                id="content"
-                v-bind="componentField"
-                placeholder="Write your content here..."
-              />
+              <Textarea placeholder="Enter content" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -206,38 +190,9 @@ onMounted(async () => {
 
       <!-- Right Column -->
       <div class="flex flex-col space-y-6 flex-1">
-        <!-- Images -->
-        <FormField name="imageFile">
-          <FormItem>
-            <FormLabel>Page Image </FormLabel>
-            <FormControl>
-              <FileUploader v-model="imageFile" :previewUrl="values.image_url" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <!-- Status -->
-        <FormField v-slot="{ componentField }" name="status">
-          <FormItem>
-            <FormLabel>Status</FormLabel>
-            <FormControl>
-              <Select v-bind="componentField">
-                <SelectTrigger class="w-full">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="Published">Published</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
 
         <Separator />
-       <h2 class="text-2xl font-bold">SEO Metadata</h2>
+        <h2 class="text-2xl font-bold">SEO Metadata</h2>
 
         <FormField
           v-slot="{ componentField }"
@@ -278,7 +233,7 @@ onMounted(async () => {
           </FormItem>
         </FormField>
 
-           <FormField
+        <FormField
           v-slot="{ componentField }"
           name="seo_keyword"
           :validate-on-blur="!isFieldDirty"
