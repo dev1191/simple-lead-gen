@@ -4,9 +4,9 @@ import Footer from "~/components/frontend/layout/Footer.vue";
 </script>
 
 <template>
-  <div>
+  <div class="min-h-screen w-full">
     <Header />
-    <main>
+    <main class="w-full">
       <slot />
     </main>
     <Footer />

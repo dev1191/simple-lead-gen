@@ -12,6 +12,7 @@ import {
 import { useRouter } from "vue-router";
 import { toast } from "@steveyuowo/vue-hot-toast";
 import { Brain, Building2, CreditCard, Scale, TrendingUp } from "lucide-vue-next";
+import SearchTabs from "./SearchTabs.vue";
 
 const router = useRouter();
 
@@ -115,84 +116,9 @@ const trackCategoryClick = (category: string) => {
 
       <!-- Search Section -->
       <div
-        class="animate-fade-in-up animation-delay-400 max-w-2xl mx-auto mb-16"
+        class="animate-fade-in-up animation-delay-400 max-w-4xl mx-auto mb-16"
       >
-        <div
-          class="flex flex-col sm:flex-row gap-3 p-2 bg-white rounded-lg shadow-lg border border-gray-100"
-        >
-          <div class="flex-1 relative">
-            <svg
-              class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <Input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search for services, tools, or solutions..."
-              class="border-0 text-lg h-12 pl-10 focus:ring-0 focus:outline-none"
-              @keyup.enter="performSearch"
-            />
-          </div>
-
-          <Select v-model="selectedCountry">
-            <SelectTrigger class="w-full sm:w-48 h-12 border-0 focus:ring-0">
-              <SelectValue placeholder="Select Country" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="sg">
-                <div class="flex items-center gap-2">
-                  <span class="text-lg">🇸🇬</span>
-                  Singapore
-                </div>
-              </SelectItem>
-              <SelectItem value="my">
-                <div class="flex items-center gap-2">
-                  <span class="text-lg">🇲🇾</span>
-                  Malaysia
-                </div>
-              </SelectItem>
-              <SelectItem value="all">All Countries</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button
-            @click="performSearch"
-            class="bg-orange-500 hover:bg-orange-600 text-white font-medium px-8 h-12 transition-all duration-200 hover:shadow-lg"
-            :disabled="isSearching"
-          >
-            <svg
-              v-if="isSearching"
-              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            {{ isSearching ? "Searching..." : "Search" }}
-          </Button>
-        </div>
+       <SearchTabs/>
 
         <!-- Popular searches -->
         <div class="mt-4 text-sm text-gray-500">
