@@ -6,13 +6,13 @@ definePageMeta({
 });
 
 useHead({
-  title: "Why List With Us",
+  title: "List your Business",
 });
 </script>
 
 <template>
   <Layout>
-    <h1>Why List With Us page</h1>
+    <h1>List your Business page</h1>
   </Layout>
 </template>
 
