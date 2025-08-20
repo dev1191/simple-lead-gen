@@ -11,10 +11,14 @@ const sidebarNavItems: NavItem[] = [
     href: "/admin/pages/about-us",
   },
   {
+    title: "Insights(Blog)",
+    href: "/admin/pages/insights",
+  },
+  {
     title: "Why List With Us",
     href: "/admin/pages/why-list-with-us",
   },
-   {
+  {
     title: "FAQ",
     href: "/admin/pages/faq",
   },
