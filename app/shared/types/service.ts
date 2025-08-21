@@ -12,6 +12,14 @@ export interface ServiceCategories {
     sub_categories: SubCategories
 }
 
+export interface FilterOptions {
+  categories: string[]
+  serviceTypes: string[]
+  hasFreeConsultation: boolean | null
+  turnaroundTime: string[]
+  region: string[]
+}
+
 export interface Service {
     id: string;
     service_name: string;

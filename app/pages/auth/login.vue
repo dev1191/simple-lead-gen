@@ -12,6 +12,13 @@ definePageMeta({
   layout: "auth",
 });
 
+
+useSeo(
+  "Login",
+  "Log in to your Yotta account.",
+  "/images/login-og.png",
+  ["Yotta", "Login", "Tech company", "Services"]
+);
 </script>
 
 <template>
