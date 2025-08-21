@@ -98,7 +98,7 @@ const shareArticle = () => {
 
 const navigateToPost = (slug: string) => {
   // Navigate to the related post
-  navigateTo(`/blog/${slug}`);
+  navigateTo(`/insights/${slug}`);
 };
 
 const onLinkCopied = () => {
