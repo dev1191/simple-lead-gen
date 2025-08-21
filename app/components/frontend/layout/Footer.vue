@@ -148,7 +148,7 @@ const subscribe = () => {
             <ul class="space-y-2">
               <li>
                 <NuxtLink
-                  to="/browse"
+                  to="#"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Browse Services</NuxtLink
                 >
@@ -162,14 +162,14 @@ const subscribe = () => {
               </li>
               <li>
                 <NuxtLink
-                  to="/providers"
+                  to="#"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Top Providers</NuxtLink
                 >
               </li>
               <li>
                 <NuxtLink
-                  to="/pricing"
+                  to="#"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Pricing</NuxtLink
                 >
@@ -197,7 +197,7 @@ const subscribe = () => {
               </li>
               <li>
                 <NuxtLink
-                  to="/careers"
+                  to="#"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Careers</NuxtLink
                 >
@@ -218,7 +218,7 @@ const subscribe = () => {
             <ul class="space-y-2">
               <li>
                 <NuxtLink
-                  to="/help"
+                  to="#"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Help Center</NuxtLink
                 >
@@ -239,7 +239,7 @@ const subscribe = () => {
               </li>
               <li>
                 <NuxtLink
-                  to="/trust"
+                  to="#"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Trust & Safety</NuxtLink
                 >

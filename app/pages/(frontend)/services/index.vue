@@ -32,7 +32,9 @@ useSeo(
               Discover 6 professional services for your business
             </p>
           </div>
-          <Button variant="outline">Back to Home</Button>
+          <RouterLink to="/">
+            <Button variant="outline">Back to Home</Button>
+          </RouterLink>
         </div>
       </div>
     </div>

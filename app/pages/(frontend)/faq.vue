@@ -10,6 +10,9 @@ useSeo(
   "/images/home-og.png",
   ["Yotta", "Faq", "Tech company", "Solutions"]
 );
+
+
+
 </script>
 
 <template>
