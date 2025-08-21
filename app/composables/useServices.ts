@@ -1,6 +1,6 @@
 // composables/useBlogServices.ts
 import { useSupabaseClient } from '#imports'
-import type { Service } from '~/shared/types/service'
+import type { FilterOptions, Service } from '~/shared/types/service'
 
 export function useServices() {
     const supabase = useSupabaseClient()
@@ -145,7 +145,7 @@ export function useServices() {
                 servers: ServiceData.servers,
                 vendor_id: vendor[0].id
             }];
-            
+
             const { data: newService, error } = await supabase
                 .from('services')
                 .insert(serviceInsert)
@@ -449,6 +449,9 @@ export function useServices() {
             vendor_id: serviceData.vendors.id
         };
     }
+
+
+ 
 
 
     return {

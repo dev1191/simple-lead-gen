@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Button } from "@/components/ui/button";
+import type { Page } from '~/shared/types/pages'
+
+const { page } = defineProps<{
+  page: Page
+}>()
+
+
 </script>
 
 <template>
@@ -10,7 +16,7 @@ import { Button } from "@/components/ui/button";
         <div class="mb-8">
           <div class="flex items-center justify-center gap-3 mb-4">
             <h1 class="text-4xl font-bold text-gray-900">
-              Business Insights & Resources
+              {{ page.title }}
             </h1>
           </div>
         </div>
@@ -19,8 +25,7 @@ import { Button } from "@/components/ui/button";
       <div class="animate-fade-in-up animation-delay-200">
         <!-- Description -->
         <p class="text-gray-600 text-lg leading-relaxed mb-8 max-w-3xl mx-auto">
-          Stay ahead with expert insights, guides and industry trends to help
-          your business thrive in Singapore and Malaysia.
+          {{ page.content }}
         </p>
       </div>
     </div>

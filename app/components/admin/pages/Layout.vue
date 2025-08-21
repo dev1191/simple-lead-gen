@@ -10,7 +10,7 @@ const sidebarNavItems: NavItem[] = [
     title: "About Us",
     href: "/admin/pages/about-us",
   },
-    {
+  {
     title: "FAQ",
     href: "/admin/pages/faq",
   },
@@ -21,6 +21,10 @@ const sidebarNavItems: NavItem[] = [
   {
     title: "List your Business",
     href: "/admin/pages/list-your-business",
+  },
+  {
+    title: "Contact",
+    href: "/admin/pages/contact",
   },
   {
     title: "Terms Of Service",
