@@ -158,7 +158,9 @@ export function useBlogPosts() {
             const { data: { user }, error: userError } = await supabase.auth.getUser()
             if (userError || !user) throw new Error('Not authenticated')
 
-            let updatePayload = { ...updateData, slug: slugify(updateData.title) }
+            const published_at = updateData.status === 'Published' ? new Date().toISOString() : undefined;
+            console.log("published_at",published_at)
+            let updatePayload = { ...updateData, slug: slugify(updateData.title), published_at }
 
             if (newImageFile) {
                 const { data: existingPost } = await supabase
