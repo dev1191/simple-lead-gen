@@ -15,6 +15,7 @@ export interface BlogPost {
     seo_description:string;
     created_at: string
     updated_at: string
+    published_at:string;
     profiles:UserProfile
 
 }

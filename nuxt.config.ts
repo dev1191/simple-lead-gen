@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     '@nuxtjs/supabase',
     'nuxt-tiptap-editor',
+    'nuxt-jsonld'
   ],
   buildModules: ["@nuxtjs/date-fns"],
   tiptap: {
