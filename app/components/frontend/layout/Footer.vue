@@ -183,14 +183,14 @@ const subscribe = () => {
             <ul class="space-y-2">
               <li>
                 <NuxtLink
-                  to="/about"
+                  to="/about-us"
                   class="text-gray-400 hover:text-white transition-colors"
                   >About Us</NuxtLink
                 >
               </li>
               <li>
                 <NuxtLink
-                  to="/blog"
+                  to="/insights"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Blog</NuxtLink
                 >
