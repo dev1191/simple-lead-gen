@@ -99,10 +99,10 @@ const handleFormSubmit = () => {
                 Answer <span class="text-red-500">*</span>
               </FormLabel>
               <FormControl>
-                <Textarea
-                  type="text"
-                  placeholder="Enter answer"
+                <EditorTextEditor
+                  id="content"
                   v-bind="componentField"
+                  placeholder="Write your content here..."
                 />
               </FormControl>
               <FormMessage />
