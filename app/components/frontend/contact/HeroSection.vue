@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import type { Page } from "~/shared/types/pages";
+
+const { page } = defineProps<{
+  page: Page;
+}>();
 
 </script>
 
@@ -10,7 +15,7 @@
         <div class="mb-8">
           <div class="flex items-center justify-center gap-3 mb-4">
             <h1 class="text-6xl font-extrabold text-black">
-              Contact <span class="bg-gradient-to-r from-purple-500 to-orange-500 bg-clip-text text-transparent">Us</span>
+              {{ page.title.split(" ")[0] }} <span class="bg-gradient-to-r from-purple-500 to-orange-500 bg-clip-text text-transparent">{{ page.title.split(" ")[1]  }}</span>
             </h1>
           </div>
         </div>
@@ -19,7 +24,7 @@
       <div class="animate-fade-in-up animation-delay-200">
         <!-- Description -->
         <p class="text-gray-600 text-lg leading-relaxed mb-8 max-w-3xl mx-auto">
-          We're here to help you create unforgettable gifting experiences
+          {{ page.content }}
         </p>
       </div>
     </div>

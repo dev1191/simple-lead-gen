@@ -35,7 +35,9 @@ const activeCategory = ref("all");
 const categories = [{ value: "all", label: "All" }, ...BlogCategories];
 
 // Computed
-const paginatedPosts = computed(() => posts.value);
+const paginatedPosts = computed(() =>
+  posts.value.filter((post) => post.status === "Published")
+);
 
 // Handle category filter
 const setActiveCategory = (categoryId: string) => {
@@ -68,12 +70,12 @@ const formatDate = (dateString: string) => {
 
 const getCategoryColor = (category: string) => {
   const colors: Record<string, string> = {
-    "Business Registration": "bg-blue-100 text-blue-800",
-    "AI Tools": "bg-purple-100 text-purple-800",
+    "Case Study": "bg-blue-100 text-blue-800",
+    "Industry News": "bg-purple-100 text-purple-800",
     "Banking & Finance": "bg-green-100 text-green-800",
     "Legal & Compliance": "bg-red-100 text-red-800",
-    Marketing: "bg-pink-100 text-pink-800",
-    Funding: "bg-yellow-100 text-yellow-800",
+    Tips: "bg-pink-100 text-pink-800",
+    Guides: "bg-yellow-100 text-yellow-800",
   };
   return colors[category] || "bg-gray-100 text-gray-800";
 };

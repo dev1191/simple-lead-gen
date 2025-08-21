@@ -7,14 +7,16 @@ export default defineEventHandler(async (event) => {
 
     const { data, error } = await client
         .from('static_pages')
-        .select('*')
+        .select('name,title,slug,content,image_url,seo_title,seo_description,seo_keyword,meta_data')
         .eq('name', slug)
         .single()
 
-    if (error) throw createError({
-        statusCode: 404,
-        statusMessage: 'Page not found'
-    })
+    if (error) {
+        throw createError({
+            statusCode: 404,
+            statusMessage: 'Page not found'
+        })
+    }
 
     return data
 })

@@ -4,6 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  ssr: true,
+  build: {
+    ssr: true // Configuração simplificada para SSR
+  },
   modules: [
     '@nuxt/eslint',
     '@nuxt/image',
@@ -13,7 +17,7 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     'nuxt-tiptap-editor',
   ],
-    buildModules: ["@nuxtjs/date-fns"],
+  buildModules: ["@nuxtjs/date-fns"],
   tiptap: {
     prefix: 'Tiptap', //prefix for Tiptap imports, composables not included
   },
