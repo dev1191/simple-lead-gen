@@ -8,8 +8,6 @@ const route = useRoute();
 
 const { data: toolData } = await useFetch(`/api/tools/${route.params.slug}`);
 
-
-console.log("toolData",toolData.value)
 </script>
 
 <template>
