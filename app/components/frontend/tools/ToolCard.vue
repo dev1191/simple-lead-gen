@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, ExternalLink } from "lucide-vue-next";
+import { Star, ExternalLink, ImageIcon } from "lucide-vue-next";
 import { formatDescription } from "~/shared/utils";
 
 const props = defineProps<{
@@ -120,9 +120,9 @@ const bestFor = computed(() => {
         <ImageIcon v-else class="w-12 h-12 text-gray-400" />
       </div>
 
-      <Badge v-for="tag in tags" :key="tag" variant="secondary" class="text-xs">
+      <!-- <Badge v-for="tag in tags" :key="tag" variant="secondary" class="text-xs">
         {{ tag }}
-      </Badge>
+      </Badge> -->
     </CardContent>
 
     <!-- Pricing Row -->

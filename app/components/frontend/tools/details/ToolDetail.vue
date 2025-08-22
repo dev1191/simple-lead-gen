@@ -230,9 +230,10 @@ const region = computed(() => {
           >
           <CardContent class="text-center">
             <div class="text-sm text-muted-foreground">
-              Starting from <b>USD 29/month</b>
+              Starting from <b>{{ product.currency_code }} {{product.pricing}}/month</b>
             </div>
             <div
+              v-if="product.free_trial"
               class="flex items-center justify-center gap-1 text-sm text-green-600 dark:text-green-400"
             >
               <Icon name="Check" class="w-4 h-4" />
