@@ -16,18 +16,39 @@ defineProps<{
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
     >
       <div v-for="i in 6" :key="i" class="space-y-4">
-        <div class="flex items-center gap-3">
-          <Skeleton class="w-12 h-12 rounded-lg" />
-          <div class="flex-1 min-w-0">
-            <Skeleton class="w-1/4 h-2" />
-            <Skeleton class="w-1/4 h-2" />
-          </div>
-          <Skeleton class="w-1/4 h-2" />
-          <Skeleton class="w-1/1 h-2" />
-        </div>
+        <Card
+          class="flex flex-col rounded-lg shadow-md group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 hover:border-primary/20"
+        >
+          <CardHeader class="flex flex-row items-start gap-3 pr-4 pl-4">
+            <div class="flex items-center gap-3">
+              <Skeleton class="w-12 h-12 rounded-lg" />
+              <div class="flex-1 min-w-0">
+                <Skeleton class="w-1/4 h-2" />
+                <Skeleton class="w-1/4 h-2" />
+              </div>
+              <Skeleton class="w-1/4 h-2" />
+              <Skeleton class="w-1/1 h-2" />
+            </div>
+          </CardHeader>
+          <CardContent class="flex flex-wrap gap-2 pr-4 pl-4">
+            <Skeleton class="w-5/5 h-40" />
+          </CardContent>
 
-        <Skeleton class="w-3/4 h-6" />
-        <Skeleton class="w-1/2 h-4" />
+          <CardContent class="pr-4 pl-4">
+            <div class="flex items-center gap-4 text-sm text-muted-foreground">
+              <div class="flex items-center gap-2 flex-1">
+                <Skeleton class="w-1/1 h-6" />
+                <Skeleton class="w-1/1 h-6" />
+                <Skeleton class="w-1/1 h-6" />
+              </div>
+            </div>
+          </CardContent>
+
+          <CardFooter class="flex justify-between gap-2">
+            <Skeleton class="w-3/4 h-8" />
+            <Skeleton class="w-1/6 h-8" />
+          </CardFooter>
+        </Card>
       </div>
     </div>
 
