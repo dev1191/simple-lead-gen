@@ -71,3 +71,16 @@ export const fileWithAspectRatio = (widthRatio: number, heightRatio: number) =>
       message: "Must be a URL or an uploaded image",
     });
   });
+
+
+export const formatDescription = (desc: string, limit: number) => {
+  // Convert to UCWords
+  const ucwords = desc.replace(/\b\w/g, c => c.toUpperCase());
+
+  // Limit string length
+  if (ucwords.length > limit) {
+    return ucwords.slice(0, limit).trim() + "...";
+  }
+
+  return ucwords;
+}

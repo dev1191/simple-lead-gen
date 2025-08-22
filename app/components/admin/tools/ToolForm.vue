@@ -26,7 +26,7 @@ const formSchema = toTypedSchema(
       .array(z.string())
       .min(1, "Select at least one sub categories"),
     logo_url: fileWithAspectRatio(1, 1), // File or URL
-    banner_url: z.string().optional(), // 16:9 aspect ratio
+    banner_url: fileWithAspectRatio(16, 9), // 16:9 aspect ratio
     description: z
       .string()
       .min(1, "Detailed description of your tool is required"),
