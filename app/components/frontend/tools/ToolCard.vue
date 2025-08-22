@@ -150,7 +150,7 @@ const bestFor = computed(() => {
     <!-- Footer Buttons -->
     <CardFooter class="flex justify-between gap-2">
       <Button class="flex-1" size="sm">
-        <NuxtLink target="_blank" :to="`/tools/${slug}`"
+        <NuxtLink  :to="`/tools/${slug}`"
           >View Details</NuxtLink
         ></Button
       >
