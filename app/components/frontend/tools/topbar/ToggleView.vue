@@ -2,10 +2,16 @@
 import { Button } from "@/components/ui/button"
 import { LayoutGrid, List } from "lucide-vue-next"
 
-const view = ref<"grid" | "list">("grid")
+const props = defineProps<{
+  modelValue: "grid" | "list"
+}>()
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: "grid" | "list"): void
+}>()
 
 const toggle = (v: "grid" | "list") => {
-  view.value = v
+  emit("update:modelValue", v)
 }
 </script>
 
@@ -14,19 +20,19 @@ const toggle = (v: "grid" | "list") => {
     <Button
       variant="outline"
       size="icon"
-      :class="view === 'grid' ? 'bg-orange-600 text-white' : ''"
+      :class="props.modelValue === 'grid' ? 'bg-orange-600 text-white' : ''"
       @click="toggle('grid')"
     >
-      <LayoutGrid class="w-4 h-4 " />
+      <LayoutGrid class="w-4 h-4" />
     </Button>
 
     <Button
       variant="outline"
       size="icon"
-      :class="view === 'list' ? 'bg-orange-600 text-white' : ''"
+      :class="props.modelValue === 'list' ? 'bg-orange-600 text-white' : ''"
       @click="toggle('list')"
     >
-      <List class="w-4 h-4 " />
+      <List class="w-4 h-4" />
     </Button>
   </div>
 </template>

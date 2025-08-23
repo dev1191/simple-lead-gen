@@ -15,17 +15,13 @@ const route = useRoute();
 const searchQuery = ref("");
 const selectedCategory = ref("");
 const selectedSort = ref("newest");
-const toolType = ref("")
-const region = ref("")
-const minPrice = ref("");
-const maxPrice = ref("");
-const minRating = ref("");
+const toolType = ref("");
+const region = ref("");
 const consultationType = ref("");
 const currentPage = ref(1);
 
 // Other states
 const viewMode = ref("grid");
-const showFilters = ref(true);
 
 // Fetch tools (SSR-friendly)
 const {
@@ -38,10 +34,7 @@ const {
     category: selectedCategory,
     sortBy: selectedSort,
     toolType: toolType,
-    region:region,
-    minPrice,
-    maxPrice,
-    minRating,
+    region: region,
     consultationType,
     page: currentPage,
     limit: 24,
@@ -50,9 +43,6 @@ const {
     searchQuery,
     selectedCategory,
     selectedSort,
-    minPrice,
-    maxPrice,
-    minRating,
     consultationType,
     currentPage,
   ],
@@ -83,9 +73,6 @@ const resetFilters = () => {
   searchQuery.value = "";
   selectedCategory.value = "";
   selectedSort.value = "newest";
-  minPrice.value = "";
-  maxPrice.value = "";
-  minRating.value = "";
   consultationType.value = "";
   currentPage.value = 1;
 };
@@ -109,11 +96,11 @@ useSeo("Tools", "Explore the tools offered by Yotta.", "/images/tools-og.png", [
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
     <div class="bg-white border-b">
-      <div class="container mx-auto px-4 py-4">
+      <div class="container mx-auto px-16 py-6">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold">Tool Showcase</h1>
-            <p class="text-gray-600">
+            <h1 class="text-3xl font-bold text-foreground">Tool Showcase</h1>
+            <p class="text-muted-foreground mt-1">
               Discover {{ pagination?.totalItems || 0 }} amazing tools for your
               business
             </p>
@@ -125,10 +112,11 @@ useSeo("Tools", "Explore the tools offered by Yotta.", "/images/tools-og.png", [
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto p-8">
+    <div class="container mx-auto px-16 py-6">
       <div class="flex flex-row gap-4">
         <!-- Sidebar -->
         <ToolFilters
+ 
           :searchQuery="searchQuery"
           :selectedCategory="selectedCategory"
           :selectedToolType="toolType"
@@ -149,12 +137,18 @@ useSeo("Tools", "Explore the tools offered by Yotta.", "/images/tools-og.png", [
               {{ pagination?.totalItems || 0 }} tools found
             </div>
             <div class="flex gap-4 items-center">
-              <SortDropdown />
-              <ToggleView />
+              <SortDropdown
+                :modelValue="selectedSort"
+                @update:modelValue="selectedSort = $event"
+              />
+              <ToggleView
+                :modelValue="viewMode"
+                @update:modelValue="viewMode = $event"
+              />
             </div>
           </div>
 
-          <ToolList :tools="tools" :loading="pending" />
+          <ToolList :tools="tools" :loading="pending"          :viewMode="viewMode" />
         </div>
       </div>
     </div>
