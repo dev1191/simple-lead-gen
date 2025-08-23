@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
 
     let dbQuery = client.from('services').select(`*, service_categories(
             categories(id,name)
-            )`, { count: 'exact' })
+            )`, { count: 'exact' }).eq('status', true)
 
     // Apply filters
     if (search) {
@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
 
 
     if (consultationType.length > 0) {
-        dbQuery = dbQuery.in('free_trail', consultationType)
+        dbQuery = dbQuery.in('free_consultation', consultationType)
     }
 
     if (turnaroundTime.length > 0) {

@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
-import { Star } from "lucide-vue-next"
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Star } from "lucide-vue-next";
 
 defineProps<{
   service_name: string;
-  service_tagline:string;
+  service_tagline: string;
   slug: string;
   service_description: string;
   rating: number;
   pricing: number;
   type_of_service?: string;
-  category: string;
-  sub_categories: string[];
+  service_categories: [];
+  service_sub_categories: [];
   audience?: string;
   logo_url: string;
   banner_url?: string;
@@ -20,18 +25,24 @@ defineProps<{
   free_trial?: boolean;
   pricing_model?: string;
   free_consultation?: boolean;
-}>()
+}>();
 </script>
 
 <template>
-  <Card class="flex flex-col rounded-2xl shadow-md overflow-hidden">
+  <Card
+    class="flex flex-col rounded-lg shadow-md group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 hover:border-primary/20"
+  >
     <!-- Image -->
     <div class="relative">
       <img :src="banner_url" alt="service" class="w-full h-40 object-cover" />
-      <Badge v-if="free_consultation" class="absolute top-2 left-2 bg-white text-black">Free Consultation</Badge>
+      <Badge
+        v-if="free_consultation"
+        class="absolute top-2 left-2 bg-white text-black"
+        >Free Consultation</Badge
+      >
     </div>
 
-    <CardHeader>
+    <CardHeader class="flex flex-row items-start gap-3 pr-4 pl-4">
       <div class="flex justify-between items-center">
         <h3 class="text-lg font-semibold truncate">{{ service_name }}</h3>
         <div class="flex items-center text-yellow-500 text-sm">
@@ -44,7 +55,9 @@ defineProps<{
 
     <CardContent>
       <div class="flex flex-wrap gap-2">
-        <Badge v-for="tag in category" :key="tag" variant="secondary">{{ tag }}</Badge>
+        <Badge v-for="tag in category" :key="tag" variant="secondary">{{
+          tag
+        }}</Badge>
       </div>
     </CardContent>
 

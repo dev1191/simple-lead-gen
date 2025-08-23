@@ -34,7 +34,7 @@ export interface Service {
     highlights: string[];
     included: string[];
     currency_code: string;
-    pricing: string;
+    pricing: number;
     turnaround_time: string;
     free_consultation : boolean;
     url: string;

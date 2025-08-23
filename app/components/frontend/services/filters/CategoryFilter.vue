@@ -12,21 +12,12 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
-const categories = [
-  { value: "start-your-business", label: "Start Your Business" },
-  { value: "run-operate-smoothly", label: "Run & Operate Smoothly" },
-  { value: "manage-your-money", label: "Manage Your Money" },
-  { value: "hire-build-your-team", label: "Hire & Build Your Team" },
-  { value: "get-customers-grow", label: "Get Customers & Grow" },
-  {
-    value: "build-tech-digital-presence",
-    label: "Build Tech & Digital Presence",
-  },
-  { value: "ship-products", label: "Ship Products" },
-  { value: "stay-compliant-protected", label: "Stay Compliant & Protected" },
-  { value: "level-up-as-founder", label: "Level Up as a Founder" },
-  { value: "expand-internationally", label: "Expand Internationally" },
-];
+const {
+  data: categories,
+  pending,
+  error,
+} = await useFetch<[]>("/api/categories");
+
 
 // toggle category when checkbox changes
 const handleChange = (categoryValue: string, checked: boolean) => {
@@ -51,20 +42,20 @@ const handleChange = (categoryValue: string, checked: boolean) => {
     </h3>
     <div
       v-for="category in categories"
-      :key="category.value"
+      :key="category.id"
       class="flex items-center text-sm space-x-2"
     >
       <Checkbox
-        :id="category.value"
-        :model-value="props.modelValue.includes(category.value)"
-        @update:model-value="(checked) => handleChange(category.value, checked)"
+        :id="category.id"
+        :model-value="props.modelValue.includes(category.id)"
+        @update:model-value="(checked) => handleChange(category.id, checked)"
         class="h-5 w-5"
       />
       <label
-        :for="category.value"
+        :for="category.id"
         class="text-sm font-medium leading-none cursor-pointer"
       >
-        {{ category.label }}
+        {{ category.name }}
       </label>
     </div>
   </FilterSection>

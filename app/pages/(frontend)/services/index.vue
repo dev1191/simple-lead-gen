@@ -144,7 +144,7 @@ useSeo(
         <!-- Main Content -->
         <div class="flex-1 space-y-6">
           <div class="flex justify-between items-center">
-            <div class="text-sm text-gray-500">6 services found</div>
+            <div class="text-sm text-gray-500">{{ pagination?.totalItems || 0 }} services found</div>
             <div class="flex gap-4 items-center">
               <SortDropdown
                 :modelValue="selectedSort"
@@ -156,9 +156,13 @@ useSeo(
               />
             </div>
           </div>
-          <ServiceList   :services="services" :loading="pending" :viewMode="viewMode" />
+          <ServiceList
+            :services="services"
+            :loading="pending"
+            :viewMode="viewMode"
+          />
 
-           <!-- Shadcn-vue Pagination -->
+          <!-- Shadcn-vue Pagination -->
           <div
             v-if="pagination?.totalPages > 1"
             class="flex justify-center mt-8"
@@ -196,7 +200,6 @@ useSeo(
               </PaginationContent>
             </Pagination>
           </div>
-          
         </div>
       </div>
     </div>

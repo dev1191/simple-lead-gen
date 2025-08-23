@@ -48,6 +48,19 @@ const emit = defineEmits([
       :model-value="searchQuery"
       @update:model-value="$emit('update:searchQuery', $event)"
     />
+
+    
+    <div v-if="hasActiveFilters" class="flex items-center gap-2 flex-wrap">
+      <div class="text-sm text-muted-foreground">1 filter applied</div>
+      <Button
+        variant="outline"
+        class="w-28 h-6 text-sm"
+        @click="$emit('reset')"
+      >
+        <Icon name="X" /> Clear all
+      </Button>
+    </div>
+    
     <CategoryFilter
       :model-value="selectedCategory"
       @update:model-value="$emit('update:selectedCategory', $event)"
