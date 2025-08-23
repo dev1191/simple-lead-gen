@@ -12,11 +12,7 @@ export default defineEventHandler(async (event) => {
     category = '',
     sortBy = 'newest',
     toolType = '',
-    minPrice = '',
-    maxPrice = '',
-    minRating = '',
     consultationType = '',
-    tags = '',
     region = ''
   } = query
 
@@ -25,7 +21,7 @@ export default defineEventHandler(async (event) => {
   // Apply filters
   if (search) {
     dbQuery = dbQuery.or(
-      `name.ilike.%${search}%,description.ilike.%${search}%,tags.cs.{${search}}`
+      `name.ilike.%${search}%,description.ilike.%${search}%,tagline.ilike.%${search}%`
     )
   }
 
@@ -33,16 +29,7 @@ export default defineEventHandler(async (event) => {
     dbQuery = dbQuery.eq('category', category)
   }
 
-  if (minPrice) {
-    dbQuery = dbQuery.gte('pricing', parseInt(minPrice))
-  }
-  if (maxPrice) {
-    dbQuery = dbQuery.lte('pricing', parseInt(maxPrice))
-  }
 
-  if (minRating) {
-    dbQuery = dbQuery.gte('rating', parseFloat(minRating))
-  }
 
   if (consultationType) {
     dbQuery = dbQuery.eq('free_trail', consultationType === 'Yes' ? true : false)
@@ -56,11 +43,7 @@ export default defineEventHandler(async (event) => {
     dbQuery = dbQuery.contains('operate', [region])
   }
 
-  if (tags) {
-    const tagArray = tags.split(',').map((tag) => tag.trim())
-    // Assuming `tags` is stored as a Postgres array
-    dbQuery = dbQuery.contains('tags', tagArray)
-  }
+
 
   // Sorting
   switch (sortBy) {
@@ -72,10 +55,10 @@ export default defineEventHandler(async (event) => {
       dbQuery = dbQuery.order('created_at', { ascending: false })
       break
     case 'priceLowToHigh':
-      dbQuery = dbQuery.order('price', { ascending: true })
+      dbQuery = dbQuery.order('pricing', { ascending: true })
       break
     case 'priceHighToLow':
-      dbQuery = dbQuery.order('price', { ascending: false })
+      dbQuery = dbQuery.order('pricing', { ascending: false })
       break
   }
 
@@ -102,9 +85,6 @@ export default defineEventHandler(async (event) => {
       search,
       category,
       sortBy,
-      minPrice,
-      maxPrice,
-      minRating,
       consultationType,
     },
     pagination: {

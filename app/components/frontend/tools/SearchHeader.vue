@@ -25,7 +25,7 @@ const toggleView = () => {
       <div class="flex flex-col lg:flex-row gap-4">
         <div class="flex-1">
           <div class="relative">
-            <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-6 w-6" />
             <Input
               v-model="searchQuery"
               placeholder="Search tools, features, or use cases..."
