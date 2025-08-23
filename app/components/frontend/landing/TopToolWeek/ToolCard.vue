@@ -85,6 +85,22 @@ const regions = computed(() => {
   return regionOptions.filter((opt) => props.operate?.includes(opt.value));
 });
 
+const pricingOptions = [
+  { value: "free_forever", label: "Free Forever" },
+  { value: "free_trial", label: "Free Trial Available" },
+  { value: "freemium", label: "Freemium" },
+  { value: "monthly_subscription", label: "Monthly Subscription" },
+  { value: "pay_as_you_go", label: "Pay-as-you-go" },
+  { value: "custom_varies", label: "Custom / Varies" },
+];
+
+const pricingModel = computed(() => {
+  const option = pricingOptions.find(
+    (opt) => opt.value === props.pricing_model
+  );
+  return option ? option.label : "Unknown";
+});
+
 const symbol = computed(() => {
   const currency = currencyOptions.find(
     (opt) => opt.value === props.currency_code
@@ -174,7 +190,7 @@ defineEmits<{
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-1">
               <Clock class="w-3 h-3" />
-              {{ pricing_model }}
+              {{ pricingModel }}
             </div>
             <div class="flex items-center gap-1">
               <MapPin class="w-3 h-3" />

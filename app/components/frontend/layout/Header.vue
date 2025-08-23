@@ -64,13 +64,6 @@ const handleClickOutside = () => {
             Home
           </NuxtLink>
           <NuxtLink
-            to="/categories"
-            class="text-gray-300 hover:text-white transition-colors"
-            :class="{ 'text-orange-400': $route.path === '/categories' }"
-          >
-            Categories
-          </NuxtLink>
-          <NuxtLink
             to="/insights"
             class="text-gray-300 hover:text-white transition-colors"
             :class="{ 'text-orange-400': $route.path === '/insights' }"
