@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
   }
 
 
-  let dbQuery = client.from('tools').select('*', { count: 'exact' })
+  let dbQuery = client.from('tools').select('*', { count: 'exact' }).eq('status', true)
 
   // Apply filters
   if (search) {
