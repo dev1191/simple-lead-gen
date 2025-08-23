@@ -1,16 +1,17 @@
 import { serverSupabaseClient } from "#supabase/server"
 
-// server/api/pages/[slug].get.ts
+// server/api/tools/weeks/index.get.ts
 export default defineEventHandler(async (event) => {
-    const slug = getRouterParam(event, 'slug')
+
     const client = await serverSupabaseClient(event)
 
     const { data, error } = await client
         .from('tools')
         .select(`*
         `)
-        .eq('slug', slug)
-        .single()
+        .eq('status', true)
+        .eq('is_featured', true)
+        .limit(3)
 
     if (error) {
         throw createError({
@@ -19,6 +20,5 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-
-    return data
+    return data;
 })

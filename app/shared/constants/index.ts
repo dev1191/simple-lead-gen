@@ -23,6 +23,13 @@ export const BlogCategories = [
     },
 ]
 
+export const currencyOptions = [
+  { value: "MYR", label: "MYR (RM)", symbol: "RM" },
+  { value: "SGD", label: "SGD ($)", symbol: "S$" },
+  { value: "USD", label: "USD ($)", symbol: "$" },
+  { value: "GBP", label: "GBP (£)", symbol: "£" },
+];
+
 
 export const toolCategories = [
     {
