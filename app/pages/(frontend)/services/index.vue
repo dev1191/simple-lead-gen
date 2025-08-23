@@ -24,11 +24,11 @@ useSeo(
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
     <div class="bg-white border-b">
-      <div class="container mx-auto px-4 py-4">
+      <div class="container mx-auto px-16 py-6">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold">Service Marketplace</h1>
-            <p class="text-gray-600">
+            <h1 class="text-3xl font-bold">Service Marketplace</h1>
+            <p class="text-muted-foreground mt-1">
               Discover 6 professional services for your business
             </p>
           </div>
@@ -39,7 +39,7 @@ useSeo(
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto p-8">
+    <div class="container mx-auto px-16 py-6">
       <div class="flex flex-row gap-4">
         <!-- Sidebar -->
         <ServiceFilters />

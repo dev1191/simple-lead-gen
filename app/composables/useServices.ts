@@ -1,6 +1,7 @@
 // composables/useBlogServices.ts
 import { useSupabaseClient } from '#imports'
 import type { FilterOptions, Service } from '~/shared/types/service'
+import { slugify } from '~/shared/utils'
 
 export function useServices() {
     const supabase = useSupabaseClient()
@@ -143,7 +144,8 @@ export function useServices() {
                 url: ServiceData.url,
                 client_logos: ServiceData.client_logos,
                 servers: ServiceData.servers,
-                vendor_id: vendor[0].id
+                vendor_id: vendor[0].id,
+                slug: slugify(ServiceData.service_name)
             }];
 
             const { data: newService, error } = await supabase
@@ -230,6 +232,7 @@ export function useServices() {
                 client_logos: ServiceData.client_logos,
                 servers: ServiceData.servers,
                 vendor_id: ServiceData.vendor_id,
+                slug: slugify(ServiceData.service_name)
             };
 
             const { error: serviceError } = await supabase

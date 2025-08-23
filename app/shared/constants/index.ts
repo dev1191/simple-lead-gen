@@ -24,12 +24,21 @@ export const BlogCategories = [
 ]
 
 export const currencyOptions = [
-  { value: "MYR", label: "MYR (RM)", symbol: "RM" },
-  { value: "SGD", label: "SGD ($)", symbol: "S$" },
-  { value: "USD", label: "USD ($)", symbol: "$" },
-  { value: "GBP", label: "GBP (£)", symbol: "£" },
+    { value: "MYR", label: "MYR (RM)", symbol: "RM" },
+    { value: "SGD", label: "SGD ($)", symbol: "S$" },
+    { value: "USD", label: "USD ($)", symbol: "$" },
+    { value: "GBP", label: "GBP (£)", symbol: "£" },
 ];
 
+
+export const toolTypes = [
+    { value: "free_forever", label: "Free Forever" },
+    { value: "free_trial", label: "Free Trial Available" },
+    { value: "freemium", label: "Freemium" },
+    { value: "monthly_subscription", label: "Monthly Subscription" },
+    { value: "pay_as_you_go", label: "Pay-as-you-go" },
+    { value: "custom_varies", label: "Custom / Varies" },
+];
 
 export const toolCategories = [
     {

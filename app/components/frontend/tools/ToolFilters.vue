@@ -8,11 +8,24 @@ import SearchBar from "./topbar/SearchBar.vue";
 import { defineProps, defineEmits } from "vue";
 
 defineProps({
-  searchQuery: String,
-  selectedCategory: String,
-  selectedToolType: String,
-  selectedConsultation: String,
-  selectedRegion: String,
+  searchQuery: String, // string
+  selectedCategory: {
+    type: Array as () => string[], // Changed to Array for multi-select
+    default: () => [],
+  },
+  selectedToolType: {
+    type: Array as () => string[], // Changed to Array for multi-select
+    default: () => [],
+  },
+  selectedConsultation: {
+    type: Array as () => string[], // Changed to Array for multi-select
+    default: () => [],
+  },
+  selectedRegion: {
+    type: Array as () => string[], // Changed to Array for multi-select
+    default: () => [],
+  },
+  hasActiveFilters: Boolean, // boolean
 });
 
 const emit = defineEmits([
@@ -27,13 +40,21 @@ const emit = defineEmits([
 
 <template>
   <aside class="w-80 space-y-6">
-      <!-- <button class="btn btn-outline w-full" @click="$emit('reset')">
-      Reset Filters
-    </button> -->
     <SearchBar
       :model-value="searchQuery"
       @update:model-value="$emit('update:searchQuery', $event)"
     />
+
+    <div v-if="hasActiveFilters" class="flex items-center gap-2 flex-wrap">
+      <div class="text-sm text-muted-foreground">1 filter applied</div>
+      <Button
+        variant="outline"
+        class="w-28 h-6 text-sm"
+        @click="$emit('reset')"
+      >
+        <Icon name="X" /> Clear all
+      </Button>
+    </div>
     <CategoryFilter
       :model-value="selectedCategory"
       @update:model-value="$emit('update:selectedCategory', $event)"
@@ -50,7 +71,5 @@ const emit = defineEmits([
       :model-value="selectedRegion"
       @update:model-value="$emit('update:selectedRegion', $event)"
     />
-
-  
   </aside>
 </template>

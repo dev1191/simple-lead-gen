@@ -115,6 +115,7 @@ export function useTools() {
 
     const createTool = async (ToolData: any) => {
         try {
+            ToolData.slug = slugify(ToolData.name);
             //  Otherwise, insert new tool
             const { data, error } = await supabase
                 .from("tools")
@@ -134,7 +135,7 @@ export function useTools() {
         try {
 
 
-            let updatePayload = { ...updateData }
+            let updatePayload = { ...updateData, slug: slugify(updateData.name) }
 
             const { data, error } = await supabase
                 .from('tools')
@@ -175,7 +176,7 @@ export function useTools() {
         const { count: draft, error: errDraft } = await supabase
             .from('tools')
             .select('id', { count: 'exact', head: true })
-            .eq('status',true)
+            .eq('status', true)
 
         if (errDraft) {
             error.value = errDraft

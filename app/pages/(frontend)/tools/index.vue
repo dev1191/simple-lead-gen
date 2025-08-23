@@ -8,16 +8,13 @@ definePageMeta({
   layout: "blank",
 });
 
-// Router & Queries
-const route = useRoute();
-
 // Reactive filter/query states directly bound to URL
 const searchQuery = ref("");
-const selectedCategory = ref("");
+const selectedCategory = ref([]);
 const selectedSort = ref("newest");
-const toolType = ref("");
-const region = ref("");
-const consultationType = ref("");
+const toolType = ref([]);
+const region = ref([]);
+const consultationType = ref([]);
 const currentPage = ref(1);
 
 // Other states
@@ -70,12 +67,22 @@ const visiblePages = computed(() => {
 
 // Reset filters
 const resetFilters = () => {
-  searchQuery.value = "";
-  selectedCategory.value = "";
+  selectedCategory.value = [];
   selectedSort.value = "newest";
-  consultationType.value = "";
+  consultationType.value = [];
+  toolType.value = [];
+  region.value = [];
   currentPage.value = 1;
 };
+
+const hasActiveFilters = computed(() => {
+  return (
+    selectedCategory.value.length > 0 ||
+    toolType.value.length > 0 ||
+    region.value.length > 0 ||
+    consultationType.value.length > 0
+  );
+});
 
 // Pagination
 const setPage = (page: number) => {
@@ -116,12 +123,12 @@ useSeo("Tools", "Explore the tools offered by Yotta.", "/images/tools-og.png", [
       <div class="flex flex-row gap-4">
         <!-- Sidebar -->
         <ToolFilters
- 
           :searchQuery="searchQuery"
           :selectedCategory="selectedCategory"
           :selectedToolType="toolType"
           :selectedConsultation="consultationType"
           :selectedRegion="region"
+          :hasActiveFilters="hasActiveFilters"
           @update:searchQuery="searchQuery = $event"
           @update:selectedCategory="selectedCategory = $event"
           @update:selectedToolType="toolType = $event"
@@ -136,6 +143,7 @@ useSeo("Tools", "Explore the tools offered by Yotta.", "/images/tools-og.png", [
             <div class="text-sm text-gray-500">
               {{ pagination?.totalItems || 0 }} tools found
             </div>
+
             <div class="flex gap-4 items-center">
               <SortDropdown
                 :modelValue="selectedSort"
@@ -148,7 +156,46 @@ useSeo("Tools", "Explore the tools offered by Yotta.", "/images/tools-og.png", [
             </div>
           </div>
 
-          <ToolList :tools="tools" :loading="pending"          :viewMode="viewMode" />
+          <ToolList :tools="tools" :loading="pending" :viewMode="viewMode" />
+
+          <!-- Shadcn-vue Pagination -->
+          <div
+            v-if="pagination?.totalPages > 1"
+            class="flex justify-center mt-8"
+          >
+            <Pagination
+              v-slot="{ page }"
+              :items-per-page="pagination.perPage"
+              :total="pagination.totalItems"
+              :default-page="pagination.currentPage"
+              @update:page="setPage"
+            >
+              <PaginationContent v-slot="{ items }">
+                <!-- Prev -->
+                <PaginationPrevious :disabled="page === 1" />
+
+                <!-- Page Numbers -->
+                <template v-for="(item, index) in items" :key="index">
+                  <PaginationItem
+                    v-if="item.type === 'page'"
+                    :value="item.value"
+                    :is-active="item.value === page"
+                  >
+                    {{ item.value }}
+                  </PaginationItem>
+
+                  <!-- Ellipsis -->
+                  <PaginationEllipsis
+                    v-else-if="item.type === 'ellipsis'"
+                    :index="index"
+                  />
+                </template>
+
+                <!-- Next -->
+                <PaginationNext :disabled="page === pagination.totalPages" />
+              </PaginationContent>
+            </Pagination>
+          </div>
         </div>
       </div>
     </div>
