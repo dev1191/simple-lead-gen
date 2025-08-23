@@ -229,10 +229,7 @@ const onSubmit = handleSubmit(
         logo_url: logoUrl,
         banner_url: bannerUrl,
         client_logos: clientLogoUrls,
-        servers:
-          Array.isArray(formData.servers) && formData.servers.includes("global")
-            ? ["malaysia", "singapore"]
-            : formData.servers,
+        servers:formData.servers ,
       };
 
       //console.log("Form submitted with data:", submitData);
