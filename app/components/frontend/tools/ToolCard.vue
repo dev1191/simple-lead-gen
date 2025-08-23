@@ -5,9 +5,8 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Star, ExternalLink, ImageIcon } from "lucide-vue-next";
+import { toolCategories } from "~/shared/constants";
 import { formatDescription } from "~/shared/utils";
 
 const props = defineProps<{
@@ -16,9 +15,10 @@ const props = defineProps<{
   slug: string;
   description: string;
   rating: number;
-  pricing: string;
+  pricing: number;
   priceType?: string;
-  tags: string[];
+  category: string;
+  sub_categories: string[];
   audience?: string;
   logo_url: string;
   banner_url?: string;
@@ -27,6 +27,17 @@ const props = defineProps<{
   free_trial?: boolean;
   pricing_model?: string;
 }>();
+
+const CategoryName = computed(() => {
+  const category = toolCategories.find((cat) => cat.value === props.category);
+  return category ? category.label : "";
+});
+
+const subCategories = computed(() => {
+  return toolCategories.flatMap((cat) =>
+    cat.subcategories.filter((sub) => props.sub_categories?.includes(sub.value))
+  );
+});
 
 const pricingOptions = [
   { value: "free_forever", label: "Free Forever" },
@@ -94,8 +105,8 @@ const bestFor = computed(() => {
           >
             {{ name }}
           </h3>
-          <p class="text-gray-500 text-xs line-clamp-2 whitespace-pre-line">
-            {{ formatDescription(description, 40) }}
+          <p class="text-gray-500 text-sm line-clamp-2 whitespace-pre-line">
+            {{ formatDescription(tagline, 40) }}
           </p>
         </div>
       </div>
@@ -121,9 +132,12 @@ const bestFor = computed(() => {
         <ImageIcon v-else class="w-12 h-12 text-gray-400" />
       </div>
 
-      <!-- <Badge v-for="tag in tags" :key="tag" variant="secondary" class="text-xs">
-        {{ tag }}
-      </Badge> -->
+      <div class="flex flex-wrap gap-2">
+        <Badge variant="secondary" class="font-semibold">{{ CategoryName }}</Badge>
+        <Badge v-for="sub in subCategories" :key="sub.value" variant="secondary" class="font-semibold">
+          {{ sub.label }}
+        </Badge>
+      </div>
     </CardContent>
 
     <!-- Pricing Row -->
@@ -150,12 +164,12 @@ const bestFor = computed(() => {
 
     <!-- Footer Buttons -->
     <CardFooter class="flex justify-between gap-2">
-      <Button class="flex-1" size="sm">
+      <Button class="flex-1 w-full h-10" >
         <NuxtLink  :to="`/tools/${slug}`"
           >View Details</NuxtLink
         ></Button
       >
-      <Button size="sm" variant="outline">
+      <Button class="w-10 h-10" variant="outline">
         <ExternalLink class="w-4 h-4" />
       </Button>
     </CardFooter>
