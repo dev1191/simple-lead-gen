@@ -236,10 +236,7 @@ const onSubmit = handleSubmit(
         ...formData,
         logo_url: logoUrl,
         banner_url: bannerUrl,
-        operate:
-          Array.isArray(formData.operate) && formData.operate.includes("global")
-            ? ["malaysia", "singapore"]
-            : formData.operate,
+        operate:formData.operate
       };
       
       // call composable useTool
@@ -249,7 +246,7 @@ const onSubmit = handleSubmit(
         await createTool(submitData);
       }
 
-      toast.success("Tool created successfully!");
+      toast.success(`Tool ${props.isEditable ? "updated" : "created"} successfully!`);
      resetForm();
      router.push("/admin/tools");
     } catch (error) {

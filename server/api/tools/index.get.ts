@@ -94,8 +94,14 @@ export default defineEventHandler(async (event) => {
     dbQuery = dbQuery.in('pricing_model', toolType)
   }
 
+  if (region.includes('global')) {
+    region = ['malaysia', 'singapore', 'global']
+  }
+
   if (region.length > 0) {
-    dbQuery = dbQuery.contains('operate', region)
+    dbQuery = dbQuery.or(
+      region.map(r => `operate.cs.{${r}}`).join(',')
+    )
   }
 
 
