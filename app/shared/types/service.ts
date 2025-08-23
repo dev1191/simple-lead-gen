@@ -23,6 +23,7 @@ export interface FilterOptions {
 export interface Service {
     id: string;
     service_name: string;
+    slug: string;
     service_tagline: string;
     service_categories: ServiceCategories
     logo_url: string;
