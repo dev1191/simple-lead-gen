@@ -5,42 +5,97 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const client = await serverSupabaseClient(event)
 
-  const {
+  let {
     page = 1,
     limit = 24,
     search = '',
-    category = '',
+    category = [],
     sortBy = 'newest',
-    toolType = '',
-    consultationType = '',
-    region = ''
+    toolType = [],
+    consultationType = [],
+    region = []
   } = query
+
+  if (typeof category === 'string') {
+    try {
+      // if query comes like ?category=["a","b"]
+      category = JSON.parse(category)
+    } catch {
+      // if query comes like ?category=a
+      category = [category]
+    }
+  }
+
+  if (!Array.isArray(category)) {
+    category = []
+  }
+
+  if (typeof toolType === 'string') {
+    try {
+      // if query comes like ?category=["a","b"]
+      toolType = JSON.parse(toolType)
+    } catch {
+      // if query comes like ?category=a
+      toolType = [toolType]
+    }
+  }
+
+  if (!Array.isArray(toolType)) {
+    toolType = []
+  }
+
+  if (typeof region === 'string') {
+    try {
+
+      region = JSON.parse(region)
+    } catch {
+
+      region = [region]
+    }
+  }
+
+  if (!Array.isArray(region)) {
+    region = []
+  }
+
+  if (typeof consultationType === 'string') {
+    if (consultationType === 'true' || consultationType === 'false') {
+      consultationType = [consultationType === 'true'] // convert to boolean inside array
+    } else {
+      consultationType = [consultationType] // wrap normal string in array
+    }
+  }
+
+  if (!Array.isArray(consultationType)) {
+    consultationType = []
+  }
+
 
   let dbQuery = client.from('tools').select('*', { count: 'exact' })
 
   // Apply filters
   if (search) {
     dbQuery = dbQuery.or(
-      `name.ilike.%${search}%,description.ilike.%${search}%,tagline.ilike.%${search}%`
+      `name.ilike.%${search}%,description.ilike.%${search}%,tagline.ilike.%${search}%,problem_solved.ilike.%${search}%`
     )
   }
 
-  if (category) {
-    dbQuery = dbQuery.eq('category', category)
+  if (category.length > 0) {
+    dbQuery = dbQuery.in('category', category)
   }
 
 
 
-  if (consultationType) {
-    dbQuery = dbQuery.eq('free_trail', consultationType === 'Yes' ? true : false)
+  if (consultationType.length > 0) {
+    dbQuery = dbQuery.in('free_trail', consultationType)
   }
 
-  if (toolType) {
-    dbQuery = dbQuery.eq('pricing_model', toolType)
+  if (toolType.length > 0) {
+    dbQuery = dbQuery.in('pricing_model', toolType)
   }
 
-  if (region) {
-    dbQuery = dbQuery.contains('operate', [region])
+  if (region.length > 0) {
+    dbQuery = dbQuery.contains('operate', region)
   }
 
 

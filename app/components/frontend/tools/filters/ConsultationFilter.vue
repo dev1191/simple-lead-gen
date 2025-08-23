@@ -5,27 +5,31 @@ import FilterSection from "./FilterSection.vue";
 
 const props = defineProps({
   modelValue: {
-    type: String, // single select
-    default: "",
+    type: Array as () => string[],
+    default: () => [],
   },
 });
 
 const emit = defineEmits(["update:modelValue"]);
 
-const selected = ref(props.modelValue);
+const options = [
+  { value: true, label: "Yes" },
+  { value: false, label: "No" },
+];
 
-// Emit changes to parent
-watch(selected, (val) => emit("update:modelValue", val));
-
-// Update internal value if parent changes it
-watch(
-  () => props.modelValue,
-  (val) => {
-    selected.value = val;
+const handleChange = (val: string, checked: boolean) => {
+  const current = [...props.modelValue];
+  if (checked) {
+    if (!current.includes(val)) {
+      emit("update:modelValue", [...current, val]);
+    }
+  } else {
+    emit(
+      "update:modelValue",
+      current.filter((item) => item !== val)
+    );
   }
-);
-
-const options = ["Yes", "No"];
+};
 </script>
 
 <template>
@@ -36,16 +40,16 @@ const options = ["Yes", "No"];
 
     <div
       v-for="o in options"
-      :key="o"
+      :key="o.value"
       class="flex items-center text-sm space-x-2"
     >
       <Checkbox
-        :id="o"
-        class="h-4 w-4"
-        :checked="selected === o"
-        @update:model-value="selected = $event ? o : ''"
+        :id="o.label"
+        class="h-5 w-5"
+        :model-value="props.modelValue.includes(o.value)"
+        @update:model-value="(checked) => handleChange(o.value, checked)"
       />
-      <label :for="o">{{ o }}</label>
+      <label :for="o.label">{{ o.label }}</label>
     </div>
   </FilterSection>
 </template>
