@@ -5,7 +5,7 @@ import ConsultationFilter from "./filters/ConsultationFilter.vue";
 import RegionFilter from "./filters/RegionFilter.vue";
 import SearchBar from "./topbar/SearchBar.vue";
 
-import { defineProps, defineEmits } from "vue";
+
 
 defineProps({
   searchQuery: String, // string

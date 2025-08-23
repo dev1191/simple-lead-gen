@@ -36,7 +36,7 @@ export interface Service {
     currency_code: string;
     pricing: string;
     turnaround_time: string;
-    free_consulatation: boolean;
+    free_consultation : boolean;
     url: string;
     client_logos: string[];
     servers: string[];

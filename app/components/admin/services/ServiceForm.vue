@@ -58,7 +58,7 @@ const formSchema = toTypedSchema(
     description: z
       .string()
       .min(1, "Detailed description of your service is required"),
-    free_consulatation: z.boolean().optional(),
+    free_consultation: z.boolean().optional(),
     client_logos: z.array(z.string()).optional(),
     servers: z
       .array(z.enum(["malaysia", "singapore", "global"]))
@@ -100,7 +100,7 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
       currency_code: "MYR",
       pricing: "",
       turnaround_time: "within-48-hours",
-      free_consulatation: false,
+      free_consultation: false,
       client_logos: [],
       servers: [],
       url: "",
@@ -648,7 +648,7 @@ onMounted(() => fetchCategories());
           <FormField
             v-slot="{ value, handleChange }"
             type="checkbox"
-            name="free_consulatation"
+            name="free_consultation"
           >
             <FormItem class="flex flex-row items-start gap-x-3 space-y-0 p-4">
               <FormControl>
