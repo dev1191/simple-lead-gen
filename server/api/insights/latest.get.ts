@@ -1,24 +1,24 @@
 import { serverSupabaseClient } from "#supabase/server"
 
-// server/api/pages/[slug].get.ts
+// server/api/insights/latest.get.ts
 export default defineEventHandler(async (event) => {
-    const slug = getRouterParam(event, 'slug')
+
     const client = await serverSupabaseClient(event)
 
     const { data, error } = await client
-        .from('tools')
+        .from('blog_posts')
         .select(`*
         `)
-        .eq('slug', slug)
-        .single()
+        .eq('status', 'Published')
+        .order("published_at", { ascending: false })
+        .limit(3)
 
     if (error) {
         throw createError({
             statusCode: 404,
-            statusMessage: 'Tool not found'
+            statusMessage: 'Blog posts not found'
         })
     }
 
-
-    return data
+    return data;
 })

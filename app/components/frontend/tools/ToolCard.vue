@@ -12,6 +12,7 @@ import { formatDescription } from "~/shared/utils";
 
 const props = defineProps<{
   name: string;
+  tagline:string;
   slug: string;
   description: string;
   rating: number;

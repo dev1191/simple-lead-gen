@@ -1,6 +1,7 @@
 export interface Tool {
     id:string;
     name:string;
+    slug:string;
     tagline:string;
     category:string,
     sub_category:string[],
@@ -16,6 +17,7 @@ export interface Tool {
     currency_code:string;
     pricing:string;
     cta_label:string;
+    rating:number;
     free_trial:boolean;
     integrations:string[];
     platforms:string[];
