@@ -9,6 +9,7 @@ import { ExternalLink } from "lucide-vue-next";
 import { NuxtLink } from "#components";
 import Button from "~/components/ui/button/Button.vue";
 import { toolCategories } from "~/shared/constants";
+import { Switch } from "~/components/ui/switch"
 
 
 export const columns: ColumnDef<Vendor>[] = [
@@ -28,7 +29,7 @@ export const columns: ColumnDef<Vendor>[] = [
 
             return h(
                 Badge,
-                { variant: "secondary",class:"font-semibold" }, // you can use "default", "secondary", "outline", etc.
+                { variant: "secondary", class: "font-semibold" }, // you can use "default", "secondary", "outline", etc.
                 { default: () => category.label }
             );
         },
@@ -92,6 +93,41 @@ export const columns: ColumnDef<Vendor>[] = [
                     : "bg-slate-200 text-slate-700 font-semibold rounded-xl";
             return h(Badge, { class: className, variant: "secondary" }, () => value ? 'Active' : 'Inactive');
         },
+    },
+    {
+        accessorKey: "is_featured",
+        header: "Is Featured",
+        cell: ({ row }) => {
+
+            const isFeatured = row.getValue("is_featured") as boolean
+
+            return h(Switch, {
+                modelValue: isFeatured,
+                'onUpdate:modelValue': async (checked: boolean) => {
+                    // update API
+                    try {
+                        // Optimistically update UI
+                        row.original.is_featured = checked
+
+                        // Call API
+                        const { data, error } = await $fetch(`/api/tools/${row.original.id}/status`, {
+                            method: "PATCH",
+                            body: { is_featured: checked }
+                        })
+
+                        if (error.value) {
+
+                            // rollback if failed
+                            row.original.is_featured = !checked
+                        }
+                    } catch (err) {
+
+                        // rollback if failed
+                        row.original.is_featured = !checked
+                    }
+                }
+            })
+        }
     },
     {
         accessorKey: "actions",
