@@ -5,8 +5,6 @@ export default defineEventHandler(async (event) => {
     const slug = getRouterParam(event, 'slug')
     const client = await serverSupabaseClient(event)
 
-    console.log("slug", slug)
-
     const { data, error } = await client
         .from('tools')
         .select(`*
@@ -21,8 +19,5 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-
-
-
-    return data
+    return;
 })

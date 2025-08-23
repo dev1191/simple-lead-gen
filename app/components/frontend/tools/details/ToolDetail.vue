@@ -4,12 +4,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, Star } from "lucide-vue-next";
 import ToolHeader from "./ToolHeader.vue";
+import { toolCategories } from "~/shared/constants";
 
 const props = defineProps({
   tool: Object,
 });
 
-const product = props.tool;
+const product = reactive(props.tool);
+const CategoryName = computed(() => {
+  const category = toolCategories.find((cat) => cat.value === product.category);
+  return category ? category.label : "";
+});
+
+const subCategories = computed(() => {
+  return toolCategories.flatMap((cat) =>
+    cat.subcategories.filter((sub) =>
+      product.sub_categories?.includes(sub.value)
+    )
+  );
+});
 
 const bestForOptions = [
   {
@@ -103,12 +116,19 @@ const region = computed(() => {
               </div>
             </div>
 
-            <p class="text-gray-600">{{ product.description }}</p>
+            <p class="text-muted-foreground">{{ product.tagline }}</p>
 
             <div class="flex flex-wrap gap-2 mt-2">
-              <Badge variant="outline" v-for="tag in product.tags" :key="tag">{{
-                tag
+              <Badge variant="secondary" class="font-semibold">{{
+                CategoryName
               }}</Badge>
+              <Badge
+                variant="secondary"
+                class="font-semibold"
+                v-for="category in subCategories"
+                :key="category.value"
+                >{{ category.label }}</Badge
+              >
             </div>
           </div>
         </div>
@@ -130,7 +150,9 @@ const region = computed(() => {
           <CardHeader class="text-2xl font-semibold leading-none tracking-tight"
             >About {{ product.name }}</CardHeader
           >
-          <CardContent>{{ product.description }}</CardContent>
+          <CardContent class="text-muted-foreground">{{
+            product.description
+          }}</CardContent>
         </Card>
 
         <!-- Problem Solved -->
@@ -138,7 +160,9 @@ const region = computed(() => {
           <CardHeader class="text-2xl font-semibold leading-none tracking-tight"
             >Problem Solved</CardHeader
           >
-          <CardContent>{{ product.problem_solved }}</CardContent>
+          <CardContent class="text-muted-foreground">{{
+            product.problem_solved
+          }}</CardContent>
         </Card>
 
         <!-- Features -->
@@ -168,13 +192,13 @@ const region = computed(() => {
               >Pros</CardHeader
             >
             <CardContent>
-              <ul class="pl-5 space-y-1 text-green-600">
+              <ul class="pl-5 space-y-1 ">
                 <li
-                  v-for="p in product.pros"
+                  v-for="p in product.pros.slice(0, 3)"
                   :key="p"
-                  class="flex items-start gap-2"
+                  class="flex items-baseline gap-2"
                 >
-                  <Icon name="Check" class="w-4 h-4" />{{ p }}
+                  <Icon name="Check" class="w-4 h-4 text-green-600" />{{ p }}
                 </li>
               </ul>
             </CardContent>
@@ -185,13 +209,13 @@ const region = computed(() => {
               >Cons</CardHeader
             >
             <CardContent class="p-6 pt-0 space-y-3">
-              <ul class="list-disc pl-5 space-y-1 text-red-600">
+              <ul class="list-disc pl-5 space-y-1 ">
                 <li
-                  v-for="c in product.cons"
+                  v-for="c in product.cons.slice(0, 3)"
                   :key="c"
-                  class="flex items-start gap-2"
+                  class="flex items-baseline gap-2"
                 >
-                  <Icon name="X" class="w-4 h-4" />{{ c }}
+                  <Icon name="X" class="w-4 h-4 text-red-600" />{{ c }}
                 </li>
               </ul>
             </CardContent>
@@ -225,21 +249,24 @@ const region = computed(() => {
         <Card
           class="shadow-sm border-primary/20 bg-gradient-to-br from-primary/5 to-primary-glow/5"
         >
-          <CardHeader class="text-center font-bold text-2xl text-black mb-0"
-            >Freemium</CardHeader
-          >
-          <CardContent class="text-center">
-            <div class="text-sm text-muted-foreground">
-              Starting from <b>{{ product.currency_code }} {{product.pricing}}/month</b>
+          <CardHeader class="text-center font-bold text-2xl text-black mb-0">{{
+            pricingModel
+          }}</CardHeader>
+          <CardContent class="space-y-2">
+            <div class="text-center">
+              <div class="text-sm text-muted-foreground">
+                Starting from
+                <b>{{ product.currency_code }} {{ product.pricing }}/month</b>
+              </div>
+              <div
+                v-if="product.free_trail"
+                class="flex items-center justify-center gap-1 p-2 text-sm text-green-600 dark:text-green-400"
+              >
+                <Icon name="Check" class="w-4 h-4" />
+                Free trial available
+              </div>
+              <Button class="w-full h-11 mt-3">Start Free Trial</Button>
             </div>
-            <div
-              v-if="product.free_trial"
-              class="flex items-center justify-center gap-1 text-sm text-green-600 dark:text-green-400"
-            >
-              <Icon name="Check" class="w-4 h-4" />
-              Free trial available
-            </div>
-            <Button class="w-full h-10 mt-3">Start Free Trial</Button>
           </CardContent>
         </Card>
 

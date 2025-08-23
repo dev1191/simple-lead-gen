@@ -133,7 +133,7 @@ export function useTools() {
     const updateTool = async (ToolId: string, updateData: any) => {
         try {
 
-            console.log("ToolId", ToolId)
+
             let updatePayload = { ...updateData }
 
             const { data, error } = await supabase

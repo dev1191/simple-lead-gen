@@ -2,9 +2,9 @@
 </script>
 
 <template>
-  <div class="min-h-screen w-full">
+  <div class="min-h-screen ">
 
-    <main class="w-full">
+    <main class="min-h-screen bg-background">
       <slot />
     </main>
 
