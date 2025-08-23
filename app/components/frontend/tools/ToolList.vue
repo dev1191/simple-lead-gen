@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { Tool } from "~/shared/types/tools";
 import ToolCard from "./ToolCard.vue";
 import { Skeleton } from "@/components/ui/skeleton"; // shadcn-vue skeleton if you’re using it
 
 defineProps<{
-  tools: Array<any>;
+  tools: Array<Tool>;
   loading: boolean;
 }>();
 </script>
