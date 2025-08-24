@@ -58,7 +58,7 @@ const handleClickOutside = () => {
         <nav class="hidden md:flex items-center space-x-8">
           <NuxtLink
             to="/"
-            class="text-orange-400 hover:text-orange-300 transition-colors font-medium"
+            class="text-gray-400 hover:text-white transition-colors font-medium"
             :class="{ 'text-orange-400': $route.path === '/' }"
           >
             Home
