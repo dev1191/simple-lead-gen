@@ -86,9 +86,17 @@ export default defineEventHandler(async (event) => {
     }
 
 
-    let dbQuery = client.from('services').select(`*, service_categories(
-            categories(id,name)
-            )`, { count: 'exact' }).eq('status', true)
+    let dbQuery = client.from('services').select(
+        `
+      *,
+      service_categories (
+        categories ( id, name )
+      ),
+      service_sub_categories (
+        sub_categories ( id, name )
+      )
+    `,
+        { count: "exact" }).eq('status', true)
 
     // Apply filters
     if (search) {

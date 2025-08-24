@@ -52,7 +52,7 @@ const formSchema = toTypedSchema(
     banner_url: fileWithAspectRatio(16, 9), // 16:9 aspect ratio
     type_of_service: z.string(),
     currency_code: z.string().optional(),
-    pricing: z.string().optional(),
+    pricing: z.number().optional(),
     turnaround_time: z.string("Typical turnaround time is required"),
     url: z.string(),
     description: z
@@ -98,7 +98,7 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue, errors } =
       highlights: [],
       included: [],
       currency_code: "MYR",
-      pricing: "",
+      pricing: 0,
       turnaround_time: "within-48-hours",
       free_consultation: false,
       client_logos: [],
@@ -500,7 +500,7 @@ onMounted(() => fetchCategories());
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="one-time">One-time</SelectItem>
-                    <SelectItem value="retainer-montly"
+                    <SelectItem value="retainer-monthly"
                       >Retainer / Monthly</SelectItem
                     >
                     <SelectItem value="project-based">Project-based</SelectItem>
@@ -598,6 +598,8 @@ onMounted(() => fetchCategories());
                     <FormItem class="flex-1">
                       <FormControl>
                         <Input
+                          type="number"
+                          :min="0"
                           v-bind="priceField"
                           placeholder="Enter starting price"
                         />
@@ -740,9 +742,7 @@ onMounted(() => fetchCategories());
                   </FormControl>
                   <div class="flex flex-row gap-8 leading-none">
                     <FormLabel>{{ server.label }}</FormLabel>
-                    <FormDescription v-if="server.value === 'global'"
-                      >(Auto-includes Malaysia and Singapore)</FormDescription
-                    >
+                    
                   </div>
                 </FormItem>
               </div>
