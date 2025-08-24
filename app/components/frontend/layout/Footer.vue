@@ -232,7 +232,7 @@ const subscribe = () => {
               </li>
               <li>
                 <NuxtLink
-                  to="/term-and-condition"
+                  to="/term-of-service"
                   class="text-gray-400 hover:text-white transition-colors"
                   >Terms of Service</NuxtLink
                 >
