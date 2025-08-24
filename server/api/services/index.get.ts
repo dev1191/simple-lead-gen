@@ -89,7 +89,8 @@ export default defineEventHandler(async (event) => {
     let dbQuery = client.from('services').select(
         `
       *,
-      service_categories (
+      service_categories!inner (
+        category_id,
         categories ( id, name )
       ),
       service_sub_categories (
@@ -101,9 +102,10 @@ export default defineEventHandler(async (event) => {
     // Apply filters
     if (search) {
         dbQuery = dbQuery.or(
-            `service_name.ilike.%${search}%,service_description.ilike.%${search}%,service_tagline.ilike.%${search}%,type_of_service.ilike.%${search}%`
+            `service_name.ilike.%${search}%,service_tagline.ilike.%${search}%,service_tagline.ilike.%${search}%,type_of_service.ilike.%${search}%`
         )
     }
+
 
     if (category.length > 0) {
         dbQuery = dbQuery.in('service_categories.category_id', category)
@@ -131,7 +133,7 @@ export default defineEventHandler(async (event) => {
 
     if (region.length > 0) {
         dbQuery = dbQuery.or(
-            region.map(r => `operate.cs.{${r}}`).join(',')
+            region.map(r => `servers.cs.{${r}}`).join(',')
         )
     }
 
