@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
             service_id: body.data.service_id,
             name: body.data.name,
             email: body.data.email,
+            company_name: body.data.company_name,
             phone_number: body.data.phone_number,
             timeline: body.data.timeline,
             budgets: body.data.budgets,

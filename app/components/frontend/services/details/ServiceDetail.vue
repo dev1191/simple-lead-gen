@@ -261,7 +261,7 @@ const externalLink = (url: string) => {
                 ><Icon name="Mail" /> More Details</Button
               >
               <ServiceModal
-                v-model:open="modalOpen"
+               v-model:open="modalOpen"
                 :service="service"
               />
               <Separator class="my-6" />
