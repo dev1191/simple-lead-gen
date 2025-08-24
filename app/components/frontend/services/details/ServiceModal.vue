@@ -6,14 +6,25 @@ import { useForm } from "vee-validate";
 import * as z from "zod";
 
 const props = defineProps<{
-  modelValue: boolean;
+  open: boolean;
   service: Service;
 }>();
 
-const isOpen = ref(props.modelValue);
+const emit = defineEmits(["update:open"]);
+
+const isOpen = ref(props.open);
 const isLoading = ref(false);
+
+watch(
+  () => props.open,
+  (val) => {
+    isOpen.value = val;
+  }
+);
+
 const close = () => {
   isOpen.value = false;
+  emit("update:open", false);
 };
 
 const title = computed(() => {
@@ -48,15 +59,20 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const result = await useFetch("/api/services/details", {
+    isLoading.value = true;
+    values.service_id = props.service.id;
+    const result = await $fetch("/api/services/details", {
       method: "POST",
       body: {
         data: values, // sending form values
       },
     });
     toast.success(result.message);
+    isLoading.value = false;
+    close()
   } catch (error) {
     toast.error(error?.data?.statusMessage || "Failed to submit form.");
+    isLoading.value = false;
   }
 });
 </script>
@@ -122,7 +138,7 @@ const onSubmit = handleSubmit(async (values) => {
               <FormLabel> Company Name </FormLabel>
               <FormControl>
                 <Input
-                  id="content"
+                  id="company_name"
                   v-bind="componentField"
                   placeholder="Enter company name..."
                 />
@@ -226,10 +242,14 @@ const onSubmit = handleSubmit(async (values) => {
         </div>
 
         <div class="flex gap-3 pt-4">
-          <Button type="button" @click="close" class="flex-1" variant="outline"
-            >Close</Button
+          <Button
+            type="button"
+            @click="close"
+            class="flex-1 h-10"
+            variant="outline"
+            >Cancel</Button
           >
-          <Button type="submit" class="flex-1" :disabled="isLoading">
+          <Button type="submit" class="flex-1 h-10" :disabled="isLoading">
             <Icon
               name="Loader2"
               v-if="isLoading"
