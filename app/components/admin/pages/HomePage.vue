@@ -30,7 +30,7 @@ const formSchema = toTypedSchema(
     image_url: z.string().optional(),
     seo_title: z.string().min(1, "Meta Title is required"),
     seo_description: z.string().min(1, "Meta Description is required"),
-    seo_keyword:z.string().min(1, "Meta Keywords is required"),
+    seo_keyword: z.string().min(1, "Meta Keywords is required"),
     status: z.enum(["Draft", "Published"]),
     featured_services: z
       .array(z.string())
@@ -38,6 +38,10 @@ const formSchema = toTypedSchema(
     featured_tools: z
       .array(z.string())
       .min(1, "Please select at least one featured tools"),
+    featured_in: z
+      .array(z.string())
+      .min(1, "Please select at least one featured tools"),
+      more_services: z.array(z.string()).min(1, "Please select at least one more service"),
   })
 );
 
@@ -49,12 +53,14 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
       name: "homepage",
       featured_services: [],
       featured_tools: [],
+      featured_in: [],
+      more_services: [],
       title: "",
       sub_title: "",
       image_url: "",
       seo_title: "",
       seo_description: "",
-      seo_keyword:""
+      seo_keyword: "",
     },
   });
 
@@ -82,6 +88,8 @@ const onSubmit = handleSubmit(async (formValues) => {
         sub_title: formValues.sub_title,
         featured_services: formValues.featured_services,
         featured_tools: formValues.featured_tools,
+        featured_in: formValues.featured_in,
+        more_services: formValues.more_services,
       },
       image_url: imageUrl,
     };
@@ -117,6 +125,8 @@ onMounted(async () => {
           sub_title: page.meta_data.sub_title,
           featured_services: page.meta_data.featured_services,
           featured_tools: page.meta_data.featured_tools,
+          featured_in: page.meta_data.featured_in,
+          more_services: page.meta_data.more_services,
           imageFile: null,
         },
       });
@@ -257,6 +267,68 @@ onMounted(async () => {
           </FormItem>
         </FormField>
 
+        <FormField
+          v-slot="{ componentField }"
+          name="featured_in"
+          :validate-on-blur="!isFieldDirty"
+        >
+          <FormItem>
+            <FormLabel
+              >Featured In (Type and press Enter)
+              <span class="text-red-500">*</span></FormLabel
+            >
+            <FormControl>
+              <TagsInput
+                :model-value="componentField.modelValue"
+                @update:model-value="componentField['onUpdate:modelValue']"
+              >
+                <TagsInputItem
+                  v-for="item in componentField.modelValue"
+                  :key="item"
+                  :value="item"
+                >
+                  <TagsInputItemText />
+                  <TagsInputItemDelete />
+                </TagsInputItem>
+                <TagsInputInput placeholder="Featured in" />
+              </TagsInput>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        
+        <!----more_services -->
+ <FormField
+          v-slot="{ componentField }"
+          name="more_services"
+          :validate-on-blur="!isFieldDirty"
+        >
+          <FormItem>
+            <FormLabel
+              >More Services (Type and press Enter)
+              <span class="text-red-500">*</span></FormLabel
+            >
+            <FormControl>
+              <TagsInput
+                :model-value="componentField.modelValue"
+                @update:model-value="componentField['onUpdate:modelValue']"
+              >
+                <TagsInputItem
+                  v-for="item in componentField.modelValue"
+                  :key="item"
+                  :value="item"
+                >
+                  <TagsInputItemText />
+                  <TagsInputItemDelete />
+                </TagsInputItem>
+                <TagsInputInput placeholder="More services" />
+              </TagsInput>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+
         <!-- Status -->
         <FormField v-slot="{ componentField }" name="status">
           <FormItem>
@@ -335,7 +407,7 @@ onMounted(async () => {
           </FormItem>
         </FormField>
 
-           <FormField
+        <FormField
           v-slot="{ componentField }"
           name="seo_keyword"
           :validate-on-blur="!isFieldDirty"
@@ -353,7 +425,6 @@ onMounted(async () => {
             <FormMessage />
           </FormItem>
         </FormField>
-        
       </div>
     </form>
   </AdminLayoutPage>

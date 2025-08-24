@@ -3,6 +3,19 @@ import { useRouter } from "vue-router";
 import { Brain, Building2, CreditCard, Scale, TrendingUp } from "lucide-vue-next";
 import SearchTabs from "./SearchTabs.vue";
 
+
+const props = defineProps<{
+  title: string;
+  subTitle: string;
+}>();
+
+
+const highlightText = "better deal";
+
+// Split the sentence dynamically
+const [beforeText, afterText] = props.title.split(highlightText);
+
+
 const router = useRouter();
 
 
@@ -27,9 +40,9 @@ const trackCategoryClick = (category: string) => {
         <h1
           class="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight"
         >
-          Find a
+       {{ beforeText }}
           <span class="text-orange-500 relative">
-            better deal
+            {{ highlightText }}
             <svg
               class="absolute -bottom-2 left-0 w-full h-3 text-orange-200"
               viewBox="0 0 100 8"
@@ -40,7 +53,7 @@ const trackCategoryClick = (category: string) => {
               />
             </svg>
           </span>
-          for you
+         {{ afterText }}
         </h1>
       </div>
 
@@ -49,9 +62,7 @@ const trackCategoryClick = (category: string) => {
         <p
           class="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
         >
-          Discover, compare and get quotes on the best services, deals, and AI
-          tools to start, scale and succeed in business across Singapore and
-          Malaysia.
+         {{ subTitle }}
         </p>
       </div>
 
