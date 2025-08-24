@@ -16,7 +16,7 @@ const types = [
   { value: "retainer-monthly", label: "Retainer / Monthly" },
   { value: "project-based", label: "Project-based" },
   { value: "custom-varies", label: "Custom / Varies" },
-]; // Or define your tool types array here if not in constants
+]; 
 
 // Handle tool type toggle - same pattern as CategoryFilter
 const handleChange = (typeValue: string, checked: boolean) => {
