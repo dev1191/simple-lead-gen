@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { toast } from "@steveyuowo/vue-hot-toast";
 
 const email = ref("");
 
 const currentYear = computed(() => new Date().getFullYear());
 
-const subscribe = () => {
+const subscribe = async () => {
   if (!email.value) {
     toast({
       message: "Please enter your email address to subscribe.",
@@ -27,6 +24,12 @@ const subscribe = () => {
     return;
   }
 
+  const result = await $fetch("/api/subscriptions", {
+    method: "POST",
+    body: {
+      email: email.value, // sending form values
+    },
+  });
   // Here you would typically call your API to subscribe the user
   console.log("Subscribing email:", email.value);
 
