@@ -111,9 +111,9 @@ const bestFor = computed(() => {
         </div>
       </div>
 
-      <div class="flex items-center text-yellow-500 text-sm">
-        <Star class="w-4 h-4 fill-current" />
-        <span class="ml-1 font-medium">{{ rating ? rating : 0 }}</span>
+      <div class="flex items-center gap-1 text-sm font-medium">
+        <Star class="w-4 h-4 fill-primary text-primary" />
+        <span class="text-foreground">{{ rating ? rating : 0 }}</span>
       </div>
     </CardHeader>
 
