@@ -7,14 +7,15 @@ import ToggleView from "~/components/frontend/services/topbar/ToggleView.vue";
 definePageMeta({
   layout: "blank",
 });
-
+const route = useRoute();
+const router = useRouter();
 // Reactive filter/query states directly bound to URL
-const searchQuery = ref("");
+const searchQuery = ref((route.query.search as string) || "");
 const selectedCategory = ref([]);
 const selectedSort = ref("newest");
 const serviceType = ref([]);
 const turnaroundTime = ref([]);
-const region = ref([]);
+const region = ref(route.query.country ? [route.query.country as string] : []);
 const consultationType = ref([]);
 const currentPage = ref(1);
 
@@ -75,7 +76,12 @@ const resetFilters = () => {
   turnaroundTime.value = [];
   serviceType.value = [];
   region.value = [];
+  searchQuery.value = "";
   currentPage.value = 1;
+  router.push({
+    path: route.path,
+    query: {}, // empty object removes all query params
+  });
 };
 
 const hasActiveFilters = computed(() => {
@@ -144,7 +150,9 @@ useSeo(
         <!-- Main Content -->
         <div class="flex-1 space-y-6">
           <div class="flex justify-between items-center">
-            <div class="text-sm text-gray-500">{{ pagination?.totalItems || 0 }} services found</div>
+            <div class="text-sm text-gray-500">
+              {{ pagination?.totalItems || 0 }} services found
+            </div>
             <div class="flex gap-4 items-center">
               <SortDropdown
                 :modelValue="selectedSort"
