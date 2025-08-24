@@ -51,7 +51,7 @@ const emit = defineEmits([
 
     
     <div v-if="hasActiveFilters" class="flex items-center gap-2 flex-wrap">
-      <div class="text-sm text-muted-foreground">1 filter applied</div>
+      
       <Button
         variant="outline"
         class="w-28 h-6 text-sm"

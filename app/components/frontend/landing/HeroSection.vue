@@ -1,69 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useRouter } from "vue-router";
-import { toast } from "@steveyuowo/vue-hot-toast";
 import { Brain, Building2, CreditCard, Scale, TrendingUp } from "lucide-vue-next";
 import SearchTabs from "./SearchTabs.vue";
 
 const router = useRouter();
 
-// Search state
-const searchQuery = ref("");
-const selectedCountry = ref("");
-const isSearching = ref(false);
-
-// Popular search terms
-const popularSearches = ref([
-  "Web Development",
-  "Digital Marketing",
-  "Accounting",
-  "Legal Services",
-  "AI Tools",
-]);
-
-const performSearch = async () => {
-  if (!searchQuery.value.trim()) {
-    toast({
-      message: "Please enter a search term to find services.",
-      type: "error",
-    });
-    return;
-  }
-
-  isSearching.value = true;
-
-  // Simulate search delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // Navigate to search results
-  router.push({
-    path: "/search",
-    query: {
-      q: searchQuery.value,
-      country: selectedCountry.value || "all",
-    },
-  });
-
-  toast({
-    message: `Found services for "${searchQuery.value}"`,
-  });
-
-  isSearching.value = false;
-};
-
-const quickSearch = (term: string) => {
-  searchQuery.value = term;
-  performSearch();
-};
 
 const navigateToCategory = (category: string) => {
   router.push(`/categories/${category}`);
@@ -120,22 +61,10 @@ const trackCategoryClick = (category: string) => {
       >
        <SearchTabs/>
 
-        <!-- Popular searches -->
-        <div class="mt-4 text-sm text-gray-500">
-          <span>Popular searches: </span>
-          <button
-            v-for="term in popularSearches"
-            :key="term"
-            @click="quickSearch(term)"
-            class="mx-1 text-orange-500 hover:text-orange-600 underline transition-colors"
-          >
-            {{ term }}
-          </button>
-        </div>
       </div>
 
       <!-- Service Categories -->
-      <div class="animate-fade-in-up animation-delay-600">
+      <div class="">
         <h2 class="text-2xl font-semibold text-gray-900 mb-8">
           Popular Categories
         </h2>

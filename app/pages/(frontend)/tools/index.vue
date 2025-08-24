@@ -7,13 +7,15 @@ import ToggleView from "~/components/frontend/tools/topbar/ToggleView.vue";
 definePageMeta({
   layout: "blank",
 });
+const route = useRoute();
+const router = useRouter();
 
 // Reactive filter/query states directly bound to URL
-const searchQuery = ref("");
+const searchQuery = ref((route.query.search as string) || "");
 const selectedCategory = ref([]);
 const selectedSort = ref("newest");
 const toolType = ref([]);
-const region = ref([]);
+const region = ref(route.query.country ? [route.query.country as string] : []);
 const consultationType = ref([]);
 const currentPage = ref(1);
 
@@ -73,6 +75,12 @@ const resetFilters = () => {
   toolType.value = [];
   region.value = [];
   currentPage.value = 1;
+  searchQuery.value = "";
+
+  router.push({
+    path: route.path,
+    query: {}, // empty object removes all query params
+  });
 };
 
 const hasActiveFilters = computed(() => {
