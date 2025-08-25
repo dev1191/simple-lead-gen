@@ -20,6 +20,7 @@ import {
   Globe,
   Wrench,
   Briefcase,
+  Handshake,
 } from "lucide-vue-next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -73,6 +74,12 @@ const sidebarLinks = [
     icon: Globe,
     to: "/admin/pages/home-page",
     tooltip: "Frontend Pages",
+  },
+    {
+    title: "List Your Business",
+    icon: Handshake,
+    to: "/admin/list-your-business",
+    tooltip: "List Your Business",
   },
   {
     title: "Settings",
