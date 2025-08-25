@@ -74,8 +74,12 @@ export const columns: ColumnDef<Vendor>[] = [
         },
     },
     {
-        accessorKey: "clicks_count",
+        accessorKey: "tool_clicks",
         header: "Clicks",
+        cell: ({ row }) => {
+            const value = row.getValue("tool_clicks");
+            return value.length;
+        }
     },
     {
         accessorKey: "conversions",
