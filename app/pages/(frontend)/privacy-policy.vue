@@ -9,6 +9,19 @@ useSeo(
   "/images/contact-og.png",
   ["Yotta", "Privacy Policy", "Tech company", "Support"]
 );
+
+// Update SEO dynamically when page data is available
+watch(pageData, (value) => {
+  if (value) {
+    useSeo(
+      value.title,
+      value.content,
+      "/images/home-og.png", // optional field
+      value.seo_keyword ? value.seo_keyword.split(",") : ["Yotta", "Insights"] // optionally update keywords
+    );
+  }
+});
+
 </script>
 
 <template>
