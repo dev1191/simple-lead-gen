@@ -205,6 +205,10 @@ onMounted(async () => {
           </FormItem>
         </FormField>
 
+          <Separator />
+        <h2 class="text-2xl font-bold">Page Extra Settings</h2>
+
+        
         <!-- featured services -->
         <FormField
           v-slot="{ componentField }"

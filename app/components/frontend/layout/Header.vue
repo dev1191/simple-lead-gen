@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "vue-router";
+import ListServiceModal from "../ListServiceModal.vue";
 
 const router = useRouter();
 
@@ -16,9 +17,11 @@ const closeMobileMenu = () => {
   mobileMenuOpen.value = false;
 };
 
+const isOpen = ref(false);
+
 const handleListService = () => {
   // Navigate to list service page or open modal
-  router.push("/list-service");
+  isOpen.value = true;
   closeMobileMenu();
 };
 
@@ -110,6 +113,7 @@ const handleClickOutside = () => {
           >
             List Your Service
           </Button>
+          <ListServiceModal v-model:open="isOpen" />
         </div>
 
         <!-- Mobile menu button -->
