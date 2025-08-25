@@ -6,6 +6,12 @@ export interface PopularServices {
     icon: string;
 }
 
+
+export interface Stats {
+    label: string;
+    value: string;
+}
+
 export interface Page {
     id: string
     title: string
@@ -28,6 +34,9 @@ export interface Page {
         featured_in: string[];
         more_services: string[];
         popular_services: PopularServices[];
+        stats: Stats[],
+        cta_text:string,
+        cta_link:string
     }
 
 

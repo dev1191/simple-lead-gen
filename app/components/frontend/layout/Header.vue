@@ -78,6 +78,15 @@ const handleClickOutside = () => {
             About
           </NuxtLink>
           <NuxtLink
+            to="/list-your-business"
+            class="text-gray-300 hover:text-white transition-colors"
+            :class="{
+              'text-orange-400': $route.path === '/list-your-business',
+            }"
+          >
+            List your Business
+          </NuxtLink>
+          <NuxtLink
             to="/faq"
             class="text-gray-300 hover:text-white transition-colors"
             :class="{ 'text-orange-400': $route.path === '/faq' }"
