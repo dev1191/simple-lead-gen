@@ -37,9 +37,14 @@ export function useLeads() {
             .select(`
         *,
         vendors(id,name,email),
-        services(*),
+        services(
+        *,
+        service_details(*)
+        ),
         tools(*)
       `, { count: 'exact' })
+        .order('created_at', { ascending: false, foreignTable: 'services.service_details' })
+
 
         if (filters.value.search) {
             query = query.or(`question.ilike.%${filters.value.search}%,answer.ilike.%${filters.value.search}%`)

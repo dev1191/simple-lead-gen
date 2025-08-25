@@ -21,6 +21,11 @@ import {
   Wrench,
   Briefcase,
   Handshake,
+  NotepadText,
+  TableOfContents,
+  Phone,
+  Siren,
+  Rss,
 } from "lucide-vue-next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -86,6 +91,42 @@ const sidebarLinks = [
     icon: Settings,
     to: "/admin/settings",
     tooltip: "Settings",
+  },
+    {
+    title: "About Us",
+    icon: NotepadText,
+    to: "/admin/pages/about-us",
+    tooltip: "About Us",
+  },
+    {
+    title: "FAQs Page",
+    icon: TableOfContents,
+    to: "/admin/pages/faq",
+    tooltip: "FAQs",
+  },
+      {
+    title: "Insights(Blogs) Page",
+    icon: Rss,
+    to: "/admin/pages/insights",
+    tooltip: "Insights(Blogs) Page",
+  },
+    {
+    title: "Contact Page",
+    icon: Phone,
+    to: "/admin/pages/contact",
+    tooltip: "Contact Page",
+  },
+    {
+    title: "Term of Service Page",
+    icon:Handshake,
+    to: "/admin/pages/terms-of-service",
+    tooltip: "Term of Service Page",
+  },
+      {
+    title: "Privacy Policy Page",
+    icon: Siren,
+    to: "/admin/pages/privacy-policy",
+    tooltip: "Privacy Policy Page",
   },
 ];
 

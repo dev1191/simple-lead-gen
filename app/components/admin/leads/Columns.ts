@@ -37,9 +37,28 @@ export const columns: ColumnDef<Lead>[] = [
         header: "Service/Tool Name",
     },
     {
-        accessorKey: "vendors.email",
+        accessorKey: "services",
         header: "Requester Info",
+        cell: ({ row }) => {
+            const value = row.getValue("services");
+            const serviceDetails = value?.service_details || [];
+
+            if (Array.isArray(serviceDetails) && serviceDetails.length > 0) {
+                // get latest by created_at
+                const latest = [...serviceDetails].sort(
+                    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+                )[0];
+
+                   const text = `${latest.company_name} - ${latest.name} (${latest.email})`;
+                   return h('div', { class: "max-w-[200px] truncate text-gray-800" }, text);
+            }
+
+            return "-";
+
+
+        }
     },
+
     {
         accessorKey: "vendors.email",
         header: "Sent To",
