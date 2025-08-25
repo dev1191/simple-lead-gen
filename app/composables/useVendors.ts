@@ -38,7 +38,7 @@ export function useVendors() {
         let query = supabase
             .from('vendors')
             .select(`
-        *
+        *,services(*),leads(*)
       `, { count: 'exact' })
 
         if (filters.value.search) {
