@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import Layout from "~/components/admin/pages/Layout.vue";
+import ListYourBusiness from "~/components/admin/pages/ListYourBusiness.vue";
+
 definePageMeta({
   layout: "admin",
   middleware: ["auth"],
@@ -12,7 +14,7 @@ useHead({
 
 <template>
   <Layout>
-    <h1>List your Business page</h1>
+        <ListYourBusiness />
   </Layout>
 </template>
 
