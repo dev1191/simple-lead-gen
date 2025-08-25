@@ -11,6 +11,18 @@ useSeo(
   "/images/contact-og.png",
   ["Yotta", "Terms of Service", "Tech company", "Support"]
 );
+
+watch(pageData, (value) => {
+  if (value) {
+    useSeo(
+      value.title,
+      value.content,
+      "/images/home-og.png", // optional field
+      value.seo_keyword ? value.seo_keyword.split(",") : ["Yotta", "Insights"] // optionally update keywords
+    );
+  }
+});
+
 </script>
 
 <template>
