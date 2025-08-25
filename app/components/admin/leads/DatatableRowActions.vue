@@ -5,6 +5,7 @@ import { type Row } from "@tanstack/vue-table";
 
 import ViewModal from "./LeadView.vue";
 import type { Lead } from "~/shared/types/leads";
+import ForwardModal from "./ForwardModal.vue";
 
 const props = defineProps<{ row: Row<Lead> }>();
 
@@ -14,10 +15,11 @@ const currentComponent = ref<keyof typeof componentsMap | null>(null);
 // Control dialog open state
 const isDialogOpen = ref(false);
 
-const { sendEmail } = useLeads();
+
 // Map action types to components
 const componentsMap = {
   view: ViewModal,
+  send: ForwardModal,
 };
 
 function handleAction(type: keyof typeof componentsMap) {
@@ -25,31 +27,6 @@ function handleAction(type: keyof typeof componentsMap) {
   isDialogOpen.value = true;
 }
 
-async function handleForward() {
-  const message = `
-<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    Hello ${props.row.original.vendors.name},<br><br>
-    
-    You have received a new lead for ${
-      props.row.original.type === "Service"
-        ? props.row.original.services.service_name
-        : ""
-    }.<br><br>
-    
-    <strong>Company:</strong> {{company_name}}<br>
-    <strong>Contact:</strong> {{contact_name}}<br>
-    <strong>Email:</strong> {{contact_email}}<br><br>
-    
-    Best regards,<br>
-    Lead Gen Team
-</div>`;
-
-  await sendEmail({
-    email: "venturenexthq@gmail.com", //"devrajthapa1191@gmail.com",
-    subject: "New Leads",
-    message,
-  });
-}
 
 function closeModal() {
   isDialogOpen.value = false;
@@ -60,25 +37,16 @@ function closeModal() {
 
 <template>
   <div class="flex items-center gap-4">
-    <AlertDialog>
-      <AlertDialogTrigger as-child>
-        <Button class="w-24 h-7"> <Icon name="Send" class="w-4 h-4" /> Forward </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Forward this enquiry?</AlertDialogTitle>
-          <AlertDialogDescription>
-            The enquiry details will be sent to the provider's registered email
-            address. Please confirm before proceeding.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction @click="handleForward">Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-
+  
+    <Button
+      size="icon"
+      class="w-24 h-7"
+      :disabled="props.row.original.services.service_details.length === 0"
+      @click="handleAction('send')"
+    >
+      <Icon name="Send" :size="20" />
+      Forward
+    </Button>
     <Button variant="ghost" size="icon" @click="handleAction('view')">
       <Icon name="Eye" :size="20" class="text-red-800" />
     </Button>

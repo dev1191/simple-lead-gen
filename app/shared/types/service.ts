@@ -19,6 +19,14 @@ export interface FilterOptions {
   turnaroundTime: string[]
   region: string[]
 }
+export interface ServiceDetails {
+    id: string;
+    company_name: string;
+    name: string;
+    email: string;
+    phone:string;
+    created_at: string;
+}
 
 export interface Service {
     id: string;
@@ -42,4 +50,5 @@ export interface Service {
     servers: string[];
     vendor_id?: string;
     status: boolean
+    service_details?:ServiceDetails[]
 }
