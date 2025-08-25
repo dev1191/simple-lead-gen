@@ -18,16 +18,41 @@ export const columns: ColumnDef<Vendor>[] = [
         header: "Contact Email",
     },
     {
-        accessorKey: "service_listed",
+        accessorKey: "services",
         header: " Services Listed",
+        cell: ({ row }) => {
+            const value = row.getValue("services");
+            return h("div", {}, value.length);
+        }
     },
     {
         accessorKey: "monthly_leads",
         header: "Leads This Month",
+        cell: ({ row }) => {
+            const leads = row.getValue("leads"); // all leads
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            // Filter leads for current month
+            const monthlyLeads = leads.filter((lead: any) => {
+                const createdAt = new Date(lead.created_at);
+                return (
+                    createdAt.getMonth() === currentMonth &&
+                    createdAt.getFullYear() === currentYear
+                );
+            });
+
+            return monthlyLeads.length;
+        },
     },
     {
-        accessorKey: "total_leads",
+        accessorKey: "leads",
         header: "Total Leads",
+        cell: ({ row }) => {
+            const value = row.getValue("leads");
+            return h("div", {}, value.length);
+        }
     },
     {
         accessorKey: "status",

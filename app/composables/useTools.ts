@@ -37,7 +37,7 @@ export function useTools() {
         let query = supabase
             .from('tools')
             .select(`
-        *
+        *,tool_clicks(*)
       `, { count: 'exact' })
 
         if (filters.value.search) {
