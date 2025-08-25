@@ -44,6 +44,20 @@ const formSchema = toTypedSchema(
     more_services: z
       .array(z.string())
       .min(1, "Please select at least one more service"),
+    meta_data: z
+      .object({
+        popular_categories: z
+          .array(
+            z.object({
+              icon: z.string(),
+              label: z.string(),
+              value: z.string(),
+                 color: z.string(),
+            })
+          )
+          .optional(),
+      })
+      .optional(),
   })
 );
 
@@ -63,8 +77,43 @@ const { isFieldDirty, handleSubmit, values, resetForm, setFieldValue } =
       seo_title: "",
       seo_description: "",
       seo_keyword: "",
+      meta_data: {
+        popular_categories: [],
+      },
     },
   });
+
+// Create a reactive reference to popularCategories for easier manipulation
+const popularCategories = computed({
+  get: () => values.meta_data?.popular_categories || [],
+  set: (newCategories) => {
+    setFieldValue("meta_data.popular_categories", newCategories);
+  },
+});
+
+const addPopularCategory = () => {
+  const currentCategories = [...(values.meta_data?.popular_categories || [])];
+  currentCategories.push({ icon: "", label: "", value: "",color:"" });
+  setFieldValue("meta_data.popular_categories", currentCategories);
+};
+
+const removePopularCategory = (index: number) => {
+  const currentCategories = [...(values.meta_data?.popular_categories || [])];
+  currentCategories.splice(index, 1);
+  setFieldValue("meta_data.popular_categories", currentCategories);
+};
+
+const updatePopularCategory = (
+  index: number,
+  field: "label" | "value" | "icon" | "color",
+  newValue: string
+) => {
+  const currentCategories = [...(values.meta_data?.popular_categories || [])];
+  if (currentCategories[index]) {
+    currentCategories[index][field] = newValue;
+    setFieldValue("meta_data.popular_categories", currentCategories);
+  }
+};
 
 const onSubmit = handleSubmit(async (formValues) => {
   isLoading.value = true;
@@ -92,6 +141,7 @@ const onSubmit = handleSubmit(async (formValues) => {
         featured_tools: formValues.featured_tools,
         featured_in: formValues.featured_in,
         more_services: formValues.more_services,
+        popular_categories: formValues.meta_data?.popular_categories || [],
       },
       image_url: imageUrl,
     };
@@ -131,6 +181,9 @@ const fetchData = async () => {
           featured_tools: page.meta_data.featured_tools,
           featured_in: page.meta_data.featured_in,
           more_services: page.meta_data.more_services,
+          meta_data: {
+            popular_categories: page.meta_data?.popular_categories || [],
+          },
           imageFile: null,
         },
       });
@@ -182,6 +235,7 @@ onMounted(async () => {
         <!-- Tabs List -->
         <TabsList class="h-12">
           <TabsTrigger value="hero">Hero Content</TabsTrigger>
+          <TabsTrigger value="popular">Popular Categories</TabsTrigger>
           <TabsTrigger value="featured">Featured Items</TabsTrigger>
           <TabsTrigger value="seo">SEO Metadata</TabsTrigger>
         </TabsList>
@@ -239,6 +293,92 @@ onMounted(async () => {
                 <FormMessage />
               </FormItem>
             </FormField>
+          </div>
+        </TabsContent>
+
+        <!-- popular Tab -->
+        <TabsContent value="popular">
+          <div class="flex flex-col space-y-6">
+            <Separator />
+            <h2 class="text-2xl font-bold">Popular Categories Settings</h2>
+
+            <!-- Categories (dynamic array) -->
+            <div>
+              <Label class="text-base font-semibold mb-2 block"
+                >Categories</Label
+              >
+              <div
+                v-for="(category, i) in popularCategories"
+                :key="`category-${i}`"
+                class="flex gap-2 mb-2 p-2 border rounded-lg bg-gray-50"
+              >
+                <div class="flex-1">
+                  <Label class="text-sm text-gray-600 mb-1 block"
+                    >Icon name</Label
+                  >
+                  <Input
+                    :model-value="category.icon"
+                    @update:model-value="
+                      (newValue) => updatePopularCategory(i, 'icon', newValue)
+                    "
+                    placeholder="Enter an icon"
+                  />
+                </div>
+                  <div class="flex-1">
+                  <Label class="text-sm text-gray-600 mb-1 block"
+                    >Color name</Label
+                  >
+                  <Input
+                    :model-value="category.color"
+                    @update:model-value="
+                      (newValue) => updatePopularCategory(i, 'color', newValue)
+                    "
+                    placeholder="Enter an icon"
+                  />
+                </div>
+                <div class="flex-1">
+                  <Label class="text-sm text-gray-600 mb-1 block">Title</Label>
+                  <Input
+                    :model-value="category.value"
+                    @update:model-value="
+                      (newValue) => updatePopularCategory(i, 'value', newValue)
+                    "
+                    placeholder="Enter a title"
+                  />
+                </div>
+                <div class="flex-1">
+                  <Label class="text-sm text-gray-600 mb-1 block"
+                    >Sub Title</Label
+                  >
+                  <Input
+                    :model-value="category.label"
+                    @update:model-value="
+                      (newValue) => updatePopularCategory(i, 'label', newValue)
+                    "
+                    placeholder="Enter a sub title"
+                  />
+                </div>
+                <div class="flex items-end">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    @click="removePopularCategory(i)"
+                  >
+                    <Icon name="Trash2" class="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                class="mt-2"
+                @click="addPopularCategory"
+              >
+                + Add Category
+              </Button>
+            </div>
           </div>
         </TabsContent>
 

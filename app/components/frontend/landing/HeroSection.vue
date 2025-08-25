@@ -1,23 +1,26 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { Brain, Building2, CreditCard, Scale, TrendingUp } from "lucide-vue-next";
+import {
+  Brain,
+  Building2,
+  CreditCard,
+  Scale,
+  TrendingUp,
+} from "lucide-vue-next";
 import SearchTabs from "./SearchTabs.vue";
-
 
 const props = defineProps<{
   title: string;
   subTitle: string;
+  popularCategories: Array<{ icon: string; label: string; value: string }>;
 }>();
-
 
 const highlightText = "better deal";
 
 // Split the sentence dynamically
 const [beforeText, afterText] = props.title.split(highlightText);
 
-
 const router = useRouter();
-
 
 const navigateToCategory = (category: string) => {
   router.push(`/categories/${category}`);
@@ -40,7 +43,7 @@ const trackCategoryClick = (category: string) => {
         <h1
           class="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight"
         >
-       {{ beforeText }}
+          {{ beforeText }}
           <span class="text-orange-500 relative">
             {{ highlightText }}
             <svg
@@ -53,7 +56,7 @@ const trackCategoryClick = (category: string) => {
               />
             </svg>
           </span>
-         {{ afterText }}
+          {{ afterText }}
         </h1>
       </div>
 
@@ -62,7 +65,7 @@ const trackCategoryClick = (category: string) => {
         <p
           class="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
         >
-         {{ subTitle }}
+          {{ subTitle }}
         </p>
       </div>
 
@@ -70,8 +73,7 @@ const trackCategoryClick = (category: string) => {
       <div
         class="animate-fade-in-up animation-delay-400 max-w-4xl mx-auto mb-16"
       >
-       <SearchTabs/>
-
+        <SearchTabs />
       </div>
 
       <!-- Service Categories -->
@@ -81,104 +83,26 @@ const trackCategoryClick = (category: string) => {
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4 w-full mx-auto">
           <!-- Register a Business -->
-          <div
-            @click="navigateToCategory('register-business')"
-            class="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group transform hover:-translate-y-1"
-          >
+          <template v-for="category in popularCategories" :key="category.value">
             <div
-              class="text-red-500 mb-4 group-hover:scale-110 transition-transform duration-200"
+              class="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300  group transform hover:-translate-y-1"
             >
-             <Building2 class="w-10 h-10 mx-auto"/>
+              <div
+                :class="`text-${category.color}-500 mb-4 group-hover:scale-110 transition-transform duration-200`"
+              >
+                <Icon :name="category.icon" class="w-10 h-10 mx-auto" />
+              </div>
+              <h3
+                class="font-semibold text-gray-900 mb-2 transition-colors"
+                :class="`group-hover:text-${category.color}-500`"
+              >
+                {{ category.label }}
+              </h3>
+              <p class="text-sm text-gray-600">
+                {{ category.value }}
+              </p>
             </div>
-            <h3
-              class="font-semibold text-gray-900 mb-2 group-hover:text-red-500 transition-colors"
-            >
-              Register a Business
-            </h3>
-            <p class="text-sm text-gray-600">
-              Company formation and registration services
-            </p>
-          </div>
-
-          <!-- Legal & Compliance -->
-          <div
-            @click="navigateToCategory('legal-compliance')"
-            class="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group transform hover:-translate-y-1"
-          >
-            <div
-              class="text-yellow-500 mb-4 group-hover:scale-110 transition-transform duration-200"
-            >
-                       <Scale class="w-10 h-10 mx-auto"/>
-            </div>
-            <h3
-              class="font-semibold text-gray-900 mb-2 group-hover:text-yellow-500 transition-colors"
-            >
-              Legal & Compliance
-            </h3>
-            <p class="text-sm text-gray-600">
-              Legal services and regulatory compliance
-            </p>
-          </div>
-
-          <!-- Banking & Finance -->
-          <div
-            @click="navigateToCategory('banking-finance')"
-            class="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group transform hover:-translate-y-1"
-          >
-            <div
-              class="text-green-500 mb-4 group-hover:scale-110 transition-transform duration-200"
-            >
-                          <CreditCard class="w-10 h-10 mx-auto"/>
-            </div>
-            <h3
-              class="font-semibold text-gray-900 mb-2 group-hover:text-green-500 transition-colors"
-            >
-              Banking & Finance
-            </h3>
-            <p class="text-sm text-gray-600">
-              Financial services and business banking
-            </p>
-          </div>
-
-          <!-- SaaS & AI Tools -->
-          <div
-            @click="navigateToCategory('saas-ai-tools')"
-            class="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group transform hover:-translate-y-1"
-          >
-            <div
-              class="text-blue-500 mb-4 group-hover:scale-110 transition-transform duration-200"
-            >
-                    <TrendingUp class="w-10 h-10 mx-auto"/>
-            </div>
-            <h3
-              class="font-semibold text-gray-900 mb-2 group-hover:text-blue-500 transition-colors"
-            >
-              SaaS & AI Tools
-            </h3>
-            <p class="text-sm text-gray-600">
-              Software solutions to streamline your business
-            </p>
-          </div>
-
-          <!-- Marketing & Growth -->
-          <div
-            @click="navigateToCategory('marketing-growth')"
-            class="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer group transform hover:-translate-y-1"
-          >
-            <div
-              class="text-purple-500 mb-4 group-hover:scale-110 transition-transform duration-200"
-            >
-                      <Brain class="w-10 h-10 mx-auto"/>
-            </div>
-            <h3
-              class="font-semibold text-gray-900 mb-2 group-hover:text-purple-500 transition-colors"
-            >
-              Marketing & Growth
-            </h3>
-            <p class="text-sm text-gray-600">
-              Grow your business with marketing tools
-            </p>
-          </div>
+          </template>
         </div>
       </div>
 

@@ -22,7 +22,7 @@ useSeo(
 <template>
   <div>
 
-    <HeroSection :title="pageData.title"  :sub-title="pageData.meta_data?.sub_title" />
+    <HeroSection :title="pageData.title"  :sub-title="pageData.meta_data?.sub_title" :popularCategories="pageData.meta_data?.popular_categories" />
 
     <ServiceCategories />
     <FeaturedPress :featured_in="pageData.meta_data?.featured_in" />

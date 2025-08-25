@@ -49,12 +49,13 @@ const onSubmit = async () => {
 </div>`;
 
   await sendEmail({
-    email: "devrajthapa1191@gmail.com", //"venturenexthq@gmail.com",
+    email: "venturenexthq@gmail.com", //"devrajthapa1191@gmail.com", //
     subject: "New Leads",
     message,
   });
 
   isLoading.value = false;
+  handleCancel();
 };
 </script>
 
