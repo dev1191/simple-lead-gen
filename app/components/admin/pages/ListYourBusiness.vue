@@ -72,7 +72,7 @@ const stats = computed({
   get: () => values.meta_data?.stats || [],
   set: (newStats) => {
     setFieldValue("meta_data.stats", newStats);
-  }
+  },
 });
 
 const addStat = () => {
@@ -87,7 +87,11 @@ const removeStat = (index: number) => {
   setFieldValue("meta_data.stats", currentStats);
 };
 
-const updateStat = (index: number, field: 'label' | 'value', newValue: string) => {
+const updateStat = (
+  index: number,
+  field: "label" | "value",
+  newValue: string
+) => {
   const currentStats = [...(values.meta_data?.stats || [])];
   if (currentStats[index]) {
     currentStats[index][field] = newValue;
@@ -125,7 +129,8 @@ const onSubmit = handleSubmit(async (formValues) => {
   }
 });
 
-onMounted(async () => {
+const activeTab = ref("content");
+const fetchData = async () => {
   const pathSegments = route.path.split("/").filter(Boolean);
   let slug = pathSegments[pathSegments.length - 1] || "business";
   slug = slug.replace(/-/g, "");
@@ -141,13 +146,21 @@ onMounted(async () => {
             cta_text: page.meta_data?.cta_text || "",
             cta_link: page.meta_data?.cta_link || "",
             stats: page.meta_data?.stats || [],
-          }
+          },
         },
       });
     }
   } catch (error) {
     toast.error("Failed to load page data");
   }
+};
+
+watch(activeTab, async (tab) => {
+  await fetchData();
+});
+
+onMounted(async () => {
+  await fetchData();
 });
 </script>
 
@@ -176,231 +189,244 @@ onMounted(async () => {
       >
     </template>
 
-    <form
-      @submit.prevent="onSubmit"
-      id="abouts-form"
-      class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6"
-    >
-      <!-- Left Column -->
-      <div class="flex flex-col space-y-6 flex-1">
-        <!-- Title -->
-        <FormField
-          v-slot="{ componentField }"
-          name="title"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel
-              >Page Title <span class="text-red-500">*</span></FormLabel
+    <form @submit.prevent="onSubmit" id="abouts-form" class="w-full">
+      <Tabs v-model="activeTab" defaultValue="content" class="w-full">
+        <!-- Tabs List -->
+        <TabsList>
+          <TabsTrigger value="content">Content</TabsTrigger>
+          <TabsTrigger value="extras">Extra Settings</TabsTrigger>
+          <TabsTrigger value="seo">SEO Metadata</TabsTrigger>
+        </TabsList>
+
+        <!-- Content Tab -->
+        <TabsContent value="content" force-render>
+          <div class="flex flex-col space-y-6">
+            <!-- Page Title -->
+            <FormField
+              v-slot="{ componentField }"
+              name="title"
+              :validate-on-blur="!isFieldDirty"
             >
-            <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter title"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+              <FormItem>
+                <FormLabel
+                  >Page Title <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="Enter title"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <FormField
-          v-slot="{ componentField }"
-          name="slug"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>Page Slug <span class="text-red-500">*</span></FormLabel>
-            <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter slug"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <!-- Content -->
-        <FormField
-          v-slot="{ componentField }"
-          name="content"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel
-              >Page Content <span class="text-red-500">*</span></FormLabel
+            <!-- Page Slug -->
+            <FormField
+              v-slot="{ componentField }"
+              name="slug"
+              :validate-on-blur="!isFieldDirty"
             >
-            <FormControl>
-              <Textarea
-                id="content"
-                v-bind="componentField"
-                placeholder="Write your content here..."
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+              <FormItem>
+                <FormLabel
+                  >Page Slug <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="Enter slug"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <Separator />
-        <h2 class="text-2xl font-bold">Page Extra Settings</h2>
+            <!-- Page Content -->
+            <FormField
+              v-slot="{ componentField }"
+              name="content"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormLabel
+                  >Page Content <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <Textarea
+                    id="content"
+                    placeholder="Write your content here..."
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+        </TabsContent>
 
-        <!-- CTA Text -->
-        <FormField name="meta_data.cta_text" v-slot="{ componentField }">
-          <FormItem>
-            <FormLabel>CTA Button Text</FormLabel>
-            <FormControl>
-              <Input
-                placeholder="Start Your Application →"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+        <!-- Extra Settings / Stats Tab -->
+        <TabsContent value="extras" force-render>
+          <div class="flex flex-col space-y-6">
+            <Separator />
+            <h2 class="text-2xl font-bold">Page Extra Settings</h2>
 
-        <!-- CTA Link -->
-        <FormField name="meta_data.cta_link" v-slot="{ componentField }">
-          <FormItem>
-            <FormLabel>CTA Button Link</FormLabel>
-            <FormControl>
-              <Input placeholder="/apply" v-bind="componentField" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+            <!-- CTA Text -->
+            <FormField name="meta_data.cta_text" v-slot="{ componentField }">
+              <FormItem>
+                <FormLabel>CTA Button Text</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Start Your Application →"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <!-- Stats (dynamic array) -->
-        <div>
-          <Label class="text-base font-semibold mb-2 block">Stats</Label>
-          <div
-            v-for="(stat, i) in stats"
-            :key="`stat-${i}`"
-            class="flex gap-2 mb-2 p-2 border rounded-lg bg-gray-50"
-          >
-            <div class="flex-1">
-              <Label class="text-sm text-gray-600 mb-1 block">Value</Label>
-              <Input
-                :model-value="stat.value"
-                @update:model-value="updateStat(i, 'value', ($event.target as HTMLInputElement).value)"
-                placeholder="50K+"
-              />
-            </div>
-            <div class="flex-1">
-              <Label class="text-sm text-gray-600 mb-1 block">Label</Label>
-              <Input
-                :model-value="stat.label"
-                @update:model-value="updateStat(i, 'label', ($event.target as HTMLInputElement).value)"
-                placeholder="Monthly Visitors"
-              />
-            </div>
-            <div class="flex items-end">
+            <!-- CTA Link -->
+            <FormField name="meta_data.cta_link" v-slot="{ componentField }">
+              <FormItem>
+                <FormLabel>CTA Button Link</FormLabel>
+                <FormControl>
+                  <Input placeholder="/apply" v-bind="componentField" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
+            <!-- Stats (dynamic array) -->
+            <div>
+              <Label class="text-base font-semibold mb-2 block">Stats</Label>
+              <div
+                v-for="(stat, i) in stats"
+                :key="`stat-${i}`"
+                class="flex gap-2 mb-2 p-2 border rounded-lg bg-gray-50"
+              >
+                <div class="flex-1">
+                  <Label class="text-sm text-gray-600 mb-1 block">Value</Label>
+                  <Input
+                    :model-value="stat.value"
+                    @update:model-value="
+                      updateStat(
+                        i,
+                        'value',
+                        ($event.target as HTMLInputElement).value
+                      )
+                    "
+                    placeholder="50K+"
+                  />
+                </div>
+                <div class="flex-1">
+                  <Label class="text-sm text-gray-600 mb-1 block">Label</Label>
+                  <Input
+                    :model-value="stat.label"
+                    @update:model-value="
+                      updateStat(
+                        i,
+                        'label',
+                        ($event.target as HTMLInputElement).value
+                      )
+                    "
+                    placeholder="Monthly Visitors"
+                  />
+                </div>
+                <div class="flex items-end">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    @click="removeStat(i)"
+                  >
+                    <Icon name="Trash2" class="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
               <Button
                 type="button"
-                variant="destructive"
-                size="sm"
-                @click="removeStat(i)"
+                variant="outline"
+                class="mt-2"
+                @click="addStat"
               >
-                <Icon name="Trash2" class="w-4 h-4"/>
+                + Add Stat
               </Button>
             </div>
           </div>
+        </TabsContent>
 
-          <Button 
-            type="button" 
-            variant="outline" 
-            class="mt-2" 
-            @click="addStat"
-          >
-            + Add Stat
-          </Button>
-          
-        </div>
-      </div>
+        <!-- SEO Metadata Tab -->
+        <TabsContent value="seo" force-render>
+          <div class="flex flex-col space-y-6">
+            <Separator />
+            <h2 class="text-2xl font-bold">SEO Metadata</h2>
 
-      <!-- Right Column -->
-      <div class="flex flex-col space-y-6 flex-1">
-        <!-- Status -->
-        <FormField v-slot="{ componentField }" name="status">
-          <FormItem>
-            <FormLabel>Status</FormLabel>
-            <FormControl>
-              <Select v-bind="componentField">
-                <SelectTrigger class="w-full">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="Published">Published</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+            <!-- SEO Title -->
+            <FormField
+              v-slot="{ componentField }"
+              name="seo_title"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormLabel
+                  >Meta Title <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="Enter meta title"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <Separator />
-        <h2 class="text-2xl font-bold">SEO Metadata</h2>
+            <!-- SEO Description -->
+            <FormField
+              v-slot="{ componentField }"
+              name="seo_description"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormLabel
+                  >Meta Description
+                  <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter meta description"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <FormField
-          v-slot="{ componentField }"
-          name="seo_title"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>
-              Meta Title <span class="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter meta title"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField
-          v-slot="{ componentField }"
-          name="seo_description"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>
-              Meta Description <span class="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Enter meta description"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField
-          v-slot="{ componentField }"
-          name="seo_keyword"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>
-              Meta Keywords<span class="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Input
-                placeholder="Enter meta keywords separated by commas"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-      </div>
+            <!-- SEO Keywords -->
+            <FormField
+              v-slot="{ componentField }"
+              name="seo_keyword"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormLabel
+                  >Meta Keywords <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <Input
+                    placeholder="Enter meta keywords separated by commas"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+        </TabsContent>
+      </Tabs>
     </form>
   </AdminLayoutPage>
 </template>

@@ -97,7 +97,8 @@ const handleFormSubmit = async () => {
   }
 };
 
-onMounted(async () => {
+const activeTab = ref('content')
+const fetchData = async () => {
   const pathSegments = route.path.split("/").filter(Boolean);
   let slug = pathSegments[pathSegments.length - 1] || "aboutus";
   slug = slug.replace(/-/g, "");
@@ -113,10 +114,19 @@ onMounted(async () => {
       });
     }
   } catch (error) {
-    console.error("Failed to load page:", error); // Debug line
+
     toast.error("Failed to load page data");
   }
+};
+
+watch(activeTab, async (tab) => {
+  await fetchData();
 });
+
+onMounted(async () => {
+  await fetchData();
+});
+
 </script>
 
 <template>
@@ -143,62 +153,43 @@ onMounted(async () => {
         <Save v-else class="w-4 h-4 mr-2" /> Save Changes
       </Button>
     </template>
-    <form
-      @submit.prevent="onSubmit"
-      id="privacy-policy-form"
-      class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6"
-    >
-      <!-- Left Column -->
-      <div class="flex flex-col space-y-6 flex-1">
-        <!-- Title -->
-        <FormField
-          v-slot="{ componentField }"
-          name="title"
-          :validate-on-blur="!isFieldDirty"
-        >
+<form @submit.prevent="onSubmit" id="privacy-policy-form" class="w-full">
+  <Tabs v-model="activeTab" defaultValue="content" class="w-full">
+    <!-- Tabs List -->
+    <TabsList>
+      <TabsTrigger value="content">Content</TabsTrigger>
+      <TabsTrigger value="seo">SEO Metadata</TabsTrigger>
+    </TabsList>
+
+    <!-- Content Tab -->
+    <TabsContent value="content" force-render>
+      <div class="flex flex-col space-y-6">
+        <!-- Page Title -->
+        <FormField v-slot="{ componentField }" name="title" :validate-on-blur="!isFieldDirty">
           <FormItem>
-            <FormLabel
-              >Page Title <span class="text-red-500">*</span></FormLabel
-            >
+            <FormLabel>Page Title <span class="text-red-500">*</span></FormLabel>
             <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter title"
-                v-bind="componentField"
-              />
+              <Input type="text" placeholder="Enter title" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField
-          v-slot="{ componentField }"
-          name="slug"
-          :validate-on-blur="!isFieldDirty"
-        >
+        <!-- Page Slug -->
+        <FormField v-slot="{ componentField }" name="slug" :validate-on-blur="!isFieldDirty">
           <FormItem>
             <FormLabel>Page Slug <span class="text-red-500">*</span></FormLabel>
             <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter slug"
-                v-bind="componentField"
-              />
+              <Input type="text" placeholder="Enter slug" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <!-- Content -->
-        <FormField
-          v-slot="{ componentField }"
-          name="content"
-          :validate-on-blur="!isFieldDirty"
-        >
+        <!-- Page Content -->
+        <FormField v-slot="{ componentField }" name="content" :validate-on-blur="!isFieldDirty">
           <FormItem>
-            <FormLabel
-              >Page Content <span class="text-red-500">*</span></FormLabel
-            >
+            <FormLabel>Page Content <span class="text-red-500">*</span></FormLabel>
             <FormControl>
               <EditorTextEditor
                 id="content"
@@ -210,9 +201,47 @@ onMounted(async () => {
           </FormItem>
         </FormField>
       </div>
+    </TabsContent>
 
-      <!-- Right Column -->
-      <div class="flex flex-col space-y-6 flex-1">
+    <!-- SEO Metadata Tab -->
+    <TabsContent value="seo" force-render>
+      <div class="flex flex-col space-y-6">
+        <Separator />
+        <h2 class="text-2xl font-bold">SEO Metadata</h2>
+
+        <!-- SEO Title -->
+        <FormField v-slot="{ componentField }" name="seo_title" :validate-on-blur="!isFieldDirty">
+          <FormItem>
+            <FormLabel>Meta Title <span class="text-red-500">*</span></FormLabel>
+            <FormControl>
+              <Input type="text" placeholder="Enter meta title" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <!-- SEO Description -->
+        <FormField v-slot="{ componentField }" name="seo_description" :validate-on-blur="!isFieldDirty">
+          <FormItem>
+            <FormLabel>Meta Description <span class="text-red-500">*</span></FormLabel>
+            <FormControl>
+              <Textarea placeholder="Enter meta description" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <!-- SEO Keywords -->
+        <FormField v-slot="{ componentField }" name="seo_keyword" :validate-on-blur="!isFieldDirty">
+          <FormItem>
+            <FormLabel>Meta Keywords <span class="text-red-500">*</span></FormLabel>
+            <FormControl>
+              <Input placeholder="Enter meta keywords separated by commas" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
         <!-- Status -->
         <FormField v-slot="{ componentField }" name="status">
           <FormItem>
@@ -231,68 +260,9 @@ onMounted(async () => {
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <Separator />
-         <h2 class="text-2xl font-bold">SEO Metadata</h2>
-
-        <FormField
-          v-slot="{ componentField }"
-          name="seo_title"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>
-              Meta Title <span class="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter meta title"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField
-          v-slot="{ componentField }"
-          name="seo_description"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>
-              Meta Description <span class="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Enter meta description"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-           <FormField
-          v-slot="{ componentField }"
-          name="seo_keyword"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>
-              Meta Keywords<span class="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Input
-                placeholder="Enter meta keywords separated by commas"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
       </div>
-    </form>
+    </TabsContent>
+  </Tabs>
+</form>
   </AdminLayoutPage>
 </template>
