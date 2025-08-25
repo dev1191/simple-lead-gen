@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Table } from "@tanstack/vue-table";
-import { Search } from "lucide-vue-next";
+import { Download, Search } from "lucide-vue-next";
 import {
   Select,
   SelectContent,
@@ -10,12 +10,15 @@ import {
 } from "~/components/ui/select";
 import Icon from "~/components/Icon.vue";
 import type { Vendor } from "~/shared/types/vendor";
+import jsonToCsvExport from "json-to-csv-export";
+import { format, parseISO } from "date-fns";
 
 interface DataTableToolbarProps {
   table: Table<Vendor>;
   globalFilter: string;
   statusFilter: string;
-  isFiltered:boolean;
+  isFiltered: boolean;
+  data: Vendor[];
 }
 
 const props = defineProps<DataTableToolbarProps>();
@@ -24,13 +27,12 @@ const props = defineProps<DataTableToolbarProps>();
 const emit = defineEmits<{
   (e: "update:globalFilter", value: string): void;
   (e: "update:statusFilter", value: string): void;
-  (e:'resetFilters'):void;
+  (e: "resetFilters"): void;
 }>();
 
 // Local reactive copy of globalFilter
 const localFilter = ref(props.globalFilter);
 const status = ref(props.statusFilter || "");
-
 
 // Watch for prop changes to update localFilter
 watch(
@@ -43,18 +45,38 @@ watch(
 
 // Emit update when localFilter changes (debounce if needed)
 // Emit updates when either localFilter or status changes
-watch(
-  [localFilter, status],
-  ([newFilter, newStatus, newCategory]) => {
-    emit("update:globalFilter", newFilter);
-    emit("update:statusFilter", newStatus);
-  }
-);
+watch([localFilter, status], ([newFilter, newStatus, newCategory]) => {
+  emit("update:globalFilter", newFilter);
+  emit("update:statusFilter", newStatus);
+});
 
 function onResetFilters() {
-  emit('resetFilters');
+  emit("resetFilters");
 }
 
+//"created_at":"2025-08-22T06:46:41.354569+00:00","status":"Active","":0}
+
+const formatData = computed(() =>
+  props.data.map((vendor) => ({
+    ...vendor,
+    created_at: vendor.created_at
+      ? format(parseISO(vendor.created_at), "yyyy-MM-dd hh:mm a")
+      : "",
+  }))
+);
+
+const headers = [
+  { key: "name", label: "Vendor Name" },
+  { key: "email", label: "Vendor Email" },
+  { key: "total_leads", label: "Total Leads" },
+  { key: "monthly_leads", label: "Monthly Leads" },
+  { key: "service_listed", label: "Service Listed" },
+  { key: "status", label: "Status" },
+  { key: "created_at", label: "Created At" },
+];
+const downloadCSV = () => {
+  jsonToCsvExport({ data: formatData.value, headers, filename: "vendors" });
+};
 </script>
 
 <template>
@@ -87,7 +109,6 @@ function onResetFilters() {
         </SelectContent>
       </Select>
 
-
       <Button
         v-if="isFiltered"
         variant="ghost"
@@ -98,5 +119,11 @@ function onResetFilters() {
         <Icon name="X" class="ml-2 h-4 w-4" />
       </Button>
     </div>
+    <Button
+      @click="downloadCSV"
+      variant="outline"
+      class="w-30 h-7 text-sm font-semibold"
+      ><Icon name="Download" /> Export CSV</Button
+    >
   </div>
 </template>
