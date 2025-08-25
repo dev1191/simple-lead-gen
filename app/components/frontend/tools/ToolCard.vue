@@ -10,8 +10,9 @@ import { toolCategories } from "~/shared/constants";
 import { formatDescription } from "~/shared/utils";
 
 const props = defineProps<{
+  id:string,
   name: string;
-  tagline:string;
+  tagline: string;
   slug: string;
   description: string;
   rating: number;
@@ -82,9 +83,16 @@ const bestForOptions = [
   },
 ];
 
+const { trackClick } = useToolTracking()
+
 const bestFor = computed(() => {
   return bestForOptions.filter((opt) => props.best_for?.includes(opt.value));
 });
+
+const viewDetails = (id:string,slug:string) =>{
+  trackClick(id);
+  navigateTo(`/tools/${slug}`);
+}
 </script>
 
 <template>
@@ -133,8 +141,15 @@ const bestFor = computed(() => {
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <Badge variant="secondary" class="font-semibold">{{ CategoryName }}</Badge>
-        <Badge v-for="sub in subCategories" :key="sub.value" variant="secondary" class="font-semibold">
+        <Badge variant="secondary" class="font-semibold">{{
+          CategoryName
+        }}</Badge>
+        <Badge
+          v-for="sub in subCategories"
+          :key="sub.value"
+          variant="secondary"
+          class="font-semibold"
+        >
           {{ sub.label }}
         </Badge>
       </div>
@@ -164,11 +179,7 @@ const bestFor = computed(() => {
 
     <!-- Footer Buttons -->
     <CardFooter class="flex justify-between gap-2">
-      <Button class="flex-1 w-full h-10" >
-        <NuxtLink  :to="`/tools/${slug}`"
-          >View Details</NuxtLink
-        ></Button
-      >
+      <Button class="flex-1 w-full h-10" @click="viewDetails(id,slug)"> View Details</Button>
       <Button class="w-10 h-10" variant="outline">
         <ExternalLink class="w-4 h-4" />
       </Button>
