@@ -41,7 +41,9 @@ const formSchema = toTypedSchema(
     featured_in: z
       .array(z.string())
       .min(1, "Please select at least one featured tools"),
-      more_services: z.array(z.string()).min(1, "Please select at least one more service"),
+    more_services: z
+      .array(z.string())
+      .min(1, "Please select at least one more service"),
   })
 );
 
@@ -105,7 +107,9 @@ const onSubmit = handleSubmit(async (formValues) => {
   }
 });
 
-onMounted(async () => {
+const activeTab = ref<string>("hero");
+
+const fetchData = async () => {
   const pathSegments = route.path.split("/").filter(Boolean);
   let slug = pathSegments[pathSegments.length - 1] || "aboutus";
   slug = slug.replace(/-/g, "");
@@ -134,6 +138,13 @@ onMounted(async () => {
   } catch (error) {
     toast.error("Failed to load page data");
   }
+};
+watch(activeTab, async (tab) => {
+  await fetchData();
+});
+
+onMounted(async () => {
+  await fetchData();
 });
 </script>
 
@@ -158,278 +169,287 @@ onMounted(async () => {
           :size="18"
           class="mr-2 h-4 w-4 animate-spin"
         />
-        <Save v-else class="w-4 h-4 mr-2" /> Save Changes</Button
-      >
+        <Save v-else class="w-4 h-4 mr-2" /> Save Changes
+      </Button>
     </template>
+
     <form
       @submit.prevent="onSubmit"
       id="abouts-form"
-      class="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6"
+      class="grid grid-cols-1 gap-6"
     >
-      <!-- Left Column -->
-      <div class="flex flex-col space-y-6 flex-1">
-        <!-- Title -->
-        <FormField
-          v-slot="{ componentField }"
-          name="title"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel
-              >Hero Title <span class="text-red-500">*</span></FormLabel
-            >
-            <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter title"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+      <Tabs v-model="activeTab" defaultValue="hero" class="w-full">
+        <!-- Tabs List -->
+        <TabsList class="h-12">
+          <TabsTrigger value="hero">Hero Content</TabsTrigger>
+          <TabsTrigger value="featured">Featured Items</TabsTrigger>
+          <TabsTrigger value="seo">SEO Metadata</TabsTrigger>
+        </TabsList>
 
-        <FormField
-          v-slot="{ componentField }"
-          name="sub_title"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel
-              >Hero SubTitle <span class="text-red-500">*</span></FormLabel
+        <!-- Hero Content Tab -->
+        <TabsContent value="hero" force-render>
+          <div class="flex flex-col space-y-6">
+            <!-- Title -->
+            <FormField
+              v-slot="{ componentField }"
+              name="title"
+              :validate-on-blur="!isFieldDirty"
             >
-            <FormControl>
-              <Textarea placeholder="Enter sub title" v-bind="componentField" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-          <Separator />
-        <h2 class="text-2xl font-bold">Page Extra Settings</h2>
-
-        
-        <!-- featured services -->
-        <FormField
-          v-slot="{ componentField }"
-          name="featured_services"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel
-              >Featured Services (Type and press Enter)
-              <span class="text-red-500">*</span></FormLabel
-            >
-            <FormControl>
-              <TagsInput
-                :model-value="componentField.modelValue"
-                @update:model-value="componentField['onUpdate:modelValue']"
-              >
-                <TagsInputItem
-                  v-for="item in componentField.modelValue"
-                  :key="item"
-                  :value="item"
+              <FormItem>
+                <FormLabel
+                  >Hero Title <span class="text-red-500">*</span></FormLabel
                 >
-                  <TagsInputItemText />
-                  <TagsInputItemDelete />
-                </TagsInputItem>
-                <TagsInputInput placeholder="Featured services" />
-              </TagsInput>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+                <FormControl>
+                  <Input placeholder="Enter title" v-bind="componentField" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <!-- featured services -->
-        <FormField
-          v-slot="{ componentField }"
-          name="featured_tools"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel
-              >Featured Tools (Type and press Enter)
-              <span class="text-red-500">*</span></FormLabel
+            <!-- SubTitle -->
+            <FormField
+              v-slot="{ componentField }"
+              name="sub_title"
+              :validate-on-blur="!isFieldDirty"
             >
-            <FormControl>
-              <TagsInput
-                :model-value="componentField.modelValue"
-                @update:model-value="componentField['onUpdate:modelValue']"
-              >
-                <TagsInputItem
-                  v-for="item in componentField.modelValue"
-                  :key="item"
-                  :value="item"
+              <FormItem>
+                <FormLabel
+                  >Hero SubTitle <span class="text-red-500">*</span></FormLabel
                 >
-                  <TagsInputItemText />
-                  <TagsInputItemDelete />
-                </TagsInputItem>
-                <TagsInputInput placeholder="Featured tools" />
-              </TagsInput>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter sub title"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <FormField
-          v-slot="{ componentField }"
-          name="featured_in"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel
-              >Featured In (Type and press Enter)
-              <span class="text-red-500">*</span></FormLabel
+            <!-- Hero Image -->
+            <FormField name="imageFile">
+              <FormItem>
+                <FormLabel>Hero Image</FormLabel>
+                <FormControl>
+                  <FileUploader
+                    v-model="imageFile"
+                    :previewUrl="values.image_url"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+        </TabsContent>
+
+        <!-- Featured Items Tab -->
+        <TabsContent value="featured" force-render>
+          <div class="flex flex-col space-y-6">
+            <!-- Featured Services -->
+            <FormField
+              v-slot="{ componentField }"
+              name="featured_services"
+              :validate-on-blur="!isFieldDirty"
             >
-            <FormControl>
-              <TagsInput
-                :model-value="componentField.modelValue"
-                @update:model-value="componentField['onUpdate:modelValue']"
-              >
-                <TagsInputItem
-                  v-for="item in componentField.modelValue"
-                  :key="item"
-                  :value="item"
+              <FormItem>
+                <FormLabel
+                  >Featured Services
+                  <span class="text-red-500">*</span></FormLabel
                 >
-                  <TagsInputItemText />
-                  <TagsInputItemDelete />
-                </TagsInputItem>
-                <TagsInputInput placeholder="Featured in" />
-              </TagsInput>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-        
-        <!----more_services -->
- <FormField
-          v-slot="{ componentField }"
-          name="more_services"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel
-              >More Services (Type and press Enter)
-              <span class="text-red-500">*</span></FormLabel
+                <FormControl>
+                  <TagsInput
+                    :model-value="componentField.modelValue"
+                    @update:model-value="componentField['onUpdate:modelValue']"
+                  >
+                    <TagsInputItem
+                      v-for="item in componentField.modelValue"
+                      :key="item"
+                      :value="item"
+                    >
+                      <TagsInputItemText />
+                      <TagsInputItemDelete />
+                    </TagsInputItem>
+                    <TagsInputInput placeholder="Featured services" />
+                  </TagsInput>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
+            <!-- Featured Tools -->
+            <FormField
+              v-slot="{ componentField }"
+              name="featured_tools"
+              :validate-on-blur="!isFieldDirty"
             >
-            <FormControl>
-              <TagsInput
-                :model-value="componentField.modelValue"
-                @update:model-value="componentField['onUpdate:modelValue']"
-              >
-                <TagsInputItem
-                  v-for="item in componentField.modelValue"
-                  :key="item"
-                  :value="item"
+              <FormItem>
+                <FormLabel
+                  >Featured Tools <span class="text-red-500">*</span></FormLabel
                 >
-                  <TagsInputItemText />
-                  <TagsInputItemDelete />
-                </TagsInputItem>
-                <TagsInputInput placeholder="More services" />
-              </TagsInput>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+                <FormControl>
+                  <TagsInput
+                    :model-value="componentField.modelValue"
+                    @update:model-value="componentField['onUpdate:modelValue']"
+                  >
+                    <TagsInputItem
+                      v-for="item in componentField.modelValue"
+                      :key="item"
+                      :value="item"
+                    >
+                      <TagsInputItemText />
+                      <TagsInputItemDelete />
+                    </TagsInputItem>
+                    <TagsInputInput placeholder="Featured tools" />
+                  </TagsInput>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
+            <!-- Featured In -->
+            <FormField
+              v-slot="{ componentField }"
+              name="featured_in"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormLabel
+                  >Featured In <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <TagsInput
+                    :model-value="componentField.modelValue"
+                    @update:model-value="componentField['onUpdate:modelValue']"
+                  >
+                    <TagsInputItem
+                      v-for="item in componentField.modelValue"
+                      :key="item"
+                      :value="item"
+                    >
+                      <TagsInputItemText />
+                      <TagsInputItemDelete />
+                    </TagsInputItem>
+                    <TagsInputInput placeholder="Featured in" />
+                  </TagsInput>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <!-- Status -->
-        <FormField v-slot="{ componentField }" name="status">
-          <FormItem>
-            <FormLabel>Status</FormLabel>
-            <FormControl>
-              <Select v-bind="componentField">
-                <SelectTrigger class="w-full">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="Published">Published</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-      </div>
+            <!-- More Services -->
+            <FormField
+              v-slot="{ componentField }"
+              name="more_services"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormLabel
+                  >More Services <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <TagsInput
+                    :model-value="componentField.modelValue"
+                    @update:model-value="componentField['onUpdate:modelValue']"
+                  >
+                    <TagsInputItem
+                      v-for="item in componentField.modelValue"
+                      :key="item"
+                      :value="item"
+                    >
+                      <TagsInputItemText />
+                      <TagsInputItemDelete />
+                    </TagsInputItem>
+                    <TagsInputInput placeholder="More services" />
+                  </TagsInput>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-      <!-- Right Column -->
-      <div class="flex flex-col space-y-6 flex-1">
-        <!-- Images -->
-        <FormField name="imageFile">
-          <FormItem>
-            <FormLabel>Hero Image </FormLabel>
-            <FormControl>
-              <FileUploader
-                v-model="imageFile"
-                :previewUrl="values.image_url"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+            <!-- Status -->
+            <FormField v-slot="{ componentField }" name="status">
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <Select v-bind="componentField">
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Draft">Draft</SelectItem>
+                      <SelectItem value="Published">Published</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+        </TabsContent>
 
-        <Separator />
-        <h2 class="text-2xl font-bold">SEO Metadata</h2>
+        <!-- SEO Metadata Tab -->
+        <TabsContent value="seo" force-render>
+          <div class="flex flex-col space-y-6">
+            <FormField
+              v-slot="{ componentField }"
+              name="seo_title"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormLabel
+                  >Meta Title <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <Input
+                    placeholder="Enter meta title"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <FormField
-          v-slot="{ componentField }"
-          name="seo_title"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>
-              Meta Title <span class="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter meta title"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+            <FormField
+              v-slot="{ componentField }"
+              name="seo_description"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormLabel
+                  >Meta Description
+                  <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter meta description"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-        <FormField
-          v-slot="{ componentField }"
-          name="seo_description"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>
-              Meta Description <span class="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Enter meta description"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField
-          v-slot="{ componentField }"
-          name="seo_keyword"
-          :validate-on-blur="!isFieldDirty"
-        >
-          <FormItem>
-            <FormLabel>
-              Meta Keywords<span class="text-red-500">*</span>
-            </FormLabel>
-            <FormControl>
-              <Input
-                placeholder="Enter meta keywords separated by commas"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-      </div>
+            <FormField
+              v-slot="{ componentField }"
+              name="seo_keyword"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormLabel
+                  >Meta Keywords <span class="text-red-500">*</span></FormLabel
+                >
+                <FormControl>
+                  <Input
+                    placeholder="Enter meta keywords separated by commas"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+        </TabsContent>
+      </Tabs>
     </form>
   </AdminLayoutPage>
 </template>
