@@ -19,6 +19,7 @@ import DataTableToolbar from "./DataTableToolbar.vue";
 import { ref, reactive, watch, watchEffect, onMounted, computed } from "vue";
 import type { Vendor } from "~/shared/types/vendor";
 
+
 interface VendorsComposable {
   vendors: any;
   loading: any;
@@ -172,7 +173,9 @@ onMounted(() => {
       @update:statusFilter="(val) => (statusFilter = val)"
       :isFiltered="isFiltered"
       @resetFilters="onResetFilters"
+      :data="data"
     />
+
 
     <!-- Table -->
     <div class="rounded-md border">
