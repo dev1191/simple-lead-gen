@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { columns } from "~/components/admin/vendors/Columns";
 import DataTable from "~/components/admin/vendors/DataTable.vue";
+
 definePageMeta({
   layout: "admin",
   middleware: ["auth"],

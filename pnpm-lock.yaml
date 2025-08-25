@@ -65,6 +65,9 @@ importers:
       eslint:
         specifier: ^9.32.0
         version: 9.32.0(jiti@2.5.1)
+      json-to-csv-export:
+        specifier: ^3.1.2
+        version: 3.1.2
       lucide-vue-next:
         specifier: ^0.538.0
         version: 0.538.0(vue@3.5.18(typescript@5.9.2))
@@ -4166,6 +4169,10 @@ packages:
 
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
+
+  json-to-csv-export@3.1.2:
+    resolution: {integrity: sha512-7YBsJi6Zcho9URT2tv9zlMAikHNtMLUWu3nY2Ca1wysu4GdrllXcu1cJkXOCPZGDOMmVIcjkojoudNk1SOtSNg==}
+    engines: {node: '>=12.17.0'}
 
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
@@ -10649,6 +10656,8 @@ snapshots:
   json-schema-traverse@0.4.1: {}
 
   json-stable-stringify-without-jsonify@1.0.1: {}
+
+  json-to-csv-export@3.1.2: {}
 
   json5@2.2.3: {}
 

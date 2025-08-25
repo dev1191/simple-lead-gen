@@ -62,7 +62,7 @@ function closeModal() {
   <div class="flex items-center gap-4">
     <AlertDialog>
       <AlertDialogTrigger as-child>
-        <Button variant="outline" size="sm"> Forward </Button>
+        <Button class="w-24 h-7"> <Icon name="Send" class="w-4 h-4" /> Forward </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
