@@ -6,34 +6,34 @@ const sidebarNavItems: NavItem[] = [
     title: "Home Page",
     href: "/admin/pages/home-page",
   },
-  {
-    title: "About Us",
-    href: "/admin/pages/about-us",
-  },
-  {
-    title: "FAQ",
-    href: "/admin/pages/faq",
-  },
-  {
-    title: "Insights(Blog)",
-    href: "/admin/pages/insights",
-  },
+  // {
+  //   title: "About Us",
+  //   href: "/admin/pages/about-us",
+  // },
+  // {
+  //   title: "FAQ",
+  //   href: "/admin/pages/faq",
+  // },
+  // {
+  //   title: "Insights(Blog)",
+  //   href: "/admin/pages/insights",
+  // },
   {
     title: "List your Business",
     href: "/admin/pages/list-your-business",
   },
-  {
-    title: "Contact",
-    href: "/admin/pages/contact",
-  },
-  {
-    title: "Terms Of Service",
-    href: "/admin/pages/terms-of-service",
-  },
-  {
-    title: "Privacy Policy",
-    href: "/admin/pages/privacy-policy",
-  },
+  // {
+  //   title: "Contact",
+  //   href: "/admin/pages/contact",
+  // },
+  // {
+  //   title: "Terms Of Service",
+  //   href: "/admin/pages/terms-of-service",
+  // },
+  // {
+  //   title: "Privacy Policy",
+  //   href: "/admin/pages/privacy-policy",
+  // },
 ];
 
 const route = useRoute();
