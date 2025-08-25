@@ -26,10 +26,17 @@ export default defineEventHandler(async (event) => {
     const { data: mailData, error: mailError } = await client.functions.invoke("send-email-provider-lead", {
         body: {
             subject: `New Contact: ${data.subject}`,
-            mail: "devrajthapa1191@gmail.com",
+            mail: "venturenexthq@gmail.com", // "devrajthapa1191@gmail.com",
             message: `Name: ${data.name}\nEmail: ${data.email}\nCategory: ${data.category}\nMessage: ${data.message}`,
         },
     })
+
+     if (mailError) {
+        throw createError({
+            statusCode: 500,
+            statusMessage: mailError.message,
+        });
+    }
 
     return {
         message: "Contact form submitted",
